@@ -1,0 +1,44 @@
+/* 1. Grund-Design (Konsistente Typografie & Farben) */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    display: flex; /* Flexbox für Grundstruktur */
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 2. Flexbox-Layout für den Header */
+header {
+    background-color: #004d40; /* CampusRide Grün-Blau */
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+main {
+    flex: 1; /* Füllt den Platz zwischen Header und Footer aus */
+    padding: 20px;
+}
+
+/* 3. Responsives Design (PFLICHT laut M1) */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column; /* Stapelt Logo und Nav auf dem Handy */
+        text-align: center;
+    }
+
+    nav {
+        margin-top: 10px;
+    }
+}
+
