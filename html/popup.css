@@ -63,7 +63,7 @@ color: var(--color-brand-black);
   color: #fff;
   border: none;
   cursor: pointer;
-} 
+}
 /*all text in the popup*/
 .logintext{
     color: var(--color-brand-black);
@@ -75,12 +75,12 @@ color: var(--color-brand-black);
 
 /*Input fields used to go over the screen edge this fixes it */
 #user-id {
-  width: calc(100% - 20px); 
+  width: calc(100% - 20px);
   margin: 10px;
-  box-sizing: border-box;  
+  box-sizing: border-box;
 }
 #pass-id {
-  width: calc(100% - 20px); 
+  width: calc(100% - 20px);
   margin: 10px;
   box-sizing: border-box;
 }

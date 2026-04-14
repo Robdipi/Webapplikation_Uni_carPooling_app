@@ -12,3 +12,10 @@ Marlin Wießenberg   315344          marlinw-media
 Paul Boos           315053          Palimus1
 
 Zuordnungstabelle:
+| Kriterium | Datei | Zeile / Hinweis |
+|---|---|---|
+| Semantische HTML-Struktur | index.html | Z. 10–63 |
+| Formular mit Labels | index.html | Z. 26-51 |
+| Responsives Layout (Flexbox/Grid) | styles.css | Z. 19-60 |
+| Media Query | styles.css | Z. 63-72 |
+| URL-Struktur | index.html, home.html | Pfade: /index, /home | home ist erreichbar nach Anmeldung in index.html

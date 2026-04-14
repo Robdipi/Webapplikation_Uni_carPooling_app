@@ -6,7 +6,7 @@
 --color-brand-highlight-a: #FC814A;
 --color-brand-highlight-b: #D72483;
 }
-/*Put all darkmode colors here 
+/*Put all darkmode colors here
 TODO make Darkmode when we have Javascript in lecture */
 body.dark {
   --color-brand-bg: #004d40;/* CampusRide Grün-Blau */
@@ -44,6 +44,15 @@ nav a {
     margin-left: 15px;
     font-weight: bold;
 }
+
+footer a {
+    color: var(--color-brand-black);
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+
 
 main {
     flex: 1; /* Füllt den Platz zwischen Header und Footer aus */
