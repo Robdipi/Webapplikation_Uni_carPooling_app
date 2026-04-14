@@ -4,13 +4,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="popup.css">
     <title>CampusRide</title>
   </head>
   <body>
     <header>
       <h1>Willkommen auf der Startseite</h1>
       <nav>
-        <a href="login.html"> Anmelden </a>
+       <input type="checkbox" id="login-toggle">
+        <label for="login-toggle" class="open-btn">Login</label>
+
+
+        <div class="overlay">
+          <div class="login-popup">
+            <label for="login-toggle" class="close-btn">&times;</label>
+              <section>
+          <h2 class="logintext">Bitte Benutzerdaten eingeben</h2>
+          <p class="logintext">Melde dich an, um Fahrten am Campus zu finden oder anzubieten.</p>
+
+          <form action="home.html">
+            <div class="form-group">
+              <label for="user-id" class="logintext">Benutzername oder E-Mail:</label>
+              <input  
+                type="text"
+                id="user-id"
+                name="username"
+                placeholder="z.B. Alex_Muster"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="pass-id" class="logintext">Passwort:</label>
+              <input type="password" id="pass-id" name="password" required />
+            </div>
+
+            <button type="submit">Anmelden</button>
+          </form>
+        </section>
+  </div>
+</div>
       </nav>
     </header>
   </body>

@@ -1,3 +1,21 @@
+/*Put all variables here so you can use them everywhere because this is loaded in first everywhere*/
+:root {
+--color-brand-bg: #004d40;/* CampusRide Grün-Blau */
+--color-brand-white: #FFF;/*#F4FAFF*/
+--color-brand-black: #0C0A3E;
+--color-brand-highlight-a: #FC814A;
+--color-brand-highlight-b: #D72483;
+}
+/*Put all darkmode colors here 
+TODO make Darkmode when we have Javascript in lecture */
+body.dark {
+  --color-brand-bg: #004d40;/* CampusRide Grün-Blau */
+  --color-brand-white: #0C0A3E;/*#F4FAFF*/
+  --color-brand-black: #FFF;
+  --color-brand-highlight-a: #FC814A;
+  --color-brand-highlight-b: #D72483;
+}
+
 /* 1. Grund-Design (Konsistente Typografie & Farben) */
 body {
     font-family: sans-serif;
@@ -6,12 +24,14 @@ body {
     display: flex; /* Flexbox für Grundstruktur */
     flex-direction: column;
     min-height: 100vh;
+    color: var(--color-brand-black);
+    background-color: var(--color-brand-white);
 }
 
 /* 2. Flexbox-Layout für den Header */
 header {
-    background-color: #004d40; /* CampusRide Grün-Blau */
-    color: white;
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-white);
     padding: 1rem;
     display: flex;
     justify-content: space-between;
@@ -19,7 +39,7 @@ header {
 }
 
 nav a {
-    color: white;
+    color: var(--color-brand-white);
     text-decoration: none;
     margin-left: 15px;
     font-weight: bold;

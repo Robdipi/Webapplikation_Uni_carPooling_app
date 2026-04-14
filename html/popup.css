@@ -1,0 +1,86 @@
+:root {
+--animation-speed:0.3s;
+}
+
+#login-toggle {
+  display: none;
+}
+
+
+/*light grey transparent field which gets bigger at the same time as the popup*/
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  overflow: hidden;
+  transition: width var(--animation-speed) ease;
+}
+
+.login-popup {
+  position: absolute;
+  top: 0;
+  right: -300px;
+  width: 100%;
+  max-width: 300px;
+  height: 100%;
+  background: var(--color-brand-white);
+  padding: 20px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+  transition: right var(--animation-speed) ease;
+}
+
+.close-btn {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+color: var(--color-brand-black);
+}
+/* when the "checkbox" Login gets checkd the overlay gets pushed into the screen*/
+#login-toggle:checked ~ .overlay {
+  width: 100%;
+}
+#login-toggle:checked ~ .overlay .login-popup {
+  right: 0;
+}
+
+/*the header in  the popup*/
+.login-popup h2 {
+  color: var(--color-brand-black);
+  margin-top: 0;
+}
+
+
+/* the "Anmelden" button*/
+.login-popup button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-white);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+} 
+/*all text in the popup*/
+.logintext{
+    color: var(--color-brand-black);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/*Input fields used to go over the screen edge this fixes it */
+#user-id {
+  width: calc(100% - 20px); 
+  margin: 10px;
+  box-sizing: border-box;  
+}
+#pass-id {
+  width: calc(100% - 20px); 
+  margin: 10px;
+  box-sizing: border-box;
+}
