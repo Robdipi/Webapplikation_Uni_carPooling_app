@@ -1,6 +1,10 @@
 /*Put all variables here so you can use them everywhere because this is loaded in first everywhere*/
 :root {
 --color-brand-bg: #004d40;/* CampusRide Grün-Blau */
+--color-brand-bg-shade-a: #003D33;/*two variants of the main Brand color*/
+--color-brand-bg-shade-b: #002922;
+
+
 --color-brand-white: #FFF;/*#F4FAFF*/
 --color-brand-black: #0C0A3E;
 --color-brand-highlight-a: #FC814A;
@@ -36,6 +40,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 nav a {
