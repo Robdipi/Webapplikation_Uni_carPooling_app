@@ -14,7 +14,7 @@
   right: 0;
   width: 0;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: var(--color-shadow);
   overflow: hidden;
   transition: width var(--animation-speed) ease;
 }
@@ -36,7 +36,13 @@
   float: right;
   font-size: 24px;
   cursor: pointer;
-color: var(--color-brand-black);
+  color: var(--color-brand-black);
+  border-radius: 50%;
+  display: inline-block;
+  padding: 0px 12px
+}
+.close-btn:hover{
+    background-color: var(--color-shadow);
 }
 /* when the "checkbox" Login gets checkd the overlay gets pushed into the screen*/
 #login-toggle:checked ~ .overlay {
@@ -63,6 +69,13 @@ color: var(--color-brand-black);
   color: #fff;
   border: none;
   cursor: pointer;
+}
+.login-popup button:hover {
+      background-color: var(--color-brand-bg-shade-b);
+}
+.login-popup button:active {
+  transform: scale(0.97);
+  background-color: var(--color-brand-highlight-a);
 }
 /*all text in the popup*/
 .logintext{

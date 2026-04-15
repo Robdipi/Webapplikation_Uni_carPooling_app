@@ -6,9 +6,12 @@
 
 
 --color-brand-white: #FFF;/*#F4FAFF*/
+--color-brand-grey: #AAA7F1; /*only use for shadows for buttons on white background*/
 --color-brand-black: #0C0A3E;
 --color-brand-highlight-a: #FC814A;
 --color-brand-highlight-b: #D72483;
+
+--color-shadow:rgba(0,0,0,0.5);
 }
 /*Put all darkmode colors here
 TODO make Darkmode when we have Javascript in lecture */
@@ -48,6 +51,14 @@ nav a {
     text-decoration: none;
     margin-left: 15px;
     font-weight: bold;
+}
+.open-btn{
+    padding: 10px;
+    border-radius: 10px;
+}
+.open-btn:hover {
+    background-color: var(--color-shadow);
+
 }
 
 footer a {
