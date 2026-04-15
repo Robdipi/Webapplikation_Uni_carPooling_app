@@ -12,6 +12,7 @@
 --color-brand-highlight-b: #D72483;
 
 --color-shadow:rgba(0,0,0,0.5);
+--color-shadow-light:rgba(0,0,0,0.25);
 }
 /*Put all darkmode colors here
 TODO make Darkmode when we have Javascript in lecture */
@@ -52,6 +53,8 @@ nav a {
     margin-left: 15px;
     font-weight: bold;
 }
+
+/*buttons on the green header*/
 .open-btn{
     padding: 10px;
     border-radius: 10px;
@@ -59,6 +62,16 @@ nav a {
 .open-btn:hover {
     background-color: var(--color-shadow);
 
+}
+
+/*kontakt impressum Copyright buttons*/
+.extra-info-btn{
+    padding: 10px;
+    border-radius: 10px;
+    margin:10px;
+}
+.extra-info-btn:hover{
+    background-color: var(--color-shadow-light);
 }
 
 footer a {
