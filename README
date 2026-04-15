@@ -14,8 +14,8 @@ Our Group:
 Zuordnungstabelle:
 | Kriterium | Datei | Zeile / Hinweis |
 |---|---|---|
-| Semantische HTML-Struktur | index.html | Z. 10–63 |
+| Semantische HTML-Struktur | index.html | Z. 10–65 |
 | Formular mit Labels | index.html | Z. 26-51 |
-| Responsives Layout (Flexbox/Grid) | styles.css | Z. 19-60 |
-| Media Query | styles.css | Z. 63-72 |
-| URL-Struktur | index.html, home.html | Pfade: /index, /home | home ist erreichbar nach Anmeldung in index.html
+| Responsives Layout (Flexbox/Grid) | styles.css | Z. 30-91 |
+| Media Query | styles.css | Z. 94-98 |
+| URL-Struktur | index.html, home.html chat.html | Pfade: /index, /home, /chat.html home ist erreichbar nach Anmeldung in index.html, chat ist von home.html erreichbar |
