@@ -10,21 +10,43 @@
     <header>
       <div class="logo">CampusRide</div>
       <nav>
-          <a href="chat.html" class="open-btn">Chat</a>
+        <a href="chat.html" class="open-btn">Chat</a>
         <a href="index.html" class="open-btn">Abmelden</a>
       </nav>
     </header>
 
     <main>
-      <article>
-        <section>
-          <h1>Willkommen zurück, User!</h1>
-          <p>Hier sind deine aktuellen Campus-Fahrten.</p>
-        </section>
-      </article>
+      <h2>Fahrten in deiner Nähe</h2>
+      <ul class="rides-list">
+        <li class="map-item">
+          <div class="map">
+            <img
+              src="../images/map_placeholder.png"
+              alt="MapUI"
+              class="karte"
+            />
+          </div>
+        </li>
+        <li class="ride-item">
+          <article class="ride-card">
+            <div class="ride-info">
+              <img
+                src="../images/lisa.jpg"
+                alt="Profilbild von Lisa"
+                class="avatar"
+              />
+              <div class="details">
+                <h3>Bremen &rarr; Hannover</h3>
+                <p>Lisa, 15:00 Uhr, 3 freie Plätze, <strong>€8</strong></p>
+              </div>
+            </div>
+          </article>
+        </li>
+      </ul>
     </main>
     <footer>
-      <a href="#" class="extra-info-btn">Impressum</a> | <a href="#" class="extra-info-btn">Copyright</a> |
+      <a href="#" class="extra-info-btn">Impressum</a> |
+      <a href="#" class="extra-info-btn">Copyright</a> |
       <a href="#" class="extra-info-btn">Kontakt</a>
     </footer>
   </body>
