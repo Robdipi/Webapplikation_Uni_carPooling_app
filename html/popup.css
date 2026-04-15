@@ -30,6 +30,7 @@
   padding: 20px;
   box-shadow: -2px 0 5px rgba(0,0,0,0.3);
   transition: right var(--animation-speed) ease;
+  overflow-y: auto;
 }
 
 .close-btn {
@@ -62,6 +63,7 @@
 /* the "Anmelden" button*/
 .login-popup button {
   margin-top: 10px;
+  margin-bottom: 40px;
   padding: 10px;
   width: 100%;
   background-color: var(--color-brand-bg);
@@ -69,6 +71,7 @@
   color: #fff;
   border: none;
   cursor: pointer;
+
 }
 .login-popup button:hover {
       background-color: var(--color-brand-bg-shade-b);

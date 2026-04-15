@@ -6,10 +6,12 @@
 
 
 --color-brand-white: #FFF;/*#F4FAFF*/
---color-brand-grey: #AAA7F1; /*only use for shadows for buttons on white background*/
+--color-brand-grey: #c0c3c6;
+--color-brand-dark-grey: ##1a2b4b;
 --color-brand-black: #0C0A3E;
 --color-brand-highlight-a: #FC814A;
 --color-brand-highlight-b: #D72483;
+--color-price-number: #10b981;
 
 --color-shadow:rgba(0,0,0,0.5);
 --color-shadow-light:rgba(0,0,0,0.25);
@@ -18,7 +20,7 @@
 TODO make Darkmode when we have Javascript in lecture */
 body.dark {
   --color-brand-bg: #004d40;/* CampusRide Grün-Blau */
-  --color-brand-white: #0C0A3E;/*#F4FAFF*/
+  --color-brand-white: #0C0A3E;
   --color-brand-black: #FFF;
   --color-brand-highlight-a: #FC814A;
   --color-brand-highlight-b: #D72483;
@@ -98,83 +100,4 @@ main {
     nav {
         margin-top: 10px;
     }
-}
-
-/* 1. Die Liste als Container (Flexbox) */
-.rides-list {
-  display: flex;
-  flex-direction: column; /* Kacheln untereinander stapeln */
-  gap: 16px;              /* Gleichmäßiger Abstand zwischen den Kacheln */
-  list-style: none;       /* Entfernt die Standard-Aufzählungspunkte */
-  padding: 0;
-  margin: 20px 0;
-  max-width: 800px;
-}
-
-/* 2. Die einzelne Kachel (Card-Design) */
-.ride-card {
-  display: flex;          /* Bild und Text nebeneinander */
-  align-items: center;    /* Vertikal zentrieren */
-  background-color: var(--color-brand-white);
-  border-radius: 12px;    /* Abgerundete Ecken wie im Bild */
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sanfter Schatten für Tiefe */
-  transition: transform 0.2s ease-in-out;    /* Kleiner Effekt beim Hover */
-  border: 1px solid #e0e6ed; /* Dezenter Rahmen */
-}
-
-.ride-card:hover {
-  transform: translateY(-3px); /* Kachel hebt sich beim Drüberfahren leicht an */
-  cursor: pointer;
-}
-
-/* 3. Profilbild / Avatar */
-.avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;     /* Macht das Bild kreisrund */
-  object-fit: cover;
-  margin-right: 20px;     /* Abstand zum Text rechts */
-  border: 2px solid #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* 4. Text-Inhalte innerhalb der Kachel */
-.details h3 {
-  margin: 0 0 4px 0;      /* Titelabstände optimieren */
-  color: #1a2b4b;         /* Dunkelblau für die Route */
-  font-size: 1.1rem;
-}
-
-.details p {
-  margin: 0;
-  color: #64748b;         /* Grau für die Infos (Zeit, Plätze) */
-  font-size: 0.9rem;
-}
-
-.details strong {
-  color: #10b981;         /* Grün für den Preis (Akzentfarbe) */
-  font-weight: 700;
-}
-
-.map-item {
-  width: 100%;
-}
-
-.map {
-  background-color: #ffffff; /* Weiß statt Hellblau */
-  border-radius: 12px;
-  border: 1px solid #d1d9e6;
-  height: 250px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.karte {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain; /* Bild wird komplett gezeigt, nichts wird abgeschnitten */
-  padding: 10px;
 }

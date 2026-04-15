@@ -51,8 +51,9 @@ img.profile_pic {
       text-align: center;
       transition: transform 0.3s ease;
       background-color: var(--color-brand-bg-shade-a);
-      min-width:200px
+      width: 100%;
  }
+
  .Contact:hover {
     /*Looks shitty transform: translateY(10px);*/
     transform: scale(1.05);
@@ -118,3 +119,13 @@ img.profile_pic {
      margin-right:10px;
      color: var(--color-brand-black);
 }
+
+@media (max-width: 600px) {
+    .Contact{
+         width:300px
+    }
+    .page-layout {
+        grid-template-columns: 0.3fr 1fr; /* Spalte 1: fix, Spalte 2: Rest */
+        grid-template-rows: auto 1fr 1fr; /* Zeilen: Inhalt, wächst, Inhalt */
+    }
+ }
