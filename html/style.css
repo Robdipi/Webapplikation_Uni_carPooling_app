@@ -73,7 +73,6 @@ footer {
 .logo {
   color: var(--color-brand-white);
   text-decoration: none;
-
 }
 
 nav a {
@@ -92,7 +91,6 @@ nav a {
 }
 .open-btn:hover {
     background-color: var(--color-shadow);
-
 }
 
 /*kontakt impressum Copyright buttons*/
