@@ -93,7 +93,7 @@ nav a {
 }
 
 footer a {
-    color: var(--color-brand-black);
+    color: var(--color-brand-white);
     text-decoration: none;
     margin-left: 15px;
     font-weight: bold;
