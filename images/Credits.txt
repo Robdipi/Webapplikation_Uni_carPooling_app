@@ -6,3 +6,6 @@ paper-plane.png
 
 attach-document.png
 <a href="https://www.flaticon.com/free-icons/attachment" title="attachment icons">Attachment icons created by ALTOP7 - Flaticon</a>
+
+right-arrow.png
+<a href="https://www.flaticon.com/free-icons/arrow" title="arrow icons">Arrow icons created by Freepik - Flaticon</a>

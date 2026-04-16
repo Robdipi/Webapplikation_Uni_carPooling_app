@@ -46,6 +46,7 @@
      border: none;
      color:var(--color-brand-black);
      font-size: var(--seachbar-font-size);
+     text-align: center;
 }
 .searchbarinputfield::placeholder {
     color: var(--color-brand-middle-grey);
