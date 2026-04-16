@@ -1,0 +1,8 @@
+search.png
+<a href="https://www.flaticon.com/free-icons/magnifying-glass" title="magnifying glass icons">Magnifying glass icons created by Royyan Wijaya - Flaticon</a>
+
+paper-plane.png
+<a href="https://www.flaticon.com/free-icons/send" title="send icons">Send icons created by Pixel perfect - Flaticon</a>
+
+attach-document.png
+<a href="https://www.flaticon.com/free-icons/attachment" title="attachment icons">Attachment icons created by ALTOP7 - Flaticon</a>

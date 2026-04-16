@@ -122,7 +122,7 @@ img.profile_pic {
 
 @media (max-width: 600px) {
     .Contact{
-         width:300px
+         width:300px;
     }
     .page-layout {
         grid-template-columns: 0.3fr 1fr; /* Spalte 1: fix, Spalte 2: Rest */
