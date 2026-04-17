@@ -33,13 +33,19 @@
     padding: 10px;
     border-radius: 12px;
     border: 1px solid var(--color-brand-grey);
-
+    display: flex;              /* Makes children flexible */
+    justify-content: center;    /* Horizontal centering */
+    align-items: center;
+    margin:10px
 }
 .searchbar-holder {
     box-shadow: 0 4px 12px var(--color-shadow-light);
     border-radius: 12px;
     transition: transform 0.2s ease-in-out;
-    padding: 10px
+    display: inline-flex;              /* Makes children flexible */
+    justify-content: center;    /* Horizontal centering */
+    align-items: center;
+    margin: 0 auto
 }
 
 .searchbarinputfield {
