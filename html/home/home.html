@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../style.css" />
-      <link rel="stylesheet" href="rout_recomendation.css" />
-      <link rel="stylesheet" href="searchbar.css" />
-      <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="rout_recomendation.css" />
+    <link rel="stylesheet" href="searchbar.css" />
+    <link rel="stylesheet" href="popup.css" />
     <title>CampusRide - Dashboard</title>
   </head>
   <body>
@@ -15,110 +15,136 @@
       <nav>
         <a href="../chat/chat.html" class="open-btn">Chat</a>
         <a href="../index.html" class="open-btn">Abmelden</a>
+        <a href="../create_ride/create_ride.html" class="open-btn"
+          >Fahrt anbieten</a
+        >
       </nav>
     </header>
 
     <main>
-
-        <div class="overlay">
-            <div class="registration-popup">
-                <h2>Profil erstellen</h2>
-                <form action="home/home.html">
-                    <div class="form-group">
-                        <label for="vorname" class="logintext">Vorname:</label>
-                        <input
-                                type="text"
-                                id="vorname"
-                                name="vorname"
-                                placeholder="z.B. Alex"
-                                required
-                        />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="nachname" class="logintext">Nachname:</label>
-                        <input
-                                type="text"
-                                id="nachname"
-                                name="nachname"
-                                placeholder="z.B. Muster"
-                                required
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="studiengang" class="logintext">Studiengang:</label>
-                        <input
-                                type="text"
-                                id="studiengang"
-                                name="studiengang"
-                                placeholder="z.B. AIN"
-                                required
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="geburtstag" class="logintext">Geburtstag:</label>
-                        <input
-                                type="date"
-                                id="geburtstag"
-                                name="geburtstag"
-                                required
-                        />
-                    </div>
-                    <button type="submit">Profil erstellen</button>
-                </form>
+      <div class="overlay">
+        <div class="registration-popup">
+          <h2>Profil erstellen</h2>
+          <form action="home/home.html">
+            <div class="form-group">
+              <label for="vorname" class="logintext">Vorname:</label>
+              <input
+                type="text"
+                id="vorname"
+                name="vorname"
+                placeholder="z.B. Alex"
+                required
+              />
             </div>
+
+            <div class="form-group">
+              <label for="nachname" class="logintext">Nachname:</label>
+              <input
+                type="text"
+                id="nachname"
+                name="nachname"
+                placeholder="z.B. Muster"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="studiengang" class="logintext">Studiengang:</label>
+              <input
+                type="text"
+                id="studiengang"
+                name="studiengang"
+                placeholder="z.B. AIN"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="geburtstag" class="logintext">Geburtstag:</label>
+              <input type="date" id="geburtstag" name="geburtstag" required />
+            </div>
+            <button type="submit">Profil erstellen</button>
+          </form>
         </div>
+      </div>
       <h2>Fahrten in deiner Nähe</h2>
-        <div class="searchbar-holder">
-            <div class="searchbar">
-                <form>
-                    <input type="text" id="search-input-start" class="searchbarinputfield" placeholder="von" required/>
-                    <img src="../../images/Ui_elements/right-arrow.png" alt="icon" style="width:16px; height:16px;">
-                    <input type="text" id="search-input-end" class="searchbarinputfield" placeholder="nach" required/>
-                    <label for="date" class="seachbar-label">Am:</label>
-                    <input type="date" class="searchbarinputfield" id="date" name="date">
-                    <label for="time" class="seachbar-label">Um:</label>
-                    <input type="time" class="searchbarinputfield" id="time" name="time">
-                    <button type="submit" class="search-bar-submit-button ">
-                        <img src="../../images/Ui_elements/search.png" alt="icon" style="width:16px; height:16px;">
-                        Suchen
-                    </button>
-                </form>
-            </div>
+      <div class="searchbar-holder">
+        <div class="searchbar">
+          <form>
+            <input
+              type="text"
+              id="search-input-start"
+              class="searchbarinputfield"
+              placeholder="von"
+              required
+            />
+            <img
+              src="../../images/Ui_elements/right-arrow.png"
+              alt="icon"
+              style="width: 16px; height: 16px"
+            />
+            <input
+              type="text"
+              id="search-input-end"
+              class="searchbarinputfield"
+              placeholder="nach"
+              required
+            />
+            <label for="date" class="seachbar-label">Am:</label>
+            <input
+              type="date"
+              class="searchbarinputfield"
+              id="date"
+              name="date"
+            />
+            <label for="time" class="seachbar-label">Um:</label>
+            <input
+              type="time"
+              class="searchbarinputfield"
+              id="time"
+              name="time"
+            />
+            <button type="submit" class="search-bar-submit-button">
+              <img
+                src="../../images/Ui_elements/search.png"
+                alt="icon"
+                style="width: 16px; height: 16px"
+              />
+              Suchen
+            </button>
+          </form>
         </div>
-             <ul class="rides-list">
-          <li class="rides-list-entry">
-              <div class="map-item">
-                  <div class="map">
-                      <img
-                              src="../../images/map_placeholder.png"
-                              alt="MapUI"
-                              class="karte"
-                      />
-                  </div>
+      </div>
+      <ul class="rides-list">
+        <li class="rides-list-entry">
+          <div class="map-item">
+            <div class="map">
+              <img
+                src="../../images/map_placeholder.png"
+                alt="MapUI"
+                class="karte"
+              />
+            </div>
+          </div>
+          <div class="ride-item">
+            <article class="ride-card">
+              <div class="ride-info">
+                <img
+                  src="../../images/lisa.jpg"
+                  alt="Profilbild von Lisa"
+                  class="avatar"
+                />
+                <div class="details">
+                  <h3>Bremen &rarr; Hannover</h3>
+                  <p>Lisa, 15:00 Uhr, 3 freie Plätze, <strong>€8</strong></p>
+                </div>
               </div>
-              <div class="ride-item">
-                  <article class="ride-card">
-                      <div class="ride-info">
-                          <img
-                                  src="../../images/lisa.jpg"
-                                  alt="Profilbild von Lisa"
-                                  class="avatar"
-                          />
-                          <div class="details">
-                              <h3>Bremen &rarr; Hannover</h3>
-                              <p>Lisa, 15:00 Uhr, 3 freie Plätze, <strong>€8</strong></p>
-                          </div>
-                      </div>
-                  </article>
-              </div>
-          </li>
-
+            </article>
+          </div>
+        </li>
       </ul>
     </main>
     <footer>
-      <a href="../impressum/impressum.html" class="extra-info-btn">Impressum</a> |
-      <a href="#" class="extra-info-btn">Copyright</a> |
+      <a href="../impressum/impressum.html" class="extra-info-btn">Impressum</a>
+      | <a href="#" class="extra-info-btn">Copyright</a> |
       <a href="#" class="extra-info-btn">Kontakt</a>
     </footer>
   </body>

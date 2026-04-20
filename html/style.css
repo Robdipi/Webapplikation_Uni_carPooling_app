@@ -110,8 +110,6 @@ footer a {
     font-weight: bold;
 }
 
-
-
 main {
     flex: 1; /* Füllt den Platz zwischen Header und Footer aus */
     padding: 20px;
