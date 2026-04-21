@@ -19,11 +19,14 @@ section {
     border-radius: 10px;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea {
     padding: 10px;
-    border: 1px solid var(--color-brand-grey); /* */
+    border: 1px solid var(--color-brand-grey);
     border-radius: 8px;
     font-size: 1rem;
+    font-family: sans-serif; 
+    resize: vertical;
 }
 
 .create-ride-submit-button {
