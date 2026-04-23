@@ -14,7 +14,10 @@
         <input type="checkbox" id="login-toggle" />
         <label for="login-toggle" class="open-btn">Einloggen</label>
 
-        <div class="overlay">
+          <input type="checkbox" id="register-toggle" />
+          <label for="register-toggle" class="open-btn">Registrieren</label>
+
+          <div class="login-overlay">
           <div class="login-popup">
             <label for="login-toggle" class="close-btn">&times;</label>
             <section>
@@ -52,6 +55,88 @@
             </section>
           </div>
         </div>
+
+          <div class="register-overlay">
+              <div class="login-popup">
+                  <label for="register-toggle" class="close-btn">&times;</label>
+                  <section>
+                      <h2 class="logintext">Bitte Benutzerdaten eingeben</h2>
+                      <p class="logintext">Registriere dich, um Fahrten am Campus zu finden oder anzubieten.</p>
+
+                      <form action="home/home.html">
+                          <div class="form-group">
+                              <label for="user-id-register" class="logintext">E-Mail:</label>
+                              <input
+                                      type="text"
+                                      id="user-id-register"
+                                      name="username"
+                                      placeholder="z.B. Alex_Muster"
+                                      required
+                              />
+                          </div>
+
+                          <div class="form-group">
+                              <label for="pass-id-register" class="logintext">Passwort:</label>
+                              <input
+                                      type="password"
+                                      id="pass-id-register"
+                                      name="password"
+                                      placeholder="z.B. 12345"
+                                      required
+                              />
+                          </div>
+                          <div class="form-group">
+                              <label for="username" class="logintext">Benutzername:</label>
+                              <input
+                                      type="text"
+                                      id="username"
+                                      name="vorname"
+                                      placeholder="z.B. Alex"
+                                      required
+                              />
+                          </div>
+                          <div class="form-group">
+                              <label for="vorname" class="logintext">Vorname:</label>
+                              <input
+                                      type="text"
+                                      id="vorname"
+                                      name="vorname"
+                                      placeholder="z.B. Alex"
+                                      required
+                              />
+                          </div>
+
+                          <div class="form-group">
+                              <label for="nachname" class="logintext">Nachname:</label>
+                              <input
+                                      type="text"
+                                      id="nachname"
+                                      name="nachname"
+                                      placeholder="z.B. Muster"
+                                      required
+                              />
+                          </div>
+                          <div class="form-group">
+                              <label for="studiengang" class="logintext">Studiengang:</label>
+                              <input
+                                      type="text"
+                                      id="studiengang"
+                                      name="studiengang"
+                                      placeholder="z.B. AIN"
+                                      required
+                              />
+                          </div>
+                          <div class="form-group">
+                              <label for="geburtstag" class="logintext">Geburtstag:</label>
+                              <input type="date" id="geburtstag" name="geburtstag" required />
+                          </div>
+
+                          <button type="submit">Anmelden und Account erstellen</button>
+                      </form>
+                  </section>
+              </div>
+          </div>
+
       </nav>
     </header>
     <main>
