@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="create_ride.css" />
+    <title>Create Ride</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">CampusRide</div>
+      <nav>
+        <a href="../home/home.html" class="open-btn">Home</a>
+        <a href="../chat/chat.html" class="open-btn">Chat</a>
+        <a href="../create_ride/create_ride.html" class="open-btn"
+          >Fahrt anbieten</a
+        >
+        <a href="../find_ride/find_ride.html" class="open-btn">Fahrt finden</a>
+        <a href="../profile/profile.html" class="open-btn">Profil</a>
+        <a href="../index.html" class="open-btn">Abmelden</a>
+      </nav>
+    </header>
+    <main>
+      <div class="content-wrapper">
+        <section>
+          <h2>Fahrt anbieten</h2>
+          <form action="../home/home.html">
+            <div class="form-group">
+              <label for="departure">Startadresse</label>
+              <input
+                type="text"
+                id="departure"
+                name="departure"
+                placeholder="z.B. Konstanz HTWG"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="destination">Zieladresse</label>
+              <input
+                type="text"
+                id="destination"
+                name="destination"
+                placeholder="z.B. Seezeit Wohnheim"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="date-time">Uhrzeit und Datum</label>
+              <input
+                type="datetime-local"
+                name="date-time"
+                id="date-time"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="seats">Anzahl Sitze</label>
+              <input
+                type="number"
+                min="1"
+                max="8"
+                id="seats"
+                name="seats"
+                placeholder="4"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="extra">Zusatzinformation</label>
+              <textarea
+                id="extra"
+                name="extra"
+                placeholder="Platz für Gepäck, Musikwünsche, etc."
+                rows="4"
+              ></textarea>
+            </div>
+            <button type="submit" class="create-ride-submit-button">
+              Fahrt veröffentlichen
+            </button>
+          </form>
+        </section>
+        <aside class="info-box">
+          <h3>Tipps für Fahrer</h3>
+          <ul>
+            <li>Spritkosten fair teilen</li>
+            <li>Pünktlich am Treffpunkt sein</li>
+            <li>Musikgeschmack absprechen</li>
+          </ul>
+        </aside>
+      </div>
+    </main>
+
+    <footer>
+      <a href="../impressum/impressum.html" class="extra-info-btn">Impressum</a>
+      | <a href="#" class="extra-info-btn">Copyright</a> |
+      <a href="#" class="extra-info-btn">Kontakt</a>
+    </footer>
+  </body>
+</html>

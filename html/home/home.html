@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="rout_recomendation.css" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>CampusRide - Dashboard</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">CampusRide</div>
+      <nav>
+        <a href="../home/home.html" class="open-btn">Home</a>
+        <a href="../chat/chat.html" class="open-btn">Chat</a>
+        <a href="../create_ride/create_ride.html" class="open-btn"
+          >Fahrt anbieten</a
+        >
+        <a href="../find_ride/find_ride.html" class="open-btn">Fahrt finden</a>
+        <a href="../profile/profile.html" class="open-btn">Profil</a>
+        <a href="../index.html" class="open-btn">Abmelden</a>
+      </nav>
+    </header>
+
+    <main>
+      <h2>Deine Fahrten:</h2>
+
+      <ul class="rides-list">
+        <li class="rides-list-entry">
+          <div class="map-item">
+            <div class="map">
+              <img
+                src="../../images/map_placeholder.png"
+                alt="MapUI"
+                class="karte"
+              />
+            </div>
+          </div>
+          <div class="ride-item">
+            <article class="ride-card">
+              <div class="ride-info">
+                <img
+                  src="../../images/lisa.jpg"
+                  alt="Profilbild von Lisa"
+                  class="avatar"
+                />
+                <div class="details">
+                  <h3>Bremen &rarr; Hannover</h3>
+                  <p>Lisa, 15:00 Uhr, 3 freie Plätze, <strong>€8</strong></p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </li>
+      </ul>
+    </main>
+    <footer>
+      <a href="../impressum/impressum.html" class="extra-info-btn">Impressum</a>
+      | <a href="#" class="extra-info-btn">Copyright</a> |
+      <a href="#" class="extra-info-btn">Kontakt</a>
+    </footer>
+  </body>
+</html>

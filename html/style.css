@@ -6,15 +6,25 @@
 
 
 --color-brand-white: #FFF;/*#F4FAFF*/
+
 --color-brand-grey: #c0c3c6;
---color-brand-dark-grey: ##1a2b4b;
+--color-brand-middle-grey:#AAA;
+--color-brand-dark-grey: #1a2b4b;
+
 --color-brand-black: #0C0A3E;
 --color-brand-highlight-a: #FC814A;
+--color-brand-highlight-a-dark: #A13502;
 --color-brand-highlight-b: #D72483;
+--color-brand-highlight-b-dark:#7A154B;
 --color-price-number: #10b981;
 
 --color-shadow:rgba(0,0,0,0.5);
 --color-shadow-light:rgba(0,0,0,0.25);
+
+/* I noticed they look very similar to a certain app*/
+--gradient-brand-important-button: linear-gradient(33deg, var(--color-brand-highlight-a),var(--color-brand-highlight-b));
+--gradient-brand-important-button-hover: linear-gradient(33deg, var(--color-brand-highlight-a-dark),var(--color-brand-highlight-b-dark));
+--gradient-brand-important-button-active: linear-gradient(33deg, var(--color-brand-black), var(--color-brand-black));
 }
 /*Put all darkmode colors here
 TODO make Darkmode when we have Javascript in lecture */
@@ -49,6 +59,22 @@ header {
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
+main {
+    flex: 1;
+}
+footer {
+    background-color: #004d40;
+    color: white;
+    padding: 1rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+  color: var(--color-brand-white);
+  text-decoration: none;
+}
+
 nav a {
     color: var(--color-brand-white);
     text-decoration: none;
@@ -60,10 +86,11 @@ nav a {
 .open-btn{
     padding: 10px;
     border-radius: 10px;
+    color: var(--color-brand-white);
+    text-decoration: none;
 }
 .open-btn:hover {
     background-color: var(--color-shadow);
-
 }
 
 /*kontakt impressum Copyright buttons*/
@@ -77,13 +104,11 @@ nav a {
 }
 
 footer a {
-    color: var(--color-brand-black);
+    color: var(--color-brand-white);
     text-decoration: none;
     margin-left: 15px;
     font-weight: bold;
 }
-
-
 
 main {
     flex: 1; /* Füllt den Platz zwischen Header und Footer aus */

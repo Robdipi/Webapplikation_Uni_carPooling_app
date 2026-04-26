@@ -6,9 +6,22 @@
   display: none;
 }
 
+#register-toggle {
+  display: none;
+}
 
 /*light grey transparent field which gets bigger at the same time as the popup*/
-.overlay {
+.register-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background: var(--color-shadow);
+  overflow: hidden;
+  transition: width var(--animation-speed) ease;
+}
+.login-overlay {
   position: fixed;
   top: 0;
   right: 0;
@@ -24,7 +37,7 @@
   top: 0;
   right: -300px;
   width: 100%;
-  max-width: 300px;
+  max-width: 350px;
   height: 100%;
   background: var(--color-brand-white);
   padding: 20px;
@@ -46,10 +59,17 @@
     background-color: var(--color-shadow);
 }
 /* when the "checkbox" Login gets checkd the overlay gets pushed into the screen*/
-#login-toggle:checked ~ .overlay {
+#login-toggle:checked ~ .login-overlay {
   width: 100%;
 }
-#login-toggle:checked ~ .overlay .login-popup {
+#login-toggle:checked ~ .login-overlay .login-popup {
+  right: 0;
+}
+
+#register-toggle:checked ~ .register-overlay {
+  width: 100%;
+}
+#register-toggle:checked ~ .register-overlay .login-popup {
   right: 0;
 }
 
@@ -66,27 +86,30 @@
   margin-bottom: 40px;
   padding: 10px;
   width: 100%;
-  background-color: var(--color-brand-bg);
+  background: var(--gradient-brand-important-button);
   color: var(--color-brand-white);
   color: #fff;
   border: none;
   cursor: pointer;
-
+  transition: transform 0.2s ease-in-out;
 }
+
+
 .login-popup button:hover {
-      background-color: var(--color-brand-bg-shade-b);
+        background: var(--gradient-brand-important-button-hover);
+        transform: scale(1.1);
 }
 .login-popup button:active {
-  transform: scale(0.97);
-  background-color: var(--color-brand-highlight-a);
+  background: var(--gradient-brand-important-button-active);
 }
 /*all text in the popup*/
 .logintext{
     color: var(--color-brand-black);
     padding: 1rem;
-    display: flex;
+    display: inline;
     justify-content: space-between;
     align-items: center;
+
 }
 
 /*Input fields used to go over the screen edge this fixes it */

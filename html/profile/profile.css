@@ -1,0 +1,19 @@
+.edit-profile-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.profile-field {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.edit-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
