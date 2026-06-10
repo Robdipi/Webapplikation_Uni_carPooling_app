@@ -211,10 +211,8 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
 
 export function useChatContext(): ChatContextValue {
     const context = useContext(ChatContext);
-
     if (context === undefined) {
         throw new Error("useChatContext must be used within ChatContextProvider");
     }
-
     return context;
 }
