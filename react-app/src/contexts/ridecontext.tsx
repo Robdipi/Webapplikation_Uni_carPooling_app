@@ -43,51 +43,24 @@ interface RideContextProviderProps {
 
 const RIDES_STORAGE_KEY = "campusride-rides";
 
-const demoRides: Ride[] = [
-    {
-        id: "demo-1",
-        departureName: "HTWG Konstanz",
-        destinationName: "Universität Konstanz",
-        departureCoords: { lat: 47.6672, lng: 9.1716 },
-        destinationCoords: { lat: 47.6897, lng: 9.1881 },
-        distanceKm: 5.1,
-        durationMinutes: 14,
-        driver: "Lisa",
-        avatarUrl: "/images/lisa.jpg",
-        departureTime: "2026-06-12T08:00",
-        seatsAvailable: 3,
-        price: 3,
-        extra: "Treffpunkt am Haupteingang.",
-    },
-    {
-        id: "demo-2",
-        departureName: "Konstanz Bahnhof",
-        destinationName: "Radolfzell Bahnhof",
-        departureCoords: { lat: 47.6595, lng: 9.1750 },
-        destinationCoords: { lat: 47.7389, lng: 8.9706 },
-        distanceKm: 22.4,
-        durationMinutes: 28,
-        driver: "Max",
-        avatarUrl: "/images/lisa.jpg",
-        departureTime: "2026-06-12T15:30",
-        seatsAvailable: 2,
-        price: 8,
-        extra: "Kleiner Koffer ist okay.",
-    },
-];
-
 function readRidesFromLocalStorage(): Ride[] {
     try {
         const stored = localStorage.getItem(RIDES_STORAGE_KEY);
 
         if (stored === null) {
-            return demoRides;
+            return [];
         }
 
         const parsed = JSON.parse(stored) as Ride[];
-        return Array.isArray(parsed) ? parsed : demoRides;
+
+        if (!Array.isArray(parsed)) {
+            return [];
+        }
+
+        // Alte Demo-Fahrten aus früheren Versionen nicht mehr anzeigen.
+        return parsed.filter((ride) => !ride.id.startsWith("demo-"));
     } catch {
-        return demoRides;
+        return [];
     }
 }
 
