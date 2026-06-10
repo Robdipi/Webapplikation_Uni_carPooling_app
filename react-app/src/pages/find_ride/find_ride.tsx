@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useUserContext } from "../../contexts/usercontext";
 import "../style.css";
 import "../home/rout_recomendation.css";
 import "./searchbar.css";
@@ -26,21 +27,38 @@ const rides: Ride[] = [
         avatarUrl: "../../images/lisa.jpg",
         mapUrl: "../../images/map_placeholder.png",
     },
+    {
+        from: "Konstanz",
+        to: "Radolfzell",
+        driver: "Max",
+        time: "08:30 Uhr",
+        seatsAvailable: 2,
+        price: 4,
+        avatarUrl: "../../images/lisa.jpg",
+        mapUrl: "../../images/map_placeholder.png",
+    },
 ];
 
-const Header: React.FC = () => (
-    <header>
-        <div className="logo">CampusRide</div>
-        <nav>
-            <Link to="/home" className="open-btn">Home</Link>
-            <Link to="/chat" className="open-btn">Chat</Link>
-            <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-            <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-            <Link to="/profile" className="open-btn">Profil</Link>
-            <Link to="/" className="open-btn">Abmelden</Link>
-        </nav>
-    </header>
-);
+const Header: React.FC = () => {
+    const { currentUser, logoutUser } = useUserContext();
+
+    return (
+        <header>
+            <div className="logo">CampusRide</div>
+            <nav>
+                <Link to="/home" className="open-btn">Home</Link>
+                <Link to="/chat" className="open-btn">Chat</Link>
+                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
+                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
+                <Link to="/profile" className="open-btn">Profil</Link>
+                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
+                {currentUser !== null && (
+                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
+                )}
+            </nav>
+        </header>
+    );
+};
 
 const Footer: React.FC = () => (
     <footer>
@@ -60,11 +78,16 @@ const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => (
         <div className="ride-item">
             <article className="ride-card">
                 <div className="ride-info">
-                    <img src={ride.avatarUrl} alt={`Profilbild von ${ride.driver}`} className="avatar" />
+                    <img
+                        src={ride.avatarUrl}
+                        alt={`Profilbild von ${ride.driver}`}
+                        className="avatar"
+                    />
                     <div className="details">
                         <h3>{ride.from} &rarr; {ride.to}</h3>
                         <p>
-                            {ride.driver}, {ride.time}, {ride.seatsAvailable} freie Plätze, <strong>€{ride.price}</strong>
+                            {ride.driver}, {ride.time}, {ride.seatsAvailable} freie Plätze,{" "}
+                            <strong>€{ride.price}</strong>
                         </p>
                     </div>
                 </div>
@@ -73,14 +96,18 @@ const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => (
     </li>
 );
 
-const SearchBar: React.FC<{ onSearch: (from: string, to: string, date: string, time: string) => void }> = ({ onSearch }) => {
+interface SearchBarProps {
+    onSearch: (from: string, to: string, date: string, time: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         onSearch(from, to, date, time);
     };
 
@@ -93,16 +120,20 @@ const SearchBar: React.FC<{ onSearch: (from: string, to: string, date: string, t
                         className="searchbarinputfield"
                         placeholder="von"
                         value={from}
-                        onChange={(e) => setFrom(e.target.value)}
+                        onChange={(event) => setFrom(event.target.value)}
                         required
                     />
-                    <img src="../../images/Ui_elements/right-arrow.png" alt="icon" style={{ width: 16, height: 16 }} />
+                    <img
+                        src="../../images/Ui_elements/right-arrow.png"
+                        alt="icon"
+                        style={{ width: 16, height: 16 }}
+                    />
                     <input
                         type="text"
                         className="searchbarinputfield"
                         placeholder="nach"
                         value={to}
-                        onChange={(e) => setTo(e.target.value)}
+                        onChange={(event) => setTo(event.target.value)}
                         required
                     />
                     <label htmlFor="date" className="seachbar-label">Am:</label>
@@ -111,7 +142,7 @@ const SearchBar: React.FC<{ onSearch: (from: string, to: string, date: string, t
                         className="searchbarinputfield"
                         id="date"
                         value={date}
-                        onChange={(e) => setDate(e.target.value)}
+                        onChange={(event) => setDate(event.target.value)}
                     />
                     <label htmlFor="time" className="seachbar-label">Um:</label>
                     <input
@@ -119,10 +150,15 @@ const SearchBar: React.FC<{ onSearch: (from: string, to: string, date: string, t
                         className="searchbarinputfield"
                         id="time"
                         value={time}
-                        onChange={(e) => setTime(e.target.value)}
+                        onChange={(event) => setTime(event.target.value)}
                     />
                     <button type="submit" className="search-bar-submit-button">
-                        <img src="../../images/Ui_elements/search.png" alt="icon" style={{ width: 16, height: 16 }} /> Suchen
+                        <img
+                            src="../../images/Ui_elements/search.png"
+                            alt="icon"
+                            style={{ width: 16, height: 16 }}
+                        />{" "}
+                        Suchen
                     </button>
                 </form>
             </div>
@@ -130,11 +166,20 @@ const SearchBar: React.FC<{ onSearch: (from: string, to: string, date: string, t
     );
 };
 
-// Main Dashboard Component
 const FindRidePage: React.FC = () => {
-    const handleSearch = (from: string, to: string, date: string, time: string) => {
-        console.log("Searching for rides:", { from, to, date, time });
-        // You can replace this with API call logic
+    const [filteredRides, setFilteredRides] = useState<Ride[]>(rides);
+
+    const handleSearch = (from: string, to: string) => {
+        const normalizedFrom = from.trim().toLowerCase();
+        const normalizedTo = to.trim().toLowerCase();
+
+        setFilteredRides(
+            rides.filter(
+                (ride) =>
+                    ride.from.toLowerCase().includes(normalizedFrom) &&
+                    ride.to.toLowerCase().includes(normalizedTo)
+            )
+        );
     };
 
     return (
@@ -142,10 +187,10 @@ const FindRidePage: React.FC = () => {
             <Header />
             <main>
                 <h2>Fahrt finden</h2>
-                    <SearchBar onSearch={handleSearch} />
-                    <ul className="rides-list">
-                    {rides.map((ride, index) => (
-                        <RideCard key={index} ride={ride} />
+                <SearchBar onSearch={handleSearch} />
+                <ul className="rides-list">
+                    {filteredRides.map((ride) => (
+                        <RideCard key={`${ride.from}-${ride.to}-${ride.time}`} ride={ride} />
                     ))}
                 </ul>
             </main>

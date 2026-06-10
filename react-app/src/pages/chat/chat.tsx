@@ -1,9 +1,9 @@
-import React, { useState, FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUserContext } from "../../contexts/usercontext";
 import "../style.css";
 import "./chatstyle.css";
 
-// Types
 interface Message {
     id: number;
     content: string;
@@ -16,35 +16,45 @@ interface Contact {
     avatarUrl: string;
 }
 
-// Mock Data
 const initialMessages: Message[] = [
     { id: 1, content: "hello", type: "received" },
     { id: 2, content: "can you drive me?", type: "send" },
     { id: 3, content: "yes", type: "received" },
     { id: 4, content: "Why werent you here ;(", type: "received" },
-    { id: 5, content: "https://i.pinimg.com/736x/73/bb/46/73bb4608964f9abe087fd9fb40e45618.jpg", type: "image" },
+    {
+        id: 5,
+        content:
+            "https://i.pinimg.com/736x/73/bb/46/73bb4608964f9abe087fd9fb40e45618.jpg",
+        type: "image",
+    },
 ];
 
-const contacts: Contact[] = Array.from({ length: 6 }, (_, i) => ({
-    id: i + 1,
+const contacts: Contact[] = Array.from({ length: 6 }, (_, index) => ({
+    id: index + 1,
     name: "Hans Zimmer",
-    avatarUrl: "https://picsum.photos/200/300?random=" + (i + 1),
+    avatarUrl: `https://picsum.photos/200/300?random=${index + 1}`,
 }));
 
-// Components
-const Header: React.FC = () => (
-    <header className="page-header">
-        <div className="logo">CampusRide</div>
-        <nav>
-            <Link to="/home" className="open-btn">Home</Link>
-            <Link to="/chat" className="open-btn">Chat</Link>
-            <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-            <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-            <Link to="/profile" className="open-btn">Profil</Link>
-            <Link to="/" className="open-btn">Abmelden</Link>
-        </nav>
-    </header>
-);
+const Header: React.FC = () => {
+    const { currentUser, logoutUser } = useUserContext();
+
+    return (
+        <header className="page-header">
+            <div className="logo">CampusRide</div>
+            <nav>
+                <Link to="/home" className="open-btn">Home</Link>
+                <Link to="/chat" className="open-btn">Chat</Link>
+                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
+                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
+                <Link to="/profile" className="open-btn">Profil</Link>
+                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
+                {currentUser !== null && (
+                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
+                )}
+            </nav>
+        </header>
+    );
+};
 
 const MessageRow: React.FC<{ message: Message }> = ({ message }) => (
     <div className="message_row">
@@ -60,7 +70,11 @@ const MessageRow: React.FC<{ message: Message }> = ({ message }) => (
 
 const ContactItem: React.FC<{ contact: Contact }> = ({ contact }) => (
     <div className="Contact">
-        <img className="profile_pic" src={contact.avatarUrl} alt={`Profile of ${contact.name}`} />
+        <img
+            className="profile_pic"
+            src={contact.avatarUrl}
+            alt={`Profile of ${contact.name}`}
+        />
         {contact.name}
     </div>
 );
@@ -68,9 +82,13 @@ const ContactItem: React.FC<{ contact: Contact }> = ({ contact }) => (
 const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) => {
     const [text, setText] = useState("");
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        if (text.trim() === "") return;
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (text.trim() === "") {
+            return;
+        }
+
         onSend(text.trim());
         setText("");
     };
@@ -79,7 +97,11 @@ const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) 
         <div className="write-message-container-holder">
             <form className="write-message-container" onSubmit={handleSubmit}>
                 <button type="button" className="extra-btn">
-                    <img src="../../../public/images/Ui_elements/attach-document.png" alt="attach" style={{ width: 16, height: 16 }} />
+                    <img
+                        src="../../images/Ui_elements/attach-document.png"
+                        alt="attach"
+                        style={{ width: 16, height: 16 }}
+                    />
                 </button>
                 <input
                     type="text"
@@ -87,46 +109,50 @@ const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) 
                     className="chat-input"
                     placeholder="Nachricht an Hans Zimmer"
                     value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    onChange={(event) => setText(event.target.value)}
                     required
                 />
                 <button type="submit" className="send-btn">
-                    <img src="../../../public/images/Ui_elements/paper-plane.png" alt="send" style={{ width: 16, height: 16 }} />
+                    <img
+                        src="../../images/Ui_elements/paper-plane.png"
+                        alt="send"
+                        style={{ width: 16, height: 16 }}
+                    />
                 </button>
             </form>
         </div>
     );
 };
 
-// Main Chat Component
 const ChatPage: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
 
     const handleSend = (messageText: string) => {
         const newMessage: Message = {
-            id: messages.length + 1,
+            id: crypto.randomUUID().length + Date.now(),
             content: messageText,
             type: "send",
         };
-        setMessages([...messages, newMessage]);
+
+        setMessages((previousMessages) => [...previousMessages, newMessage]);
     };
 
     return (
         <div className="page-layout">
             <Header />
-                <div className="page-sidebar">
-                    {contacts.map((contact) => (
-                        <ContactItem key={contact.id} contact={contact} />
-                    ))}
-                </div>
-                <div className="page-main">
-                    {messages.map((msg) => (
-                        <MessageRow key={msg.id} message={msg} />
-                    ))}
-                </div>
-                <div className="page-footer">
-                    <ChatInput onSend={handleSend} />
-                </div>
+            <div className="page-sidebar">
+                {contacts.map((contact) => (
+                    <ContactItem key={contact.id} contact={contact} />
+                ))}
+            </div>
+            <div className="page-main">
+                {messages.map((message) => (
+                    <MessageRow key={message.id} message={message} />
+                ))}
+            </div>
+            <div className="page-footer">
+                <ChatInput onSend={handleSend} />
+            </div>
         </div>
     );
 };

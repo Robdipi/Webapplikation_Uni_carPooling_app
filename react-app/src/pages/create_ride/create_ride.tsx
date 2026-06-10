@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useUserContext } from "../../contexts/usercontext";
 import "../style.css";
 import "./create_ride.css";
 import RouteMap from "./RouteMap";
-
-
-
-
 
 interface RideForm {
     departure: string;
@@ -16,21 +13,27 @@ interface RideForm {
     extra: string;
 }
 
-const Header: React.FC = () => (
-    <header>
-        <div className="logo">CampusRide</div>
-        <nav>
-            <Link to="/home" className="open-btn">Home</Link>
-            <Link to="/chat" className="open-btn">Chat</Link>
-            <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-            <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-            <Link to="/profile" className="open-btn">Profil</Link>
-            <Link to="/" className="open-btn">Abmelden</Link>
-        </nav>
-    </header>
-);
+const Header: React.FC = () => {
+    const { currentUser, logoutUser } = useUserContext();
 
-// Info box
+    return (
+        <header>
+            <div className="logo">CampusRide</div>
+            <nav>
+                <Link to="/home" className="open-btn">Home</Link>
+                <Link to="/chat" className="open-btn">Chat</Link>
+                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
+                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
+                <Link to="/profile" className="open-btn">Profil</Link>
+                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
+                {currentUser !== null && (
+                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
+                )}
+            </nav>
+        </header>
+    );
+};
+
 const InfoBox: React.FC = () => (
     <aside className="info-box">
         <h3>Tipps für Fahrer</h3>
@@ -50,7 +53,6 @@ const Footer: React.FC = () => (
     </footer>
 );
 
-// Main component
 const CreateRidePage: React.FC = () => {
     const [form, setForm] = useState<RideForm>({
         departure: "",
@@ -59,25 +61,24 @@ const CreateRidePage: React.FC = () => {
         seats: 1,
         extra: "",
     });
+    const [successMessage, setSuccessMessage] = useState<string>("");
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
-        const { name, value } = e.target;
+        const { name, value } = event.target;
 
-        setForm((prev) => ({
-            ...prev,
+        setForm((previousForm) => ({
+            ...previousForm,
             [name]: name === "seats" ? Number(value) : value,
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        console.log("Ride created:", form);
-
-        // Later: API call here
-        // fetch("/api/rides", { method: "POST", body: JSON.stringify(form) })
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setSuccessMessage(
+            `Fahrt von ${form.departure} nach ${form.destination} wurde veröffentlicht.`
+        );
     };
 
     return (
@@ -89,6 +90,7 @@ const CreateRidePage: React.FC = () => {
                     departure={form.departure}
                     destination={form.destination}
                 />
+
                 <div className="content-wrapper">
                     <section>
                         <h2>Fahrt anbieten</h2>
@@ -162,6 +164,8 @@ const CreateRidePage: React.FC = () => {
                                 Fahrt veröffentlichen
                             </button>
                         </form>
+
+                        {successMessage !== "" && <p>{successMessage}</p>}
                     </section>
 
                     <InfoBox />
