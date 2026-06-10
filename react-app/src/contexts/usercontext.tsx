@@ -17,7 +17,7 @@ export interface RegisteredUser {
     profile: UserProfile;
 }
 
-interface RegisterUserInput {
+export interface RegisterUserInput {
     email: string;
     username: string;
     password: string;
@@ -27,12 +27,12 @@ interface RegisterUserInput {
     course: string;
 }
 
-interface LoginUserInput {
+export interface LoginUserInput {
     identifier: string;
     password: string;
 }
 
-interface AuthResult {
+export interface AuthResult {
     success: boolean;
     error?: string;
 }
@@ -82,7 +82,7 @@ interface UserContextProviderProps {
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
     const [users, setUsers] = useState<RegisteredUser[]>(() =>
-        readFromLocalStorage<RegisteredUser[]>(USERS_STORAGE_KEY, [])
+        readFromLocalStorage<RegisteredUser[]>(USERS_STORAGE_KEY, []),
     );
 
     const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(() => {
@@ -114,14 +114,22 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         const username = input.username.trim();
         const password = input.password;
 
-        if (email === "" || username === "" || password === "") {
+        if (
+            email === "" ||
+            username === "" ||
+            password === "" ||
+            input.firstName.trim() === "" ||
+            input.lastName.trim() === "" ||
+            input.course.trim() === "" ||
+            input.birthDate === ""
+        ) {
             return { success: false, error: "Bitte fülle alle Pflichtfelder aus." };
         }
 
         const userAlreadyExists = users.some(
             (user) =>
                 user.email === email ||
-                user.username.toLowerCase() === username.toLowerCase()
+                user.username.toLowerCase() === username.toLowerCase(),
         );
 
         if (userAlreadyExists) {
@@ -156,10 +164,14 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         const identifier = input.identifier.trim().toLowerCase();
         const password = input.password;
 
+        if (identifier === "" || password === "") {
+            return { success: false, error: "Bitte gib Benutzername/E-Mail und Passwort ein." };
+        }
+
         const foundUser = users.find(
             (user) =>
                 user.email === identifier ||
-                user.username.toLowerCase() === identifier
+                user.username.toLowerCase() === identifier,
         );
 
         if (foundUser === undefined || foundUser.password !== password) {
@@ -190,8 +202,8 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         setCurrentUser(updatedUser);
         setUsers((previousUsers) =>
             previousUsers.map((user) =>
-                user.id === updatedUser.id ? updatedUser : user
-            )
+                user.id === updatedUser.id ? updatedUser : user,
+            ),
         );
     };
 
