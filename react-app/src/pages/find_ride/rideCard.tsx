@@ -1,6 +1,6 @@
 import {Ride} from "../../contexts/ridecontext";
 import {useState} from "react";
-import RouteMap from "./../create_ride/RouteMap";
+import Route from "./RouteMapFromCoords";
 const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -46,7 +46,7 @@ const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => {
 
                 {expanded && (
                     <div className="expanded-map">
-                        <RouteMap
+                        <RouteMapFromCoords
                             departureCoords={ride.departureCoords}
                             destinationCoords={ride.destinationCoords}
                         />
