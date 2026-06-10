@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../style.css";
 import "./create_ride.css";
+import RouteMap from "./RouteMap";
 
-// Types
+
+
+
+
 interface RideForm {
     departure: string;
     destination: string;
@@ -12,7 +16,6 @@ interface RideForm {
     extra: string;
 }
 
-// Header
 const Header: React.FC = () => (
     <header>
         <div className="logo">CampusRide</div>
@@ -82,6 +85,10 @@ const CreateRidePage: React.FC = () => {
             <Header />
 
             <main>
+                <RouteMap
+                    departure={form.departure}
+                    destination={form.destination}
+                />
                 <div className="content-wrapper">
                     <section>
                         <h2>Fahrt anbieten</h2>

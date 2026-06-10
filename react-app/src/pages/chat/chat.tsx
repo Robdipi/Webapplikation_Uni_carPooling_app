@@ -79,7 +79,7 @@ const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) 
         <div className="write-message-container-holder">
             <form className="write-message-container" onSubmit={handleSubmit}>
                 <button type="button" className="extra-btn">
-                    <img src="../../images/Ui_elements/attach-document.png" alt="attach" style={{ width: 16, height: 16 }} />
+                    <img src="../../../public/images/Ui_elements/attach-document.png" alt="attach" style={{ width: 16, height: 16 }} />
                 </button>
                 <input
                     type="text"
@@ -91,7 +91,7 @@ const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) 
                     required
                 />
                 <button type="submit" className="send-btn">
-                    <img src="../../images/Ui_elements/paper-plane.png" alt="send" style={{ width: 16, height: 16 }} />
+                    <img src="../../../public/images/Ui_elements/paper-plane.png" alt="send" style={{ width: 16, height: 16 }} />
                 </button>
             </form>
         </div>
