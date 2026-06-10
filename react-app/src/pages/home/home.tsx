@@ -34,7 +34,7 @@ const Header: React.FC = () => (
     <header>
         <div className="logo">CampusRide</div>
         <nav>
-            <Link to="/dashboard" className="open-btn">Home</Link>
+            <Link to="/home" className="open-btn">Home</Link>
             <Link to="/chat" className="open-btn">Chat</Link>
             <Link to="/create_ride" className="open-btn">Fahrt anbieten</Link>
             <Link to="/find_ride" className="open-btn">Fahrt finden</Link>

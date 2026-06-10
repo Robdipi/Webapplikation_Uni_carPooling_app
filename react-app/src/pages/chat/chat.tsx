@@ -35,12 +35,12 @@ const Header: React.FC = () => (
     <header className="page-header">
         <div className="logo">CampusRide</div>
         <nav>
-            <a href="../home/home.html" className="open-btn">Home</a>
-            <a href="../chat/chat.html" className="open-btn">Chat</a>
-            <a href="../create_ride/create_ride.html" className="open-btn">Fahrt anbieten</a>
-            <a href="../find_ride/find_ride.html" className="open-btn">Fahrt finden</a>
-            <a href="../profile/profile.html" className="open-btn">Profil</a>
-            <a href="../index.html" className="open-btn">Abmelden</a>
+            <Link to="/home" className="open-btn">Home</Link>
+            <Link to="/chat" className="open-btn">Chat</Link>
+            <Link to="/create_ride" className="open-btn">Fahrt anbieten</Link>
+            <Link to="/find_ride" className="open-btn">Fahrt finden</Link>
+            <Link to="/profile" className="open-btn">Profil</Link>
+            <Link to="/" className="open-btn">Abmelden</Link>
         </nav>
     </header>
 );

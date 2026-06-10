@@ -26,7 +26,6 @@ const Header: React.FC = () => (
     </header>
 );
 
-// Info box
 const InfoBox: React.FC = () => (
     <aside className="info-box">
         <h3>Tipps für Fahrer</h3>
@@ -38,7 +37,6 @@ const InfoBox: React.FC = () => (
     </aside>
 );
 
-// Main component
 const CreateRidePage: React.FC = () => {
     const [form, setForm] = useState<RideForm>({
         departure: "",

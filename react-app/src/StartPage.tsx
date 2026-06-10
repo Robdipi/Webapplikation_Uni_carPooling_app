@@ -12,7 +12,7 @@ import ProfilePage from "./pages/profile/profile";
 /*
     All the routes are here because our Project is pretty small
     you can go to them like :
-    <Link to="/impressum" className="extra-info-btn">Impressum</Link>|
+    <Link to="/impressum" className="extra-info-btn">Impressum</Link>
     and then the ide says you should import something(at least mine does) do that
     don'T use the old syntax, Chat gpt said its bad but it still works
 
