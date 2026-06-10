@@ -1,8 +1,8 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../style.css";
 import "./profile.css";
 
-// Datenmodell für ein Profil
 interface Profile {
     firstName: string;
     lastName: string;
@@ -12,7 +12,6 @@ interface Profile {
     course: string;
 }
 
-// Startwerte
 const initialProfile: Profile = {
     firstName: "Max",
     lastName: "Mustermann",
@@ -22,24 +21,37 @@ const initialProfile: Profile = {
     course: "Allgemeine Informatik (AIN)",
 };
 
-// Header-Komponente
 const Header: React.FC = () => (
     <header>
-        <div className="logo">
-            <a href="../home/home.html" className="open-btn">
-                CampusRide
-            </a>
-        </div>
+        <div className="logo">CampusRide</div>
+        <nav>
+            <Link to="/home" className="open-btn">
+                Home
+            </Link>
+            <Link to="/chat" className="open-btn">
+                Chat
+            </Link>
+            <Link to="/create-ride" className="open-btn">
+                Fahrt anbieten
+            </Link>
+            <Link to="/find-ride" className="open-btn">
+                Fahrt finden
+            </Link>
+            <Link to="/profile" className="open-btn">
+                Profil
+            </Link>
+            <Link to="/" className="open-btn">
+                Abmelden
+            </Link>
+        </nav>
     </header>
 );
 
-// Props für ProfileField
 interface ProfileFieldProps {
     label: string;
     value: string;
 }
 
-// Komponente zum Anzeigen eines Profilfelds
 const ProfileField: React.FC<ProfileFieldProps> = ({ label, value }) => (
     <div className="form-group">
         <label>{label}</label>
@@ -47,7 +59,6 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, value }) => (
     </div>
 );
 
-// Props für ProfileInput
 interface ProfileInputProps {
     label: string;
     name: keyof Profile;
@@ -56,7 +67,6 @@ interface ProfileInputProps {
     onChange: (name: keyof Profile, value: string) => void;
 }
 
-// Komponente zum Bearbeiten eines Profilfelds
 const ProfileInput: React.FC<ProfileInputProps> = ({
     label,
     name,
@@ -76,18 +86,16 @@ const ProfileInput: React.FC<ProfileInputProps> = ({
     </div>
 );
 
-// Footer-Komponente
 const Footer: React.FC = () => (
     <footer>
-        <a href="../impressum/impressum.html" className="extra-info-btn">
+        <Link to="/impressum" className="extra-info-btn">
             Impressum
-        </a>{" "}
+        </Link>{" "}
         | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
         <a href="#" className="extra-info-btn">Kontakt</a>
     </footer>
 );
 
-// Hauptkomponente der Profilseite
 const ProfilePage: React.FC = () => {
     const [profile, setProfile] = useState<Profile>(initialProfile);
     const [draftProfile, setDraftProfile] = useState<Profile>(initialProfile);
@@ -133,14 +141,12 @@ const ProfilePage: React.FC = () => {
                                     value={draftProfile.firstName}
                                     onChange={handleInputChange}
                                 />
-
                                 <ProfileInput
                                     label="Nachname"
                                     name="lastName"
                                     value={draftProfile.lastName}
                                     onChange={handleInputChange}
                                 />
-
                                 <ProfileInput
                                     label="Geburtsdatum"
                                     name="birthDate"
@@ -148,21 +154,18 @@ const ProfilePage: React.FC = () => {
                                     value={draftProfile.birthDate}
                                     onChange={handleInputChange}
                                 />
-
                                 <ProfileInput
                                     label="Wohnort"
                                     name="city"
                                     value={draftProfile.city}
                                     onChange={handleInputChange}
                                 />
-
                                 <ProfileInput
                                     label="Preis pro km"
                                     name="pricePerKm"
                                     value={draftProfile.pricePerKm}
                                     onChange={handleInputChange}
                                 />
-
                                 <ProfileInput
                                     label="Studiengang"
                                     name="course"
@@ -178,46 +181,19 @@ const ProfilePage: React.FC = () => {
                                     >
                                         Abbrechen
                                     </button>
-
-                                    <button
-                                        type="submit"
-                                        className="create-ride-submit-button"
-                                    >
+                                    <button type="submit" className="create-ride-submit-button">
                                         Änderungen speichern
                                     </button>
                                 </div>
                             </form>
                         ) : (
                             <>
-                                <ProfileField
-                                    label="Vorname"
-                                    value={profile.firstName}
-                                />
-
-                                <ProfileField
-                                    label="Nachname"
-                                    value={profile.lastName}
-                                />
-
-                                <ProfileField
-                                    label="Geburtsdatum"
-                                    value={profile.birthDate}
-                                />
-
-                                <ProfileField
-                                    label="Wohnort"
-                                    value={profile.city}
-                                />
-
-                                <ProfileField
-                                    label="Preis pro km"
-                                    value={profile.pricePerKm}
-                                />
-
-                                <ProfileField
-                                    label="Studiengang"
-                                    value={profile.course}
-                                />
+                                <ProfileField label="Vorname" value={profile.firstName} />
+                                <ProfileField label="Nachname" value={profile.lastName} />
+                                <ProfileField label="Geburtsdatum" value={profile.birthDate} />
+                                <ProfileField label="Wohnort" value={profile.city} />
+                                <ProfileField label="Preis pro km" value={profile.pricePerKm} />
+                                <ProfileField label="Studiengang" value={profile.course} />
 
                                 <div className="edit-button-wrapper">
                                     <button
