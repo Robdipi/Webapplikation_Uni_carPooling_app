@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
 import { type Ride, useRideContext } from "../../contexts/ridecontext";
-import RouteMapFromCoords from "../home/RouteMapFromCoords";
 import RideCard from "./rideCard";
 import "../style.css";
 import "../home/rout_recomendation.css";
 import "./searchbar.css";
+import RouteMapFromCoords from "../home/RouteMapFromCoords";
 
 const Header: React.FC = () => {
     const { currentUser, logoutUser } = useUserContext();
