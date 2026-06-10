@@ -30,14 +30,26 @@
 
 /* 2. Die einzelne Kachel (Card-Design) */
 .ride-card {
-  display: flex;          /* Bild und Text nebeneinander */
-  align-items: center;    /* Vertikal zentrieren */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
   background-color: var(--color-brand-white);
-  border-radius: 12px;    /* Abgerundete Ecken wie im Bild */
+  border-radius: 12px;
   padding: 16px;
-  border: 1px solid var(--color-brand-grey); /* Dezenter Rahmen */
+  border: 1px solid var(--color-brand-grey);
   margin: 10px;
-}
+}.ride-card {
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+
+   background-color: var(--color-brand-white);
+   border-radius: 12px;
+   padding: 16px;
+   border: 1px solid var(--color-brand-grey);
+   margin: 10px;
+ }
 
 
 

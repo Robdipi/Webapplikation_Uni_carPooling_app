@@ -4,38 +4,84 @@ import { useUserContext } from "../../contexts/usercontext";
 import "../style.css";
 import "../home/rout_recomendation.css";
 import "./searchbar.css";
+import RideCard from "./rideCard";
 
 interface Ride {
-    from: string;
-    to: string;
+    id: number;
+    departureName: string;
+    destinationName: string;
+    departureCoords: {
+        lat: number;
+        lng: number;
+    };
+    destinationCoords: {
+        lat: number;
+        lng: number;
+    };
+    distanceKm: number;
+    durationMinutes: number;
     driver: string;
-    time: string;
+    avatarUrl: string;
+    departureTime: string;
     seatsAvailable: number;
     price: number;
-    avatarUrl: string;
-    mapUrl: string;
 }
 
 const rides: Ride[] = [
     {
-        from: "Bremen",
-        to: "Hannover",
+        id: 1,
+
+        departureName: "Bremen",
+        destinationName: "Hannover",
+
+        departureCoords: {
+            lat: 53.0793,
+            lng: 8.8017,
+        },
+
+        destinationCoords: {
+            lat: 52.3759,
+            lng: 9.7320,
+        },
+
+        distanceKm: 125,
+        durationMinutes: 85,
+
         driver: "Lisa",
-        time: "15:00 Uhr",
+        avatarUrl: "../../images/lisa.jpg",
+
+        departureTime: "2025-06-10T15:00:00",
+
         seatsAvailable: 3,
         price: 8,
-        avatarUrl: "../../images/lisa.jpg",
-        mapUrl: "../../images/map_placeholder.png",
     },
+
     {
-        from: "Konstanz",
-        to: "Radolfzell",
+        id: 2,
+
+        departureName: "Konstanz",
+        destinationName: "Radolfzell",
+
+        departureCoords: {
+            lat: 47.6779,
+            lng: 9.1732,
+        },
+
+        destinationCoords: {
+            lat: 47.7417,
+            lng: 8.9705,
+        },
+
+        distanceKm: 19,
+        durationMinutes: 22,
+
         driver: "Max",
-        time: "08:30 Uhr",
+        avatarUrl: "../../images/lisa.jpg",
+
+        departureTime: "2025-06-11T08:30:00",
+
         seatsAvailable: 2,
         price: 4,
-        avatarUrl: "../../images/lisa.jpg",
-        mapUrl: "../../images/map_placeholder.png",
     },
 ];
 
@@ -68,33 +114,6 @@ const Footer: React.FC = () => (
     </footer>
 );
 
-const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => (
-    <li className="rides-list-entry">
-        <div className="map-item">
-            <div className="map">
-                <img src={ride.mapUrl} alt="MapUI" className="karte" />
-            </div>
-        </div>
-        <div className="ride-item">
-            <article className="ride-card">
-                <div className="ride-info">
-                    <img
-                        src={ride.avatarUrl}
-                        alt={`Profilbild von ${ride.driver}`}
-                        className="avatar"
-                    />
-                    <div className="details">
-                        <h3>{ride.from} &rarr; {ride.to}</h3>
-                        <p>
-                            {ride.driver}, {ride.time}, {ride.seatsAvailable} freie Plätze,{" "}
-                            <strong>€{ride.price}</strong>
-                        </p>
-                    </div>
-                </div>
-            </article>
-        </div>
-    </li>
-);
 
 interface SearchBarProps {
     onSearch: (from: string, to: string, date: string, time: string) => void;
