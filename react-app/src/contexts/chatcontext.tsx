@@ -1,17 +1,44 @@
-import { createContext, useContext, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useState,
+    type Dispatch,
+    type ReactNode,
+    type SetStateAction,
+} from "react";
 
-const ChatContext = createContext("some Provider is missing");//Todo insert a default prop
+export interface ChatUser {
+    id: string;
+    name: string;
+}
 
-export function ChatContextProvider({ children }) {
-    const [user, setUser] = useState(null);
+interface ChatContextValue {
+    user: ChatUser | null;
+    setUser: Dispatch<SetStateAction<ChatUser | null>>;
+}
+
+interface ChatContextProviderProps {
+    children: ReactNode;
+}
+
+const ChatContext = createContext<ChatContextValue | undefined>(undefined);
+
+export function ChatContextProvider({ children }: ChatContextProviderProps) {
+    const [user, setUser] = useState<ChatUser | null>(null);
 
     return (
         <ChatContext.Provider value={{ user, setUser }}>
-    {children}
-    </ChatContext.Provider>
-);
+            {children}
+        </ChatContext.Provider>
+    );
 }
 
-export function useChatContext() {
-    return useContext(ChatContext);
+export function useChatContext(): ChatContextValue {
+    const context = useContext(ChatContext);
+
+    if (context === undefined) {
+        throw new Error("useChatContext must be used within ChatContextProvider");
+    }
+
+    return context;
 }

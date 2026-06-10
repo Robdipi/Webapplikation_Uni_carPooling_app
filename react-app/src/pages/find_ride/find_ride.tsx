@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../style.css";
 import "../home/rout_recomendation.css";
 import "./searchbar.css";
@@ -33,8 +34,8 @@ const Header: React.FC = () => (
         <nav>
             <Link to="/home" className="open-btn">Home</Link>
             <Link to="/chat" className="open-btn">Chat</Link>
-            <Link to="/create_ride" className="open-btn">Fahrt anbieten</Link>
-            <Link to="/find_ride" className="open-btn">Fahrt finden</Link>
+            <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
+            <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
             <Link to="/profile" className="open-btn">Profil</Link>
             <Link to="/" className="open-btn">Abmelden</Link>
         </nav>
@@ -43,8 +44,8 @@ const Header: React.FC = () => (
 
 const Footer: React.FC = () => (
     <footer>
-        <a href="../impressum/impressum.html" className="extra-info-btn">Impressum</a> |{" "}
-        <a href="#" className="extra-info-btn">Copyright</a> |{" "}
+        <Link to="/impressum" className="extra-info-btn">Impressum</Link>{" "}
+        | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
         <a href="#" className="extra-info-btn">Kontakt</a>
     </footer>
 );

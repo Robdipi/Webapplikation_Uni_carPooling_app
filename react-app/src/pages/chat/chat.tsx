@@ -1,4 +1,5 @@
 import React, { useState, FormEvent } from "react";
+import { Link } from "react-router-dom";
 import "../style.css";
 import "./chatstyle.css";
 
@@ -37,8 +38,8 @@ const Header: React.FC = () => (
         <nav>
             <Link to="/home" className="open-btn">Home</Link>
             <Link to="/chat" className="open-btn">Chat</Link>
-            <Link to="/create_ride" className="open-btn">Fahrt anbieten</Link>
-            <Link to="/find_ride" className="open-btn">Fahrt finden</Link>
+            <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
+            <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
             <Link to="/profile" className="open-btn">Profil</Link>
             <Link to="/" className="open-btn">Abmelden</Link>
         </nav>

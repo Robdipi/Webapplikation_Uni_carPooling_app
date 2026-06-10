@@ -1,23 +1,17 @@
 import React from "react";
 import "../style.css";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Header: React.FC = () => (
     <header>
-        <link rel="stylesheet" href="../style.css" />
         <div className="logo">
-            <Link to="/" className="open-btn">
+            <Link to="/home" className="open-btn">
                 CampusRide
             </Link>
         </div>
     </header>
 );
 
-/*
-<a href="../index.html" className="open-btn">
-                CampusRide
-            </a>
-*/
 interface InfoSectionProps {
     title: string;
     children: React.ReactNode;

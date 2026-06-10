@@ -1,21 +1,39 @@
-import { createContext, useContext, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useState,
+    type Dispatch,
+    type ReactNode,
+    type SetStateAction,
+} from "react";
 
-const GlobalContext = createContext("some Provider is missing");
+interface GlobalContextValue {
+    darkMode: boolean;
+    setDarkMode: Dispatch<SetStateAction<boolean>>;
+}
 
-export function GlobalContextProvider({ children }) {
-    const [darkMode, setDarkMode] = useState(false);
+interface GlobalContextProviderProps {
+    children: ReactNode;
+}
+
+const GlobalContext = createContext<GlobalContextValue | undefined>(undefined);
+
+export function GlobalContextProvider({ children }: GlobalContextProviderProps) {
+    const [darkMode, setDarkMode] = useState<boolean>(false);
+
     return (
-        <GlobalContext.Provider
-            value={{
-                darkMode,
-                setDarkMode
-            }}
-        >
+        <GlobalContext.Provider value={{ darkMode, setDarkMode }}>
             {children}
         </GlobalContext.Provider>
     );
 }
 
-export function useGlobalContext() {
-    return useContext(GlobalContext);
+export function useGlobalContext(): GlobalContextValue {
+    const context = useContext(GlobalContext);
+
+    if (context === undefined) {
+        throw new Error("useGlobalContext must be used within GlobalContextProvider");
+    }
+
+    return context;
 }

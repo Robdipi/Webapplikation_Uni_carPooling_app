@@ -1,16 +1,19 @@
-import {GlobalContextProvider} from "./globalcontext";
-import {RideContextProvider} from "./ridecontext";
-import {UserContextProvider} from "./usercontext";
-import {ChatContextProvider} from "./chatcontext";
+import type { ReactNode } from "react";
+import { ChatContextProvider } from "./chatcontext";
+import { GlobalContextProvider } from "./globalcontext";
+import { RideContextProvider } from "./ridecontext";
+import { UserContextProvider } from "./usercontext";
 
-export function AppProviders({ children }) {
+interface AppProvidersProps {
+    children: ReactNode;
+}
+
+export function AppProviders({ children }: AppProvidersProps) {
     return (
         <GlobalContextProvider>
             <RideContextProvider>
                 <UserContextProvider>
-                    <ChatContextProvider>
-                        {children}
-                    </ChatContextProvider>
+                    <ChatContextProvider>{children}</ChatContextProvider>
                 </UserContextProvider>
             </RideContextProvider>
         </GlobalContextProvider>

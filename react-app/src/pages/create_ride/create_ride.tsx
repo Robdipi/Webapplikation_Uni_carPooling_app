@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../style.css";
 import "./create_ride.css";
 
@@ -16,16 +17,17 @@ const Header: React.FC = () => (
     <header>
         <div className="logo">CampusRide</div>
         <nav>
-            <a href="../home/home.html" className="open-btn">Home</a>
-            <a href="../chat/chat.html" className="open-btn">Chat</a>
-            <a href="../create_ride/create_ride.html" className="open-btn">Fahrt anbieten</a>
-            <a href="../find_ride/find_ride.html" className="open-btn">Fahrt finden</a>
-            <a href="../profile/profile.html" className="open-btn">Profil</a>
-            <a href="../index.html" className="open-btn">Abmelden</a>
+            <Link to="/home" className="open-btn">Home</Link>
+            <Link to="/chat" className="open-btn">Chat</Link>
+            <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
+            <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
+            <Link to="/profile" className="open-btn">Profil</Link>
+            <Link to="/" className="open-btn">Abmelden</Link>
         </nav>
     </header>
 );
 
+// Info box
 const InfoBox: React.FC = () => (
     <aside className="info-box">
         <h3>Tipps für Fahrer</h3>
@@ -37,6 +39,15 @@ const InfoBox: React.FC = () => (
     </aside>
 );
 
+const Footer: React.FC = () => (
+    <footer>
+        <Link to="/impressum" className="extra-info-btn">Impressum</Link>{" "}
+        | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
+        <a href="#" className="extra-info-btn">Kontakt</a>
+    </footer>
+);
+
+// Main component
 const CreateRidePage: React.FC = () => {
     const [form, setForm] = useState<RideForm>({
         departure: "",
@@ -150,11 +161,7 @@ const CreateRidePage: React.FC = () => {
                 </div>
             </main>
 
-            <footer>
-                <a href="../impressum/impressum.html" className="extra-info-btn">Impressum</a>{" "}
-                | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
-                <a href="#" className="extra-info-btn">Kontakt</a>
-            </footer>
+            <Footer />
         </div>
     );
 };
