@@ -130,7 +130,7 @@ const SearchBar: React.FC<{ onSearch: (from: string, to: string, date: string, t
 };
 
 // Main Dashboard Component
-const FindRideDashboard: React.FC = () => {
+const FindRidePage: React.FC = () => {
     const handleSearch = (from: string, to: string, date: string, time: string) => {
         console.log("Searching for rides:", { from, to, date, time });
         // You can replace this with API call logic
@@ -153,4 +153,4 @@ const FindRideDashboard: React.FC = () => {
     );
 };
 
-export default FindRideDashboard;
+export default FindRidePage;

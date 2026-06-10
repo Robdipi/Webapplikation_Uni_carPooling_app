@@ -1,22 +1,40 @@
 import React from "react";
-import {Route, Routes} from "react-router-dom";
+import {Link, Route, Routes} from "react-router-dom";
 import ImpressumPage from "./pages/impressum/impressum";
+import HomePage from "./pages/home/home";
+import ChatPage from "./pages/chat/chat";
+import CreateRidePage from "./pages/create_ride/create_ride";
+import FindRidePage from "./pages/find_ride/file_ride";
+import ProfilePage from "./pages/profile/profile";
 
 
 
+/*
+    All the routes are here because our Project is pretty small
+    you can go to them like :
+    <Link to="/impressum" className="extra-info-btn">Impressum</Link>|
+    and then the ide says you should import something(at least mine does) do that
+    don'T use the old syntax, Chat gpt said its bad but it still works
 
-const App: React.FC = () => {
+
+ */
+const HomePageRouts: React.FC = () => {
     return (
         <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<StartPage />} />
             <Route path="/impressum" element={<ImpressumPage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/create-ride" element={<CreateRidePage />} />
+            <Route path="/find-ride" element={<FindRidePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
         </Routes>
     );
 };
 
 
 
-function HomePage() {
+function StartPage() {
     return (
         <div>
             <header>
@@ -167,11 +185,11 @@ function HomePage() {
             <article>Bitte melden sie sich an um Inhalte zu sehen</article>
         </main>
         <footer>
-            <a href="/Impressum" className="extra-info-btn">Impressum</a> |
+            <Link to="/impressum" className="extra-info-btn">Impressum</Link>|
             <a href="#" className="extra-info-btn">Copyright</a> |
             <a href="#" className="extra-info-btn">Kontakt</a>
          </footer>
         </div>);
 }
 
-export default App;
+export default HomePageRouts;

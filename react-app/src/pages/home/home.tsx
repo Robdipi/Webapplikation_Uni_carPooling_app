@@ -1,7 +1,10 @@
 import React from "react";
-import "./style.css";
+import "../style.css";
 import "./rout_recomendation.css";
 import "./popup.css";
+
+
+
 
 interface Ride {
     from: string;
@@ -27,21 +30,19 @@ const rides: Ride[] = [
     },
 ];
 
-// Components
 const Header: React.FC = () => (
     <header>
         <div className="logo">CampusRide</div>
-    <nav>
-    <a href="../home/home.html" className="open-btn">Home</a>
-    <a href="../chat/chat.html" className="open-btn">Chat</a>
-    <a href="../create_ride/create_ride.html" className="open-btn">Fahrt anbieten</a>
-<a href="../find_ride/find_ride.html" className="open-btn">Fahrt finden</a>
-<a href="../profile/profile.html" className="open-btn">Profil</a>
-    <a href="../index.html" className="open-btn">Abmelden</a>
-    </nav>
+        <nav>
+            <Link to="/dashboard" className="open-btn">Home</Link>
+            <Link to="/chat" className="open-btn">Chat</Link>
+            <Link to="/create_ride" className="open-btn">Fahrt anbieten</Link>
+            <Link to="/find_ride" className="open-btn">Fahrt finden</Link>
+            <Link to="/profile" className="open-btn">Profil</Link>
+            <Link to="/" className="open-btn">Abmelden</Link>
+        </nav>
     </header>
 );
-
 const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => (
     <li className="rides-list-entry">
         <div className="map-item">
@@ -73,7 +74,7 @@ const Footer: React.FC = () => (
     </footer>
 );
 
-const Dashboard: React.FC = () => {
+const HomePage: React.FC = () => {
     return (
         <div>
             <Header />
@@ -88,4 +89,4 @@ const Dashboard: React.FC = () => {
 );
 };
 
-export default Dashboard;
+export default HomePage;
