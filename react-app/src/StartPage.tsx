@@ -8,7 +8,7 @@ import FindRidePage from "./pages/find_ride/find_ride";
 import ProfilePage from "./pages/profile/profile";
 import { useUserContext } from "./contexts/usercontext";
 
-function StartPage() {
+const StartPage: React.FC = () => {
     const navigate = useNavigate();
     const { loginUser, registerUser } = useUserContext();
     const [loginError, setLoginError] = useState<string>("");
@@ -16,10 +16,11 @@ function StartPage() {
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setLoginError("");
 
         const formData = new FormData(event.currentTarget);
         const result = loginUser({
-            identifier: String(formData.get("identifier") ?? ""),
+            identifier: String(formData.get("username") ?? ""),
             password: String(formData.get("password") ?? ""),
         });
 
@@ -28,12 +29,12 @@ function StartPage() {
             return;
         }
 
-        setLoginError("");
         navigate("/home");
     };
 
     const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setRegisterError("");
 
         const formData = new FormData(event.currentTarget);
         const result = registerUser({
@@ -51,12 +52,11 @@ function StartPage() {
             return;
         }
 
-        setRegisterError("");
         navigate("/home");
     };
 
     return (
-        <div>
+        <div className="start-page">
             <header>
                 <h1>Willkommen auf der Startseite</h1>
                 <nav>
@@ -89,8 +89,8 @@ function StartPage() {
                                         <input
                                             type="text"
                                             id="user-id"
-                                            name="identifier"
-                                            placeholder="z.B. Alex_Muster oder alex@example.com"
+                                            name="username"
+                                            placeholder="z.B. Alex_Muster"
                                             required
                                         />
                                     </div>
@@ -108,7 +108,9 @@ function StartPage() {
                                     </div>
 
                                     {loginError !== "" && (
-                                        <p className="logintext">{loginError}</p>
+                                        <p className="logintext" role="alert">
+                                            {loginError}
+                                        </p>
                                     )}
 
                                     <button type="submit">Anmelden</button>
@@ -220,12 +222,12 @@ function StartPage() {
                                     </div>
 
                                     {registerError !== "" && (
-                                        <p className="logintext">{registerError}</p>
+                                        <p className="logintext" role="alert">
+                                            {registerError}
+                                        </p>
                                     )}
 
-                                    <button type="submit">
-                                        Anmelden und Account erstellen
-                                    </button>
+                                    <button type="submit">Anmelden und Account erstellen</button>
                                 </form>
                             </section>
                         </div>
@@ -246,7 +248,7 @@ function StartPage() {
             </footer>
         </div>
     );
-}
+};
 
 const HomePageRouts: React.FC = () => {
     return (

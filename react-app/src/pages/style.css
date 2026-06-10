@@ -126,3 +126,18 @@ main {
         margin-top: 10px;
     }
 }
+
+/* Startseite: Footer unten halten, auch wenn wenig Inhalt vorhanden ist */
+.start-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.start-page main {
+    flex: 1;
+}
+
+.start-page footer {
+    margin-top: auto;
+}

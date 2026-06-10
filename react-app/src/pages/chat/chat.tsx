@@ -1,39 +1,13 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+    type ChatContact,
+    type ChatMessage,
+    useChatContext,
+} from "../../contexts/chatcontext";
 import { useUserContext } from "../../contexts/usercontext";
 import "../style.css";
 import "./chatstyle.css";
-
-interface Message {
-    id: number;
-    content: string;
-    type: "send" | "received" | "image";
-}
-
-interface Contact {
-    id: number;
-    name: string;
-    avatarUrl: string;
-}
-
-const initialMessages: Message[] = [
-    { id: 1, content: "hello", type: "received" },
-    { id: 2, content: "can you drive me?", type: "send" },
-    { id: 3, content: "yes", type: "received" },
-    { id: 4, content: "Why werent you here ;(", type: "received" },
-    {
-        id: 5,
-        content:
-            "https://i.pinimg.com/736x/73/bb/46/73bb4608964f9abe087fd9fb40e45618.jpg",
-        type: "image",
-    },
-];
-
-const contacts: Contact[] = Array.from({ length: 6 }, (_, index) => ({
-    id: index + 1,
-    name: "Hans Zimmer",
-    avatarUrl: `https://picsum.photos/200/300?random=${index + 1}`,
-}));
 
 const Header: React.FC = () => {
     const { currentUser, logoutUser } = useUserContext();
@@ -42,44 +16,100 @@ const Header: React.FC = () => {
         <header className="page-header">
             <div className="logo">CampusRide</div>
             <nav>
-                <Link to="/home" className="open-btn">Home</Link>
-                <Link to="/chat" className="open-btn">Chat</Link>
-                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-                <Link to="/profile" className="open-btn">Profil</Link>
-                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
+                <Link to="/home" className="open-btn">
+                    Home
+                </Link>
+                <Link to="/chat" className="open-btn">
+                    Chat
+                </Link>
+                <Link to="/create-ride" className="open-btn">
+                    Fahrt anbieten
+                </Link>
+                <Link to="/find-ride" className="open-btn">
+                    Fahrt finden
+                </Link>
+                <Link to="/profile" className="open-btn">
+                    Profil
+                </Link>
+                <Link to="/" className="open-btn" onClick={logoutUser}>
+                    Abmelden
+                </Link>
                 {currentUser !== null && (
-                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
+                    <span className="open-btn">
+                        Hallo {currentUser.profile.firstName}
+                    </span>
                 )}
             </nav>
         </header>
     );
 };
 
-const MessageRow: React.FC<{ message: Message }> = ({ message }) => (
-    <div className="message_row">
-        {message.type === "image" ? (
-            <div className="send">
-                <img className="send_pic" src={message.content} alt="sent_image" />
-            </div>
-        ) : (
-            <div className={message.type}>{message.content}</div>
-        )}
-    </div>
-);
+interface ContactItemProps {
+    contact: ChatContact;
+    isSelected: boolean;
+    lastMessage?: ChatMessage;
+    onSelect: (contactId: string) => void;
+}
 
-const ContactItem: React.FC<{ contact: Contact }> = ({ contact }) => (
-    <div className="Contact">
+const ContactItem: React.FC<ContactItemProps> = ({
+    contact,
+    isSelected,
+    lastMessage,
+    onSelect,
+}) => (
+    <button
+        type="button"
+        className={isSelected ? "contact-item contact-item-selected" : "contact-item"}
+        onClick={() => onSelect(contact.id)}
+    >
         <img
-            className="profile_pic"
+            className="profile-pic"
             src={contact.avatarUrl}
-            alt={`Profile of ${contact.name}`}
+            alt={`Profilbild von ${contact.name}`}
         />
-        {contact.name}
-    </div>
+        <span className="contact-text">
+            <strong>{contact.name}</strong>
+            <span className="contact-preview">
+                {lastMessage?.content ?? "Noch keine Nachrichten"}
+            </span>
+        </span>
+    </button>
 );
 
-const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) => {
+const MessageRow: React.FC<{ message: ChatMessage }> = ({ message }) => {
+    const messageClassName =
+        message.sender === "me" ? "message-bubble message-send" : "message-bubble message-received";
+
+    return (
+        <div
+            className={
+                message.sender === "me"
+                    ? "message-row message-row-send"
+                    : "message-row message-row-received"
+            }
+        >
+            <div className={messageClassName}>
+                {message.type === "image" ? (
+                    <img
+                        className="send-pic"
+                        src={message.content}
+                        alt="Gesendetes Bild"
+                    />
+                ) : (
+                    <span>{message.content}</span>
+                )}
+                <span className="message-time">{message.sentAt}</span>
+            </div>
+        </div>
+    );
+};
+
+interface ChatInputProps {
+    selectedContact: ChatContact;
+    onSend: (message: string) => void;
+}
+
+const ChatInput: React.FC<ChatInputProps> = ({ selectedContact, onSend }) => {
     const [text, setText] = useState("");
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -89,35 +119,25 @@ const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) 
             return;
         }
 
-        onSend(text.trim());
+        onSend(text);
         setText("");
     };
 
     return (
         <div className="write-message-container-holder">
             <form className="write-message-container" onSubmit={handleSubmit}>
-                <button type="button" className="extra-btn">
-                    <img
-                        src="../../images/Ui_elements/attach-document.png"
-                        alt="attach"
-                        style={{ width: 16, height: 16 }}
-                    />
+                <button type="button" className="extra-btn" aria-label="Datei anhängen">
+                    📎
                 </button>
                 <input
                     type="text"
-                    id="chat-input"
                     className="chat-input"
-                    placeholder="Nachricht an Hans Zimmer"
+                    placeholder={`Nachricht an ${selectedContact.name}`}
                     value={text}
                     onChange={(event) => setText(event.target.value)}
-                    required
                 />
-                <button type="submit" className="send-btn">
-                    <img
-                        src="../../images/Ui_elements/paper-plane.png"
-                        alt="send"
-                        style={{ width: 16, height: 16 }}
-                    />
+                <button type="submit" className="send-btn" aria-label="Nachricht senden">
+                    ➤
                 </button>
             </form>
         </div>
@@ -125,34 +145,79 @@ const ChatInput: React.FC<{ onSend: (message: string) => void }> = ({ onSend }) 
 };
 
 const ChatPage: React.FC = () => {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const {
+        contacts,
+        selectedContactId,
+        selectedContact,
+        selectedMessages,
+        selectContact,
+        sendMessage,
+        clearChat,
+        getLastMessage,
+    } = useChatContext();
 
-    const handleSend = (messageText: string) => {
-        const newMessage: Message = {
-            id: crypto.randomUUID().length + Date.now(),
-            content: messageText,
-            type: "send",
-        };
+    const mainRef = useRef<HTMLDivElement | null>(null);
 
-        setMessages((previousMessages) => [...previousMessages, newMessage]);
-    };
+    useEffect(() => {
+        mainRef.current?.scrollTo({
+            top: mainRef.current.scrollHeight,
+            behavior: "smooth",
+        });
+    }, [selectedMessages]);
 
     return (
-        <div className="page-layout">
+        <div className="chat-page-layout">
             <Header />
-            <div className="page-sidebar">
+
+            <aside className="chat-sidebar">
+                <h2 className="chat-sidebar-title">Chats</h2>
                 {contacts.map((contact) => (
-                    <ContactItem key={contact.id} contact={contact} />
+                    <ContactItem
+                        key={contact.id}
+                        contact={contact}
+                        isSelected={contact.id === selectedContactId}
+                        lastMessage={getLastMessage(contact.id)}
+                        onSelect={selectContact}
+                    />
                 ))}
-            </div>
-            <div className="page-main">
-                {messages.map((message) => (
-                    <MessageRow key={message.id} message={message} />
-                ))}
-            </div>
-            <div className="page-footer">
-                <ChatInput onSend={handleSend} />
-            </div>
+            </aside>
+
+            <main className="chat-main">
+                <section className="chat-conversation-header">
+                    <img
+                        className="conversation-avatar"
+                        src={selectedContact.avatarUrl}
+                        alt={`Profilbild von ${selectedContact.name}`}
+                    />
+                    <div>
+                        <h2>{selectedContact.name}</h2>
+                        <p>CampusRide Chat</p>
+                    </div>
+                    <button
+                        type="button"
+                        className="clear-chat-button"
+                        onClick={() => clearChat(selectedContact.id)}
+                    >
+                        Chat leeren
+                    </button>
+                </section>
+
+                <div className="chat-messages" ref={mainRef}>
+                    {selectedMessages.length === 0 ? (
+                        <p className="empty-chat-message">
+                            Noch keine Nachrichten mit {selectedContact.name}.
+                        </p>
+                    ) : (
+                        selectedMessages.map((message) => (
+                            <MessageRow key={message.id} message={message} />
+                        ))
+                    )}
+                </div>
+            </main>
+
+            <footer className="chat-footer">
+                <ChatInput selectedContact={selectedContact} onSend={sendMessage} />
+            </footer>
         </div>
     );
 };
