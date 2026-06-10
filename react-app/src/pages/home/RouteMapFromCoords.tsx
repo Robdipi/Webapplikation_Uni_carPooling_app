@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
 import {
     MapContainer,
-    TileLayer,
     Marker,
     Polyline,
+    TileLayer,
     useMap,
 } from "react-leaflet";
-
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import type { Coordinates } from "../../contexts/ridecontext";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+interface LeafletDefaultIconPrototype extends L.Icon.Default {
+    _getIconUrl?: () => string;
+}
+
+delete (L.Icon.Default.prototype as LeafletDefaultIconPrototype)._getIconUrl;
 
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
@@ -21,115 +26,95 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
-type Coordinates = {
-    lat: number;
-    lng: number;
-};
-
-type Props = {
+interface RouteMapFromCoordsProps {
     departureCoords: Coordinates;
     destinationCoords: Coordinates;
-};
+}
 
 function MapUpdater({
-                        start,
-                        end,
-                    }: {
+    start,
+    end,
+}: {
     start: Coordinates;
     end: Coordinates;
 }) {
     const map = useMap();
 
     useEffect(() => {
-        map.fitBounds([
-            [start.lat, start.lng],
-            [end.lat, end.lng],
-        ]);
+        map.fitBounds(
+            [
+                [start.lat, start.lng],
+                [end.lat, end.lng],
+            ],
+            { padding: [40, 40] },
+        );
     }, [start, end, map]);
 
     return null;
 }
 
-const RouteMapFromCoords = ({
-                                departureCoords,
-                                destinationCoords,
-                            }: Props) => {
+const RouteMapFromCoords: React.FC<RouteMapFromCoordsProps> = ({
+    departureCoords,
+    destinationCoords,
+}) => {
     const [route, setRoute] = useState<[number, number][]>([]);
 
     useEffect(() => {
         const loadRoute = async () => {
             try {
                 const response = await fetch(
-                    `https://router.project-osrm.org/route/v1/driving/${departureCoords.lng},${departureCoords.lat};${destinationCoords.lng},${destinationCoords.lat}?overview=full&geometries=geojson`
+                    `https://router.project-osrm.org/route/v1/driving/${departureCoords.lng},${departureCoords.lat};${destinationCoords.lng},${destinationCoords.lat}?overview=full&geometries=geojson`,
                 );
 
-                const data = await response.json();
+                const data = (await response.json()) as {
+                    routes?: Array<{
+                        geometry?: {
+                            coordinates?: Array<[number, number]>;
+                        };
+                    }>;
+                };
 
-                const coordinates =
-                    data.routes?.[0]?.geometry?.coordinates ?? [];
-
+                const coordinates = data.routes?.[0]?.geometry?.coordinates ?? [];
                 const converted = coordinates.map(
-                    ([lng, lat]: [number, number]) =>
-                        [lat, lng] as [number, number]
+                    ([lng, lat]) => [lat, lng] as [number, number],
                 );
 
                 setRoute(converted);
-            } catch (error) {
-                console.error("Failed to load route", error);
+            } catch {
+                setRoute([]);
             }
         };
 
-        loadRoute();
+        void loadRoute();
     }, [departureCoords, destinationCoords]);
 
     return (
-        <div
-            style={{
-                width: "100%",
-                height: "100%",
-            }}
-        >
+        <div className="route-map-container">
             <MapContainer
-                center={[
-                    departureCoords.lat,
-                    departureCoords.lng,
-                ]}
+                center={[departureCoords.lat, departureCoords.lng]}
                 zoom={13}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "12px",
-                }}
+                className="leaflet-map"
             >
                 <TileLayer
                     attribution="&copy; OpenStreetMap contributors"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <Marker
-                    position={[
-                        departureCoords.lat,
-                        departureCoords.lng,
-                    ]}
-                />
+                <Marker position={[departureCoords.lat, departureCoords.lng]} />
+                <Marker position={[destinationCoords.lat, destinationCoords.lng]} />
 
-                <Marker
-                    position={[
-                        destinationCoords.lat,
-                        destinationCoords.lng,
-                    ]}
-                />
-
-                {route.length > 0 && (
+                {route.length > 0 ? (
+                    <Polyline positions={route} />
+                ) : (
                     <Polyline
-                        positions={route}
+                        positions={[
+                            [departureCoords.lat, departureCoords.lng],
+                            [destinationCoords.lat, destinationCoords.lng],
+                        ]}
                     />
                 )}
 
-                <MapUpdater
-                    start={departureCoords}
-                    end={destinationCoords}
-                />
+                <MapUpdater start={departureCoords} end={destinationCoords} />
             </MapContainer>
         </div>
     );

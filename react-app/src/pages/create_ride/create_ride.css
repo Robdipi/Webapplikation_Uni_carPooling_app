@@ -1,5 +1,3 @@
-
-
 section {
     flex: 2;
     max-width: 500px;
@@ -9,6 +7,7 @@ section {
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     border-radius: 12px;
 }
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -25,28 +24,38 @@ section {
     border: 1px solid var(--color-brand-grey);
     border-radius: 8px;
     font-size: 1rem;
-    font-family: sans-serif; 
+    font-family: sans-serif;
     resize: vertical;
 }
 
 .create-ride-submit-button {
     margin-top: 10px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     padding: 10px;
     width: 100%;
     background: var(--gradient-brand-important-button);
-    color: var(--color-brand-white);
     color: #fff;
     border: none;
+    border-radius: 8px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
 }
 
+.create-ride-submit-button:hover:not(:disabled) {
+    background: var(--gradient-brand-important-button-hover);
+    transform: scale(1.03);
+}
+
+.create-ride-submit-button:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
 .content-wrapper {
     display: flex;
-    flex-wrap: wrap; /* Wichtig für das Handy!  */
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
+    gap: 20px;
     padding: 20px;
     align-items: flex-start;
 }
@@ -55,15 +64,36 @@ section {
     flex: 1;
     min-width: 250px;
     max-width: 400px;
-    background-color: var(--color-brand-bg-shade-a); /* Nutze deine Variablen */
+    background-color: var(--color-brand-bg-shade-a);
     color: white;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px var(--color-shadow-light);
 }
+
 .map-wrapper {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1100px;
+    height: 430px;
     margin: 20px auto;
     padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.map-wrapper h3 {
+    margin-bottom: 10px;
+}
+
+.route-map-container,
+.leaflet-map {
+    width: 100%;
+    height: 360px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--color-shadow-light);
+}
+
+.success-message {
+    color: var(--color-price-number);
+    font-weight: bold;
 }

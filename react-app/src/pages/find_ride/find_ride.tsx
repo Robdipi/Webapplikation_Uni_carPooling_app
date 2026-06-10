@@ -1,89 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
+import { type Ride, useRideContext } from "../../contexts/ridecontext";
+import RouteMapFromCoords from "../home/RouteMapFromCoords";
+import RideCard from "./rideCard";
 import "../style.css";
 import "../home/rout_recomendation.css";
 import "./searchbar.css";
-import RideCard from "./rideCard";
-
-interface Ride {
-    id: number;
-    departureName: string;
-    destinationName: string;
-    departureCoords: {
-        lat: number;
-        lng: number;
-    };
-    destinationCoords: {
-        lat: number;
-        lng: number;
-    };
-    distanceKm: number;
-    durationMinutes: number;
-    driver: string;
-    avatarUrl: string;
-    departureTime: string;
-    seatsAvailable: number;
-    price: number;
-}
-
-const rides: Ride[] = [
-    {
-        id: 1,
-
-        departureName: "Bremen",
-        destinationName: "Hannover",
-
-        departureCoords: {
-            lat: 53.0793,
-            lng: 8.8017,
-        },
-
-        destinationCoords: {
-            lat: 52.3759,
-            lng: 9.7320,
-        },
-
-        distanceKm: 125,
-        durationMinutes: 85,
-
-        driver: "Lisa",
-        avatarUrl: "../../images/lisa.jpg",
-
-        departureTime: "2025-06-10T15:00:00",
-
-        seatsAvailable: 3,
-        price: 8,
-    },
-
-    {
-        id: 2,
-
-        departureName: "Konstanz",
-        destinationName: "Radolfzell",
-
-        departureCoords: {
-            lat: 47.6779,
-            lng: 9.1732,
-        },
-
-        destinationCoords: {
-            lat: 47.7417,
-            lng: 8.9705,
-        },
-
-        distanceKm: 19,
-        durationMinutes: 22,
-
-        driver: "Max",
-        avatarUrl: "../../images/lisa.jpg",
-
-        departureTime: "2025-06-11T08:30:00",
-
-        seatsAvailable: 2,
-        price: 4,
-    },
-];
 
 const Header: React.FC = () => {
     const { currentUser, logoutUser } = useUserContext();
@@ -114,9 +37,15 @@ const Footer: React.FC = () => (
     </footer>
 );
 
+interface SearchCriteria {
+    from: string;
+    to: string;
+    date: string;
+    time: string;
+}
 
 interface SearchBarProps {
-    onSearch: (from: string, to: string, date: string, time: string) => void;
+    onSearch: (criteria: SearchCriteria) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
@@ -127,7 +56,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        onSearch(from, to, date, time);
+        onSearch({ from, to, date, time });
     };
 
     return (
@@ -140,20 +69,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
                         placeholder="von"
                         value={from}
                         onChange={(event) => setFrom(event.target.value)}
-                        required
                     />
-                    <img
-                        src="../../images/Ui_elements/right-arrow.png"
-                        alt="icon"
-                        style={{ width: 16, height: 16 }}
-                    />
+                    <span className="searchbar-arrow">→</span>
                     <input
                         type="text"
                         className="searchbarinputfield"
                         placeholder="nach"
                         value={to}
                         onChange={(event) => setTo(event.target.value)}
-                        required
                     />
                     <label htmlFor="date" className="seachbar-label">Am:</label>
                     <input
@@ -172,11 +95,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
                         onChange={(event) => setTime(event.target.value)}
                     />
                     <button type="submit" className="search-bar-submit-button">
-                        <img
-                            src="../../images/Ui_elements/search.png"
-                            alt="icon"
-                            style={{ width: 16, height: 16 }}
-                        />{" "}
                         Suchen
                     </button>
                 </form>
@@ -185,31 +103,111 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
     );
 };
 
+function matchesDate(ride: Ride, date: string): boolean {
+    if (date === "") {
+        return true;
+    }
+
+    return ride.departureTime.startsWith(date);
+}
+
+function matchesTime(ride: Ride, time: string): boolean {
+    if (time === "") {
+        return true;
+    }
+
+    const rideDate = new Date(ride.departureTime);
+
+    if (Number.isNaN(rideDate.getTime())) {
+        return true;
+    }
+
+    const rideTime = rideDate.toTimeString().slice(0, 5);
+    return rideTime >= time;
+}
+
 const FindRidePage: React.FC = () => {
-    const [filteredRides, setFilteredRides] = useState<Ride[]>(rides);
+    const { rides } = useRideContext();
+    const [criteria, setCriteria] = useState<SearchCriteria>({
+        from: "",
+        to: "",
+        date: "",
+        time: "",
+    });
+    const [selectedRide, setSelectedRide] = useState<Ride | null>(rides[0] ?? null);
 
-    const handleSearch = (from: string, to: string) => {
-        const normalizedFrom = from.trim().toLowerCase();
-        const normalizedTo = to.trim().toLowerCase();
+    const filteredRides = useMemo(() => {
+        const normalizedFrom = criteria.from.trim().toLowerCase();
+        const normalizedTo = criteria.to.trim().toLowerCase();
 
-        setFilteredRides(
-            rides.filter(
-                (ride) =>
-                    ride.from.toLowerCase().includes(normalizedFrom) &&
-                    ride.to.toLowerCase().includes(normalizedTo)
-            )
-        );
-    };
+        return rides.filter((ride) => {
+            const matchesFrom =
+                normalizedFrom === "" ||
+                ride.departureName.toLowerCase().includes(normalizedFrom);
+
+            const matchesTo =
+                normalizedTo === "" ||
+                ride.destinationName.toLowerCase().includes(normalizedTo);
+
+            return (
+                matchesFrom &&
+                matchesTo &&
+                matchesDate(ride, criteria.date) &&
+                matchesTime(ride, criteria.time)
+            );
+        });
+    }, [rides, criteria]);
+
+    useEffect(() => {
+        if (filteredRides.length === 0) {
+            setSelectedRide(null);
+            return;
+        }
+
+        if (
+            selectedRide === null ||
+            !filteredRides.some((ride) => ride.id === selectedRide.id)
+        ) {
+            setSelectedRide(filteredRides[0]);
+        }
+    }, [filteredRides, selectedRide]);
 
     return (
         <div>
             <Header />
             <main>
                 <h2>Fahrt finden</h2>
-                <SearchBar onSearch={handleSearch} />
+                <SearchBar onSearch={setCriteria} />
+
+                <div className="campusride-map-card">
+                    {selectedRide === null ? (
+                        <div className="empty-state">Keine passende Fahrt gefunden.</div>
+                    ) : (
+                        <RouteMapFromCoords
+                            departureCoords={selectedRide.departureCoords}
+                            destinationCoords={selectedRide.destinationCoords}
+                        />
+                    )}
+                </div>
+
+                {selectedRide !== null && (
+                    <section className="selected-ride-summary">
+                        <h3>Ausgewählte Fahrt</h3>
+                        <p>
+                            {selectedRide.departureName} &rarr; {selectedRide.destinationName}
+                        </p>
+                    </section>
+                )}
+
+                <h3>Suchergebnisse</h3>
                 <ul className="rides-list">
                     {filteredRides.map((ride) => (
-                        <RideCard key={`${ride.from}-${ride.to}-${ride.time}`} ride={ride} />
+                        <RideCard
+                            key={ride.id}
+                            ride={ride}
+                            selected={selectedRide?.id === ride.id}
+                            onSelect={setSelectedRide}
+                        />
                     ))}
                 </ul>
             </main>

@@ -1,33 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
+import { type Ride, useRideContext } from "../../contexts/ridecontext";
+import RouteMapFromCoords from "./RouteMapFromCoords";
+import RideCard from "../find_ride/rideCard";
 import "../style.css";
 import "./rout_recomendation.css";
 import "./popup.css";
-
-interface Ride {
-    from: string;
-    to: string;
-    driver: string;
-    time: string;
-    seatsAvailable: number;
-    price: number;
-    avatarUrl: string;
-    mapUrl: string;
-}
-
-const rides: Ride[] = [
-    {
-        from: "Bremen",
-        to: "Hannover",
-        driver: "Lisa",
-        time: "15:00 Uhr",
-        seatsAvailable: 3,
-        price: 8,
-        avatarUrl: "../../images/lisa.jpg",
-        mapUrl: "../../images/map_placeholder.png",
-    },
-];
 
 const Header: React.FC = () => {
     const { currentUser, logoutUser } = useUserContext();
@@ -50,34 +29,6 @@ const Header: React.FC = () => {
     );
 };
 
-const RideCard: React.FC<{ ride: Ride }> = ({ ride }) => (
-    <li className="rides-list-entry">
-        <div className="map-item">
-            <div className="map">
-                <img src={ride.mapUrl} alt="MapUI" className="karte" />
-            </div>
-        </div>
-        <div className="ride-item">
-            <article className="ride-card">
-                <div className="ride-info">
-                    <img
-                        src={ride.avatarUrl}
-                        alt={`Profilbild von ${ride.driver}`}
-                        className="avatar"
-                    />
-                    <div className="details">
-                        <h3>{ride.from} &rarr; {ride.to}</h3>
-                        <p>
-                            {ride.driver}, {ride.time}, {ride.seatsAvailable} freie Plätze,{" "}
-                            <strong>€{ride.price}</strong>
-                        </p>
-                    </div>
-                </div>
-            </article>
-        </div>
-    </li>
-);
-
 const Footer: React.FC = () => (
     <footer>
         <Link to="/impressum" className="extra-info-btn">Impressum</Link>{" "}
@@ -88,6 +39,19 @@ const Footer: React.FC = () => (
 
 const HomePage: React.FC = () => {
     const { currentUser } = useUserContext();
+    const { rides } = useRideContext();
+    const [selectedRide, setSelectedRide] = useState<Ride | null>(rides[0] ?? null);
+
+    useEffect(() => {
+        if (rides.length === 0) {
+            setSelectedRide(null);
+            return;
+        }
+
+        if (selectedRide === null || !rides.some((ride) => ride.id === selectedRide.id)) {
+            setSelectedRide(rides[0]);
+        }
+    }, [rides, selectedRide]);
 
     return (
         <div>
@@ -95,12 +59,42 @@ const HomePage: React.FC = () => {
             <main>
                 <h2>
                     {currentUser === null
-                        ? "Deine Fahrten:"
-                        : `Deine Fahrten, ${currentUser.profile.firstName}:`}
+                        ? "Fahrten in deiner Nähe"
+                        : `Fahrten in deiner Nähe, ${currentUser.profile.firstName}`}
                 </h2>
+
+                <div className="campusride-map-card">
+                    {selectedRide === null ? (
+                        <div className="empty-state">Es gibt noch keine Fahrten.</div>
+                    ) : (
+                        <RouteMapFromCoords
+                            departureCoords={selectedRide.departureCoords}
+                            destinationCoords={selectedRide.destinationCoords}
+                        />
+                    )}
+                </div>
+
+                {selectedRide !== null && (
+                    <section className="selected-ride-summary">
+                        <h3>Ausgewählte Fahrt</h3>
+                        <p>
+                            {selectedRide.departureName} &rarr; {selectedRide.destinationName}
+                        </p>
+                        <p>
+                            {selectedRide.driver} · {selectedRide.seatsAvailable} freie Plätze · €{selectedRide.price}
+                        </p>
+                    </section>
+                )}
+
+                <h3>Verfügbare Fahrten</h3>
                 <ul className="rides-list">
                     {rides.map((ride) => (
-                        <RideCard key={`${ride.from}-${ride.to}-${ride.time}`} ride={ride} />
+                        <RideCard
+                            key={ride.id}
+                            ride={ride}
+                            selected={selectedRide?.id === ride.id}
+                            onSelect={setSelectedRide}
+                        />
                     ))}
                 </ul>
             </main>
