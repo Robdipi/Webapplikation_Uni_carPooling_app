@@ -1,12 +1,12 @@
 import React from "react";
-import {Link, Route, Routes} from "react-router-dom";
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import ImpressumPage from "./pages/impressum/impressum";
 import HomePage from "./pages/home/home";
 import ChatPage from "./pages/chat/chat";
 import CreateRidePage from "./pages/create_ride/create_ride";
 import FindRidePage from "./pages/find_ride/file_ride";
 import ProfilePage from "./pages/profile/profile";
-
+import { useNavigate } from "react-router-dom";
 
 
 /*
@@ -35,6 +35,19 @@ const HomePageRouts: React.FC = () => {
 
 
 function StartPage() {
+    function StartPage() {
+    const navigate = useNavigate();
+
+    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        navigate("/home");
+    };
+
+    const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        navigate("/home");
+    };
+
     return (
         <div>
             <header>
@@ -55,7 +68,7 @@ function StartPage() {
                                     Melde dich an, um Fahrten am Campus zu finden oder anzubieten.
                                 </p>
 
-                                <form action="src/pages/home/home.html">
+                                <form onSubmit={handleLogin}>
                                     <div className="form-group">
                                         <label for="user-id" className="logintext"
                                         >Benutzername oder E-Mail:</label
@@ -95,7 +108,7 @@ function StartPage() {
                                     anzubieten.
                                 </p>
 
-                                <form action="html/home/home.html">
+                                <form onSubmit={handleRegister}>
                                     <div className="form-group">
                                         <label for="user-id-register" className="logintext"
                                         >E-Mail:</label
