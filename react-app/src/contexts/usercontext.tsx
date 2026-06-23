@@ -1,4 +1,9 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
+import {
+    ApiUser,
+    loginUserRequest,
+    registerUserRequest,
+} from "../api/authApi";
 
 export interface UserProfile {
     firstName: string;
@@ -13,7 +18,6 @@ export interface RegisteredUser {
     id: string;
     email: string;
     username: string;
-    password: string;
     profile: UserProfile;
 }
 
@@ -40,10 +44,11 @@ export interface AuthResult {
 interface UserContextValue {
     users: RegisteredUser[];
     currentUser: RegisteredUser | null;
+    authToken: string | null;
     isLoggedIn: boolean;
     profile: UserProfile;
-    registerUser: (input: RegisterUserInput) => AuthResult;
-    loginUser: (input: LoginUserInput) => AuthResult;
+    registerUser: (input: RegisterUserInput) => Promise<AuthResult>;
+    loginUser: (input: LoginUserInput) => Promise<AuthResult>;
     logoutUser: () => void;
     setProfile: (profile: UserProfile) => void;
 }
@@ -57,117 +62,126 @@ const defaultProfile: UserProfile = {
     course: "Allgemeine Informatik (AIN)",
 };
 
-const USERS_STORAGE_KEY = "campusRideUsers";
-
-function readFromLocalStorage<T>(key: string, fallback: T): T {
-    try {
-        const storedValue = localStorage.getItem(key);
-
-        if (storedValue === null) {
-            return fallback;
-        }
-
-        return JSON.parse(storedValue) as T;
-    } catch {
-        return fallback;
-    }
-}
-
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
 interface UserContextProviderProps {
     children: ReactNode;
 }
 
+function toRegisteredUser(apiUser: ApiUser): RegisteredUser {
+    return {
+        id: apiUser.id,
+        email: apiUser.email,
+        username: apiUser.username,
+        profile: {
+            firstName: apiUser.profile.firstName,
+            lastName: apiUser.profile.lastName,
+            birthDate: apiUser.profile.birthDate,
+            city: "Konstanz",
+            pricePerKm: "0,60 €",
+            course: apiUser.profile.course,
+        },
+    };
+}
+
+function validateRegisterInput(input: RegisterUserInput): string | null {
+    if (
+        input.email.trim() === "" ||
+        input.username.trim() === "" ||
+        input.password.trim() === "" ||
+        input.firstName.trim() === "" ||
+        input.lastName.trim() === "" ||
+        input.course.trim() === "" ||
+        input.birthDate.trim() === ""
+    ) {
+        return "Bitte fülle alle Pflichtfelder aus.";
+    }
+
+    return null;
+}
+
+function validateLoginInput(input: LoginUserInput): string | null {
+    if (input.identifier.trim() === "" || input.password.trim() === "") {
+        return "Bitte gib Benutzername/E-Mail und Passwort ein.";
+    }
+
+    return null;
+}
+
 export function UserContextProvider({ children }: UserContextProviderProps) {
-    const [users, setUsers] = useState<RegisteredUser[]>(() =>
-        readFromLocalStorage<RegisteredUser[]>(USERS_STORAGE_KEY, []),
-    );
-
+    const [users, setUsers] = useState<RegisteredUser[]>([]);
     const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
+    const [authToken, setAuthToken] = useState<string | null>(null);
 
-    useEffect(() => {
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-    }, [users]);
+    const registerUser = async (input: RegisterUserInput): Promise<AuthResult> => {
+        const validationError = validateRegisterInput(input);
 
-    const registerUser = (input: RegisterUserInput): AuthResult => {
-        const email = input.email.trim().toLowerCase();
-        const username = input.username.trim();
-        const password = input.password;
-
-        if (
-            email === "" ||
-            username === "" ||
-            password === "" ||
-            input.firstName.trim() === "" ||
-            input.lastName.trim() === "" ||
-            input.course.trim() === "" ||
-            input.birthDate === ""
-        ) {
-            return { success: false, error: "Bitte fülle alle Pflichtfelder aus." };
+        if (validationError !== null) {
+            return { success: false, error: validationError };
         }
 
-        const userAlreadyExists = users.some(
-            (user) =>
-                user.email === email ||
-                user.username.toLowerCase() === username.toLowerCase(),
-        );
-
-        if (userAlreadyExists) {
-            return {
-                success: false,
-                error: "E-Mail oder Benutzername ist bereits registriert.",
-            };
-        }
-
-        const newUser: RegisteredUser = {
-            id: crypto.randomUUID(),
-            email,
-            username,
-            password,
-            profile: {
+        try {
+            const response = await registerUserRequest({
+                email: input.email.trim().toLowerCase(),
+                username: input.username.trim(),
+                password: input.password,
                 firstName: input.firstName.trim(),
                 lastName: input.lastName.trim(),
-                birthDate: input.birthDate,
-                city: "Konstanz",
-                pricePerKm: "0,60 €",
+                birthDate: input.birthDate.trim(),
                 course: input.course.trim(),
-            },
-        };
+            });
 
-        setUsers((previousUsers) => [...previousUsers, newUser]);
-        setCurrentUser(newUser);
+            const registeredUser = toRegisteredUser(response.user);
 
-        return { success: true };
-    };
+            setCurrentUser(registeredUser);
+            setAuthToken(response.token);
+            setUsers([registeredUser]);
 
-    const loginUser = (input: LoginUserInput): AuthResult => {
-        const identifier = input.identifier.trim().toLowerCase();
-        const password = input.password;
-
-        if (identifier === "" || password === "") {
-            return { success: false, error: "Bitte gib Benutzername/E-Mail und Passwort ein." };
-        }
-
-        const foundUser = users.find(
-            (user) =>
-                user.email === identifier ||
-                user.username.toLowerCase() === identifier,
-        );
-
-        if (foundUser === undefined || foundUser.password !== password) {
+            return { success: true };
+        } catch (error) {
             return {
                 success: false,
-                error: "Benutzername/E-Mail oder Passwort ist falsch.",
+                error: error instanceof Error
+                    ? error.message
+                    : "Registrierung fehlgeschlagen.",
             };
         }
+    };
 
-        setCurrentUser(foundUser);
-        return { success: true };
+    const loginUser = async (input: LoginUserInput): Promise<AuthResult> => {
+        const validationError = validateLoginInput(input);
+
+        if (validationError !== null) {
+            return { success: false, error: validationError };
+        }
+
+        try {
+            const response = await loginUserRequest({
+                identifier: input.identifier.trim(),
+                password: input.password,
+            });
+
+            const loggedInUser = toRegisteredUser(response.user);
+
+            setCurrentUser(loggedInUser);
+            setAuthToken(response.token);
+            setUsers([loggedInUser]);
+
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error instanceof Error
+                    ? error.message
+                    : "Anmeldung fehlgeschlagen.",
+            };
+        }
     };
 
     const logoutUser = () => {
         setCurrentUser(null);
+        setAuthToken(null);
+        setUsers([]);
     };
 
     const setProfile = (profile: UserProfile) => {
@@ -191,6 +205,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     const contextValue: UserContextValue = {
         users,
         currentUser,
+        authToken,
         isLoggedIn: currentUser !== null,
         profile: currentUser?.profile ?? defaultProfile,
         registerUser,

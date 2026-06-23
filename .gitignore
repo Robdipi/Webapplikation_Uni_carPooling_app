@@ -1,0 +1,19 @@
+test.html
+*.tmp.driveupload
+
+node_modules/
+react-app/node_modules/
+react-app/.vite/
+dist/
+react-app/dist/
+
+# Backend
+react-app/server/node_modules/
+react-app/server/dist/
+react-app/server/.env
+
+# SQLite database
+react-app/server/dev.db
+react-app/server/prisma/dev.db
+react-app/server/dev.db-journal
+react-app/server/prisma/dev.db-journal

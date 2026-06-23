@@ -8,12 +8,12 @@ const StartPage: React.FC = () => {
     const [loginError, setLoginError] = useState<string>("");
     const [registerError, setRegisterError] = useState<string>("");
 
-    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setLoginError("");
 
         const formData = new FormData(event.currentTarget);
-        const result = loginUser({
+        const result = await loginUser({
             identifier: String(formData.get("username") ?? ""),
             password: String(formData.get("password") ?? ""),
         });
@@ -26,12 +26,12 @@ const StartPage: React.FC = () => {
         navigate("/home");
     };
 
-    const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setRegisterError("");
 
         const formData = new FormData(event.currentTarget);
-        const result = registerUser({
+        const result = await registerUser({
             email: String(formData.get("email") ?? ""),
             username: String(formData.get("username") ?? ""),
             password: String(formData.get("password") ?? ""),
