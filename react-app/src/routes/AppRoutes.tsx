@@ -5,6 +5,7 @@ import CreateRidePage from "../pages/create_ride/create_ride";
 import FindRidePage from "../pages/find_ride/find_ride";
 import HomePage from "../pages/home/home";
 import ImpressumPage from "../pages/impressum/impressum";
+import NotFoundPage from "../pages/not_found/NotFoundPage";
 import ProfilePage from "../pages/profile/profile";
 
 export default function AppRoutes() {
@@ -20,6 +21,7 @@ export default function AppRoutes() {
             <Route path="/find-ride" element={<FindRidePage />} />
             <Route path="/find_ride" element={<Navigate to="/find-ride" replace />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
 }

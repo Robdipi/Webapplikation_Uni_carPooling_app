@@ -58,7 +58,6 @@ const defaultProfile: UserProfile = {
 };
 
 const USERS_STORAGE_KEY = "campusRideUsers";
-const CURRENT_USER_STORAGE_KEY = "campusRideCurrentUserEmail";
 
 function readFromLocalStorage<T>(key: string, fallback: T): T {
     try {
@@ -85,29 +84,11 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         readFromLocalStorage<RegisteredUser[]>(USERS_STORAGE_KEY, []),
     );
 
-    const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(() => {
-        const storedUsers = readFromLocalStorage<RegisteredUser[]>(USERS_STORAGE_KEY, []);
-        const currentUserEmail = localStorage.getItem(CURRENT_USER_STORAGE_KEY);
-
-        if (currentUserEmail === null) {
-            return null;
-        }
-
-        return storedUsers.find((user) => user.email === currentUserEmail) ?? null;
-    });
+    const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
 
     useEffect(() => {
         localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
     }, [users]);
-
-    useEffect(() => {
-        if (currentUser === null) {
-            localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
-            return;
-        }
-
-        localStorage.setItem(CURRENT_USER_STORAGE_KEY, currentUser.email);
-    }, [currentUser]);
 
     const registerUser = (input: RegisterUserInput): AuthResult => {
         const email = input.email.trim().toLowerCase();
