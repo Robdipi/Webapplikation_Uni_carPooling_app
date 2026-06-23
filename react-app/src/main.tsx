@@ -1,12 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import HomePageRouts from "./StartPage"; // This is your routes component
-import "./pages/style.css";
-import "./pages/popup.css";
-import {AppProviders} from "./contexts/AppProviders";
+import { AppProviders } from "./contexts/AppProviders";
+import AppRoutes from "./routes/AppRoutes";
 import "leaflet/dist/leaflet.css";
-
+import "./pages/popup.css";
+import "./pages/style.css";
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -14,7 +13,7 @@ root.render(
     <React.StrictMode>
         <AppProviders>
             <BrowserRouter>
-                <HomePageRouts /> {/* Render the routes component */}
+                <AppRoutes />
             </BrowserRouter>
         </AppProviders>
     </React.StrictMode>
