@@ -1,6 +1,7 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import {
     ApiUser,
+    getCurrentUserRequest,
     loginUserRequest,
     registerUserRequest,
 } from "../api/authApi";
@@ -46,6 +47,7 @@ interface UserContextValue {
     currentUser: RegisteredUser | null;
     authToken: string | null;
     isLoggedIn: boolean;
+    isAuthLoading: boolean;
     profile: UserProfile;
     registerUser: (input: RegisterUserInput) => Promise<AuthResult>;
     loginUser: (input: LoginUserInput) => Promise<AuthResult>;
@@ -61,6 +63,8 @@ const defaultProfile: UserProfile = {
     pricePerKm: "0,60 €",
     course: "Allgemeine Informatik (AIN)",
 };
+
+const AUTH_TOKEN_STORAGE_KEY = "campusRideAuthToken";
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
@@ -111,7 +115,36 @@ function validateLoginInput(input: LoginUserInput): string | null {
 export function UserContextProvider({ children }: UserContextProviderProps) {
     const [users, setUsers] = useState<RegisteredUser[]>([]);
     const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
-    const [authToken, setAuthToken] = useState<string | null>(null);
+    const [authToken, setAuthToken] = useState<string | null>(() =>
+        localStorage.getItem(AUTH_TOKEN_STORAGE_KEY),
+    );
+    const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        async function restoreCurrentUser() {
+            if (authToken === null) {
+                setIsAuthLoading(false);
+                return;
+            }
+
+            try {
+                const apiUser = await getCurrentUserRequest(authToken);
+                const restoredUser = toRegisteredUser(apiUser);
+
+                setCurrentUser(restoredUser);
+                setUsers([restoredUser]);
+            } catch {
+                localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+                setAuthToken(null);
+                setCurrentUser(null);
+                setUsers([]);
+            } finally {
+                setIsAuthLoading(false);
+            }
+        }
+
+        restoreCurrentUser();
+    }, [authToken]);
 
     const registerUser = async (input: RegisterUserInput): Promise<AuthResult> => {
         const validationError = validateRegisterInput(input);
@@ -133,6 +166,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
             const registeredUser = toRegisteredUser(response.user);
 
+            localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.token);
             setCurrentUser(registeredUser);
             setAuthToken(response.token);
             setUsers([registeredUser]);
@@ -163,6 +197,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
             const loggedInUser = toRegisteredUser(response.user);
 
+            localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.token);
             setCurrentUser(loggedInUser);
             setAuthToken(response.token);
             setUsers([loggedInUser]);
@@ -179,6 +214,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     };
 
     const logoutUser = () => {
+        localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
         setCurrentUser(null);
         setAuthToken(null);
         setUsers([]);
@@ -207,6 +243,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         currentUser,
         authToken,
         isLoggedIn: currentUser !== null,
+        isAuthLoading,
         profile: currentUser?.profile ?? defaultProfile,
         registerUser,
         loginUser,
