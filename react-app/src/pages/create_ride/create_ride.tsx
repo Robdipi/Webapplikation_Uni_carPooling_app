@@ -110,6 +110,7 @@ async function geocodeAddress(address: string): Promise<Coordinates | null> {
     }
 }
 
+//we are lazy so just the the distance over air instead the distance of the poligon should be a good aproximation
 function calculateDistanceKm(start: Coordinates, end: Coordinates): number {
     const earthRadiusKm = 6371;
     const latDistance = ((end.lat - start.lat) * Math.PI) / 180;
@@ -125,10 +126,12 @@ function calculateDistanceKm(start: Coordinates, end: Coordinates): number {
     return Math.max(1, directDistance * 1.25);
 }
 
+// for simplicity we assume we drive 45kmh on avg
 function calculateDurationMinutes(distanceKm: number): number {
     return Math.max(5, Math.round((distanceKm / 45) * 60));
 }
 
+//Todo put UserPrice Data in here
 function calculatePrice(distanceKm: number): number {
     return Math.max(2, Math.round(distanceKm * 0.35));
 }
@@ -178,7 +181,7 @@ const CreateRidePage: React.FC = () => {
             distanceKm,
             durationMinutes: calculateDurationMinutes(distanceKm),
             driver: currentUser?.profile.firstName ?? "Unbekannt",
-            avatarUrl: "/images/lisa.jpg",
+            avatarUrl: "/images/lisa.jpg", //Todo implement avatars maybe probably not
             departureTime: form.dateTime,
             seatsAvailable: form.seats,
             price: calculatePrice(distanceKm),

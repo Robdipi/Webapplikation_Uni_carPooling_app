@@ -198,4 +198,4 @@ Performance on point, no re-render stress,
 Everything structured, nothing a mess,
 Scalable vibe, yeah it’s future-proof gold,
 This kind of code deserves to be told.
- */
+*/

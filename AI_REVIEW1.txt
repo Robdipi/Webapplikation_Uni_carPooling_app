@@ -1,0 +1,189 @@
+Code Review: CampusRide
+========================
+
+Architecture (Good)
+- Clean SPA + REST API split, TypeScript end-to-end, proper Context-based state
+  management, Prisma ORM with SQLite, JWT auth flow.
+- Context providers are well-structured with guard hooks (useXContext throws if
+  used outside provider).
+
+
+Critical Issues
+===============
+
+1. JWT fallback secret in code
+   File: server/src/app.ts:9
+   "campusride-dev-secret" is both the code fallback and the .env.example value.
+   Anyone can forge tokens against a production instance if .env isn't set.
+   Severity: High
+
+2. Profile edits are entirely client-side
+   File: usercontext.tsx:223-238, schema.prisma
+   setProfile only updates React state. Refresh resets to hardcoded defaults.
+   Backend has no update endpoint and the Prisma User model has no city or
+   pricePerKm columns.
+   Severity: High
+
+3. Rides and chat messages live only in localStorage
+   File: ridecontext.tsx, chatcontext.tsx
+   No backend persistence. All data disappears on browser storage clear or
+   device change.
+   Severity: High
+
+4. Nominatim/OSRM API calls without User-Agent
+   File: create_ride.tsx:91-93, RouteMap.tsx:66-68, RouteMapFromCoords.tsx:65-67
+   Violates Nominatim's usage policy. Your IP could be blocked.
+   Severity: High
+
+
+Security
+========
+
+5. JWT stored in localStorage (XSS-vulnerable). Prefer httpOnly cookies.
+   File: usercontext.tsx:67
+
+6. No rate limiting on /api/auth/register or /api/auth/login - brute-force
+   attacks are trivial.
+   File: app.ts
+
+7. No password strength validation - test shows password "12345" is accepted.
+   File: app.test.ts:35
+
+8. No HTTPS in production config - API_BASE_URL is hardcoded to
+   http://localhost:3001/api.
+   File: authApi.ts:35
+
+9. CORS is wide open (app.use(cors()) with no origin restriction).
+   File: app.ts:19
+
+
+Code Quality
+============
+
+10. Massive Header/Footer duplication
+    File: All page files
+    6 pages (home, create_ride, find_ride, chat, profile) each define an
+    identical <Header> and <Footer>. Extract into a shared Layout component.
+
+11. Price as formatted string
+    File: usercontext.tsx:63
+    pricePerKm: "0,60 €" is a string with the € symbol. Numeric calculation
+    requires parsing.
+
+12. users array in UserContext is misleading
+    File: usercontext.tsx:116,135,172,203,220
+    It always contains exactly [currentUser]. Unused dead code or conceptual
+    confusion.
+
+13. Avatar is hardcoded to /images/lisa.jpg for all created rides. Should be
+    dynamic or configurable.
+    File: create_ride.tsx:184
+
+14. calculatePrice() ignores the user's pricePerKm preference and uses a
+    hardcoded 0.35 factor.
+    File: create_ride.tsx:135-137
+
+15. Leaflet icon fix duplicated in 2 files (RouteMap.tsx,
+    RouteMapFromCoords.tsx). Extract to a shared module.
+    File: Both map files
+
+16. MapUpdater component duplicated identically in both map files.
+    File: Both map files
+
+17. Server port hardcoded (3001). Should be configurable via env variable with
+    fallback.
+    File: server/src/index.ts:3
+
+
+Bugs
+====
+
+18. matchesTime() uses >= comparison on time strings - will match rides
+    departing at or after the filter time, but also silently passes through on
+    NaN dates.
+    File: find_ride.tsx:114-127
+
+19. selectedRide effect has selectedRide in deps while also setting it -
+    fragile, can cause extra re-renders.
+    File: home.tsx:45-54
+
+20. city in UserProfile but missing from Prisma User model. Hardcoded to
+    "Konstanz" in toRegisteredUser().
+    File: usercontext.tsx:84, schema.prisma
+
+21. Logout uses <Link to="/" onClick={logoutUser}> - if React's synthetic event
+    handler lags, the navigation may fire before state clears. Should use
+    <button> or event.preventDefault().
+    File: All page files
+
+22. Chat clear has no confirmation dialog - destructive action with no undo.
+    File: chat.tsx:199
+
+23. No Vite config file found (vite.config.ts) - deploying without explicit
+    config may fail.
+    File: Missing
+
+24. Frontend package.json includes @prisma/client and prisma as deps - the
+    browser can't use Prisma directly; likely dead dependencies.
+    File: package.json:13,32
+
+
+Testing
+=======
+
+25. Tests create users in the database and never clean them up - data leaks
+    between test runs.
+    File: app.test.ts
+
+26. No test for duplicate email/username registration (409 response).
+    File: app.test.ts
+
+27. No test for malformed/invalid input (400 response).
+    File: app.test.ts
+
+28. No test for expired/invalid JWT token.
+    File: app.test.ts
+
+
+Performance
+===========
+
+29. OSRM route API called on every component mount and prop change with no
+    caching. Same route could be fetched repeatedly.
+    File: Both map files
+
+30. localStorage.setItem called on every state change (rides, messages) - entire
+    array serialized each time.
+    File: ridecontext.tsx:73, chatcontext.tsx:133
+
+31. No virtualization for ride list - 1000+ rides would render 1000+ DOM nodes.
+    File: home.tsx:90-99
+
+
+What's Done Well
+================
+
+1. TypeScript end-to-end with proper interfaces, no any abuse.
+2. Guard hooks for all contexts prevent misuse.
+3. Error handling in all API routes (try/catch + console.error).
+4. Input validation on both client and server (register fields).
+5. crypto.randomUUID() for ride/message IDs.
+6. localStorage data validation - checks Array.isArray, filters old demo-rides.
+7. useMemo for filtered rides in FindRidePage.
+8. Accessible form labels (htmlFor/id pairs).
+9. Debounced geocoding to avoid excessive API calls.
+10. Clean Prisma schema with proper indexes (@unique on email/username).
+11. Generic AuthResult pattern with { success, error? } - clean error
+    propagation.
+12. JWT expiresIn: "2h" - reasonable expiration window.
+
+
+Summary
+=======
+
+This is a well-structured university project with a clean architecture. The most
+impactful fixes would be: extracting the duplicated Header/Footer into a shared
+layout (DRY), adding a backend API for rides and profile persistence (currently
+localStorage-only), and hardening auth security (rate limiting, password policy,
+removing the fallback JWT secret). The Nominatim usage policy issue should also
+be addressed immediately to avoid rate limiting.

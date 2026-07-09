@@ -113,11 +113,9 @@ function readSelectedContactIdFromLocalStorage(): string {
     const contactExists = initialContacts.some(
         (contact) => contact.id === storedContactId,
     );
-
     if (storedContactId !== null && contactExists) {
         return storedContactId;
     }
-
     return initialContacts[0].id;
 }
 

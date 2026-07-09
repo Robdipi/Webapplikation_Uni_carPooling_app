@@ -22,7 +22,6 @@ const StartPage: React.FC = () => {
             setLoginError(result.error ?? "Anmeldung fehlgeschlagen.");
             return;
         }
-
         navigate("/home");
     };
 

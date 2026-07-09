@@ -5,7 +5,7 @@ import CreateRidePage from "../pages/create_ride/create_ride";
 import FindRidePage from "../pages/find_ride/find_ride";
 import HomePage from "../pages/home/home";
 import ImpressumPage from "../pages/impressum/impressum";
-import NotFoundPage from "../pages/not_found/NotFoundPage";
+import NotFoundPage from "../pages/not_Found/NotFoundPage";
 import ProfilePage from "../pages/profile/profile";
 import ProtectedRoute from "./ProtectedRoute";
 
