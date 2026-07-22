@@ -49,6 +49,7 @@ interface ContactItemProps {
     isSelected: boolean;
     lastMessage?: ChatMessage;
     onSelect: (contactId: string) => void;
+    onDelete: (contactId: string) => void;
 }
 
 const ContactItem: React.FC<ContactItemProps> = ({
@@ -56,6 +57,7 @@ const ContactItem: React.FC<ContactItemProps> = ({
     isSelected,
     lastMessage,
     onSelect,
+    onDelete,
 }) => (
     <button
         type="button"
@@ -74,6 +76,23 @@ const ContactItem: React.FC<ContactItemProps> = ({
             <span className="contact-preview">
                 {lastMessage?.content ?? "Noch keine Nachrichten"}
             </span>
+        </span>
+        <span
+            className="contact-delete-btn"
+            role="button"
+            tabIndex={0}
+            onClick={(event) => {
+                event.stopPropagation();
+                onDelete(contact.id);
+            }}
+            onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.stopPropagation();
+                    onDelete(contact.id);
+                }
+            }}
+        >
+            &times;
         </span>
     </button>
 );
@@ -155,10 +174,23 @@ const ChatPage: React.FC = () => {
         selectContact,
         sendMessage,
         clearChat,
+        deleteContact,
         getLastMessage,
     } = useChatContext();
 
     const mainRef = useRef<HTMLDivElement | null>(null);
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+    const pendingDeleteContact = pendingDeleteId !== null
+        ? contacts.find((c) => c.id === pendingDeleteId)
+        : undefined;
+
+    const confirmDelete = () => {
+        if (pendingDeleteId !== null) {
+            deleteContact(pendingDeleteId);
+            setPendingDeleteId(null);
+        }
+    };
 
     useEffect(() => {
         mainRef.current?.scrollTo({
@@ -180,6 +212,7 @@ const ChatPage: React.FC = () => {
                         isSelected={contact.id === selectedContactId}
                         lastMessage={getLastMessage(contact.id)}
                         onSelect={selectContact}
+                        onDelete={setPendingDeleteId}
                     />
                 ))}
             </aside>
@@ -222,6 +255,34 @@ const ChatPage: React.FC = () => {
             <footer className="chat-footer">
                 <ChatInput selectedContact={selectedContact} onSend={sendMessage} />
             </footer>
+
+            {pendingDeleteContact !== undefined && (
+                <div className="confirm-overlay">
+                    <div className="confirm-dialog">
+                        <h3>Chat löschen?</h3>
+                        <p>
+                            Willst du den Chat mit <strong>{pendingDeleteContact.name}</strong> wirklich löschen?
+                            Alle Nachrichten werden entfernt.
+                        </p>
+                        <div className="confirm-dialog-actions">
+                            <button
+                                type="button"
+                                className="confirm-no"
+                                onClick={() => setPendingDeleteId(null)}
+                            >
+                                Abbrechen
+                            </button>
+                            <button
+                                type="button"
+                                className="confirm-yes"
+                                onClick={confirmDelete}
+                            >
+                                Löschen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

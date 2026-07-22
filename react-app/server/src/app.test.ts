@@ -344,6 +344,60 @@ describe("Chat", () => {
         expect(response.status).toBe(400);
         expect(response.body.error).toBe("Name und userId werden benötigt.");
     });
+
+    it("deletes a contact and its messages", async () => {
+        const uniqueValue = Date.now();
+        const registerRes = await request(app)
+            .post("/api/auth/register")
+            .send({
+                email: `del-test-${uniqueValue}@example.com`,
+                username: `del-test-user-${uniqueValue}`,
+                password: "12345",
+                firstName: "Del",
+                lastName: "Test",
+                birthDate: "2000-01-01",
+                course: "AIN",
+            });
+
+        const userId = registerRes.body.user.id as string;
+
+        const contactRes = await request(app)
+            .post("/api/chat/contacts")
+            .send({ name: "Del Kontakt", userId });
+
+        expect(contactRes.status).toBe(201);
+        const contactId = contactRes.body.contact.id as string;
+
+        // Send a message to the contact
+        await request(app)
+            .post("/api/chat/messages")
+            .send({
+                contactId,
+                sender: "me",
+                type: "text",
+                content: "Testnachricht",
+                sentAt: "12:00",
+            });
+
+        // Delete the contact
+        const deleteRes = await request(app)
+            .delete(`/api/chat/contacts/${contactId}`);
+
+        expect(deleteRes.status).toBe(200);
+        expect(deleteRes.body.success).toBe(true);
+
+        // Contact gone from DB
+        const contactAfter = await prisma.chatContact.findUnique({
+            where: { id: contactId },
+        });
+        expect(contactAfter).toBeNull();
+
+        // Messages also gone
+        const msgsAfter = await prisma.chatMessage.findMany({
+            where: { contactId },
+        });
+        expect(msgsAfter).toHaveLength(0);
+    });
 });
 
 // ── DB Status ─────────────────────────────────────────────────────────────────

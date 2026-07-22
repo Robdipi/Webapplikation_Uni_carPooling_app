@@ -10,6 +10,8 @@ import {
     getChatContactsRequest,
     sendMessageRequest,
     clearChatRequest,
+    createChatContactRequest,
+    deleteContactRequest,
 } from "../api/chatApi";
 
 export interface ChatContactUser {
@@ -47,6 +49,8 @@ interface ChatContextValue {
     selectContact: (contactId: string) => void;
     sendMessage: (content: string) => void;
     clearChat: (contactId: string) => void;
+    deleteContact: (contactId: string) => void;
+    addContact: (name: string, userId: string) => Promise<ChatContact | null>;
     getLastMessage: (contactId: string) => ChatMessage | undefined;
 }
 
@@ -68,25 +72,25 @@ const fallbackContacts: ChatContact[] = [
         id: "lisa",
         name: "Lisa Müller",
         userId: "fallback",
-        user: fallbackUser,
+        user: { ...fallbackUser, avatarUrl: "/images/2.jpg" },
     },
     {
         id: "max",
         name: "Max Weber",
         userId: "fallback",
-        user: fallbackUser,
+        user: { ...fallbackUser, avatarUrl: "/images/3.jpg" },
     },
     {
         id: "sarah",
         name: "Sarah Fischer",
         userId: "fallback",
-        user: fallbackUser,
+        user: { ...fallbackUser, avatarUrl: "/images/4.jpg" },
     },
     {
         id: "jonas",
         name: "Jonas Klein",
         userId: "fallback",
-        user: fallbackUser,
+        user: { ...fallbackUser, avatarUrl: "/images/1.jpg" },
     },
 ];
 
@@ -264,6 +268,49 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         );
     };
 
+    const deleteContact = async (contactId: string) => {
+        try {
+            await deleteContactRequest(contactId);
+        } catch {
+            // Continue even if API fails
+        }
+
+        setContacts((previousContacts) =>
+            previousContacts.filter((contact) => contact.id !== contactId),
+        );
+        setMessages((previousMessages) =>
+            previousMessages.filter((message) => message.contactId !== contactId),
+        );
+
+        if (selectedContactId === contactId) {
+            const remaining = contacts.filter((c) => c.id !== contactId);
+            setSelectedContactId(remaining.length > 0 ? remaining[0].id : "");
+        }
+    };
+
+    const addContact = async (name: string, userId: string): Promise<ChatContact | null> => {
+        const existing = contacts.find((c) => c.userId === userId);
+        if (existing) {
+            setSelectedContactId(existing.id);
+            return existing;
+        }
+
+        try {
+            const created = await createChatContactRequest(name, userId);
+            const newContact: ChatContact = {
+                id: created.id,
+                name: created.name,
+                userId: created.userId,
+                user: created.user,
+            };
+            setContacts((previousContacts) => [...previousContacts, newContact]);
+            setSelectedContactId(newContact.id);
+            return newContact;
+        } catch {
+            return null;
+        }
+    };
+
     const getLastMessage = (contactId: string): ChatMessage | undefined => {
         const contactMessages = messages.filter(
             (message) => message.contactId === contactId,
@@ -280,6 +327,8 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         selectContact,
         sendMessage,
         clearChat,
+        deleteContact,
+        addContact,
         getLastMessage,
     };
 

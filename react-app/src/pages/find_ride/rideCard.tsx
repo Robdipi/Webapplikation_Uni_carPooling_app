@@ -4,7 +4,9 @@ import type { Ride } from "../../contexts/ridecontext";
 interface RideCardProps {
     ride: Ride;
     selected?: boolean;
+    isOwnRide?: boolean;
     onSelect?: (ride: Ride) => void;
+    onChatWithDriver?: (driverId: string, driverName: string) => void;
 }
 
 function formatDateTime(value: string): string {
@@ -27,16 +29,21 @@ function formatDateTime(value: string): string {
     });
 }
 
-const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, onSelect }) => {
+const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, isOwnRide = false, onSelect, onChatWithDriver }) => {
     const handleClick = () => {
         onSelect?.(ride);
+    };
+
+    const handleAvatarClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        onChatWithDriver?.(ride.driverId, ride.driverName);
     };
 
     return (
         <li>
             <button
                 type="button"
-                className={`ride-list-button ${selected ? "ride-list-button-selected" : ""}`}
+                className={`ride-list-button ${selected ? "ride-list-button-selected" : ""} ${isOwnRide ? "ride-list-button-own" : ""}`}
                 onClick={handleClick}
             >
                 <article className="ride-card">
@@ -45,6 +52,8 @@ const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, onSelect })
                             className="ride-driver-avatar"
                             src={ride.driverAvatarUrl}
                             alt={`Profilbild von ${ride.driverName}`}
+                            onClick={handleAvatarClick}
+                            title={`Chat mit ${ride.driverName} starten`}
                         />
                     )}
                     <div className="ride-info">

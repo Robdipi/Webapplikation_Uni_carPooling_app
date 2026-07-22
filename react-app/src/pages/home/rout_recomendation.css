@@ -36,6 +36,16 @@
     box-shadow: 0 0 0 3px rgba(252, 129, 74, 0.25);
 }
 
+.ride-list-button-own .ride-card {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+}
+
+.ride-list-button-selected.ride-list-button-own .ride-card {
+    border-color: var(--color-brand-highlight-a);
+    box-shadow: 0 0 0 3px rgba(252, 129, 74, 0.25);
+}
+
 .ride-card {
     position: relative;
     display: flex;
@@ -57,6 +67,12 @@
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--color-brand-white);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.ride-driver-avatar:hover {
+    transform: scale(1.15);
 }
 
 .ride-card:hover {

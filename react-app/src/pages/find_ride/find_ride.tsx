@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
 import { type Ride, useRideContext } from "../../contexts/ridecontext";
+import { useChatContext } from "../../contexts/chatcontext";
 import RideCard from "./rideCard";
 import "../style.css";
 import "../home/rout_recomendation.css";
@@ -128,6 +129,9 @@ function matchesTime(ride: Ride, time: string): boolean {
 
 const FindRidePage: React.FC = () => {
     const { rides } = useRideContext();
+    const { addContact } = useChatContext();
+    const { currentUser } = useUserContext();
+    const navigate = useNavigate();
     const [criteria, setCriteria] = useState<SearchCriteria>({
         from: "",
         to: "",
@@ -135,6 +139,15 @@ const FindRidePage: React.FC = () => {
         time: "",
     });
     const [selectedRide, setSelectedRide] = useState<Ride | null>(rides[0] ?? null);
+
+    const handleChatWithDriver = async (driverId: string, driverName: string) => {
+        if (currentUser === null) {
+            return;
+        }
+
+        await addContact(driverName, driverId);
+        navigate("/chat");
+    };
 
     const filteredRides = useMemo(() => {
         const normalizedFrom = criteria.from.trim().toLowerCase();
@@ -206,7 +219,9 @@ const FindRidePage: React.FC = () => {
                             key={ride.id}
                             ride={ride}
                             selected={selectedRide?.id === ride.id}
+                            isOwnRide={currentUser !== null && ride.driverId === currentUser.id}
                             onSelect={setSelectedRide}
+                            onChatWithDriver={handleChatWithDriver}
                         />
                     ))}
                 </ul>

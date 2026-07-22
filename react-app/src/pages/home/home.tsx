@@ -93,6 +93,7 @@ const HomePage: React.FC = () => {
                             key={ride.id}
                             ride={ride}
                             selected={selectedRide?.id === ride.id}
+                            isOwnRide={currentUser !== null && ride.driverId === currentUser.id}
                             onSelect={setSelectedRide}
                         />
                     ))}

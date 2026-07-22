@@ -197,10 +197,10 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
         const passwordHash = await bcrypt.hash(password, 10);
 
         const defaultAvatars = [
-            "/images/exampleProfilePics/1.jpg",
-            "/images/exampleProfilePics/2.jpg",
-            "/images/exampleProfilePics/3.jpg",
-            "/images/exampleProfilePics/4.jpg",
+            "/images/1.jpg",
+            "/images/2.jpg",
+            "/images/3.jpg",
+            "/images/4.jpg",
         ];
 
         const resolvedAvatarUrl =
@@ -589,5 +589,18 @@ app.delete("/api/chat/messages/:contactId", async (req: Request, res: Response) 
     } catch (error) {
         console.error("Clear chat failed:", error);
         res.status(500).json({ error: "Chat konnte nicht gelöscht werden." });
+    }
+});
+
+app.delete("/api/chat/contacts/:contactId", async (req: Request, res: Response) => {
+    const { contactId } = req.params;
+
+    try {
+        await prisma.chatMessage.deleteMany({ where: { contactId } });
+        await prisma.chatContact.delete({ where: { id: contactId } });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Delete contact failed:", error);
+        res.status(500).json({ error: "Kontakt konnte nicht gelöscht werden." });
     }
 });

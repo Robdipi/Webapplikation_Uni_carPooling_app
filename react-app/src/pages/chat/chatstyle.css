@@ -50,9 +50,87 @@ body,
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
     cursor: pointer;
     text-align: left;
+    position: relative;
     transition:
         transform 0.2s ease,
         background-color 0.2s ease;
+}
+
+.contact-delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--color-brand-white);
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.contact-delete-btn:hover {
+    background-color: #e74c3c;
+}
+
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirm-dialog {
+    background-color: var(--color-brand-white);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.confirm-dialog h3 {
+    margin: 0 0 8px 0;
+    color: var(--color-brand-dark-grey);
+}
+
+.confirm-dialog p {
+    margin: 0 0 20px 0;
+    color: var(--color-brand-grey);
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-dialog-actions button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.confirm-yes {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.confirm-no {
+    background-color: var(--color-brand-grey);
+    color: white;
 }
 
 .contact-item:hover {
