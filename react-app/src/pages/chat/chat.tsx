@@ -62,11 +62,13 @@ const ContactItem: React.FC<ContactItemProps> = ({
         className={isSelected ? "contact-item contact-item-selected" : "contact-item"}
         onClick={() => onSelect(contact.id)}
     >
-        <img
-            className="profile-pic"
-            src={contact.avatarUrl}
-            alt={`Profilbild von ${contact.name}`}
-        />
+        {contact.user.avatarUrl !== "" && (
+            <img
+                className="profile-pic"
+                src={contact.user.avatarUrl}
+                alt={`Profilbild von ${contact.name}`}
+            />
+        )}
         <span className="contact-text">
             <strong>{contact.name}</strong>
             <span className="contact-preview">
@@ -184,11 +186,13 @@ const ChatPage: React.FC = () => {
 
             <main className="chat-main">
                 <section className="chat-conversation-header">
-                    <img
-                        className="conversation-avatar"
-                        src={selectedContact.avatarUrl}
-                        alt={`Profilbild von ${selectedContact.name}`}
-                    />
+                    {selectedContact.user.avatarUrl !== "" && (
+                        <img
+                            className="conversation-avatar"
+                            src={selectedContact.user.avatarUrl}
+                            alt={`Profilbild von ${selectedContact.name}`}
+                        />
+                    )}
                     <div>
                         <h2>{selectedContact.name}</h2>
                         <p>CampusRide Chat</p>

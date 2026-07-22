@@ -197,10 +197,10 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
         const passwordHash = await bcrypt.hash(password, 10);
 
         const defaultAvatars = [
-            "/src/assets/exampleProfilePics/1.jpg",
-            "/src/assets/exampleProfilePics/2.jpg",
-            "/src/assets/exampleProfilePics/3.jpg",
-            "/src/assets/exampleProfilePics/4.jpg",
+            "/images/exampleProfilePics/1.jpg",
+            "/images/exampleProfilePics/2.jpg",
+            "/images/exampleProfilePics/3.jpg",
+            "/images/exampleProfilePics/4.jpg",
         ];
 
         const resolvedAvatarUrl =
@@ -367,7 +367,7 @@ type RideWithDriver = {
     seatsAvailable: number;
     price: number;
     extra: string;
-    driver: { firstName: string; lastName: string };
+    driver: { firstName: string; lastName: string; avatarUrl: string };
 };
 
 function publicRide(ride: RideWithDriver) {
@@ -381,6 +381,7 @@ function publicRide(ride: RideWithDriver) {
         durationMinutes: ride.durationMinutes,
         driverId: ride.driverId,
         driverName: `${ride.driver.firstName} ${ride.driver.lastName}`,
+        driverAvatarUrl: ride.driver.avatarUrl,
         departureTime: ride.departureTime,
         seatsAvailable: ride.seatsAvailable,
         price: ride.price,
@@ -392,7 +393,7 @@ app.get("/api/rides", async (_req: Request, res: Response) => {
     try {
         const rides = await prisma.ride.findMany({
             orderBy: { createdAt: "desc" },
-            include: { driver: { select: { firstName: true, lastName: true } } },
+            include: { driver: { select: { firstName: true, lastName: true, avatarUrl: true } } },
         });
 
         res.json({ rides: rides.map(publicRide) });
@@ -445,7 +446,7 @@ app.post("/api/rides", authenticateToken, async (req: AuthenticatedRequest, res:
 
         const ride = await prisma.ride.findUnique({
             where: { id: created.id },
-            include: { driver: { select: { firstName: true, lastName: true } } },
+            include: { driver: { select: { firstName: true, lastName: true, avatarUrl: true } } },
         });
 
         res.status(201).json({ ride: publicRide(ride!) });
@@ -484,7 +485,7 @@ app.put(
 
             const ride = await prisma.ride.findUnique({
                 where: { id },
-                include: { driver: { select: { firstName: true, lastName: true } } },
+                include: { driver: { select: { firstName: true, lastName: true, avatarUrl: true } } },
             });
 
             res.json({ ride: publicRide(ride!) });
@@ -516,7 +517,10 @@ app.delete(
 app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
     try {
         const contacts = await prisma.chatContact.findMany({
-            include: { messages: true },
+            include: {
+                messages: true,
+                user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+            },
         });
         res.json({ contacts });
     } catch (error) {
@@ -526,16 +530,17 @@ app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
 });
 
 app.post("/api/chat/contacts", async (req: Request, res: Response) => {
-    const { name, avatarUrl } = req.body as { name?: string; avatarUrl?: string };
+    const { name, userId } = req.body as { name?: string; userId?: string };
 
-    if (name === undefined || avatarUrl === undefined) {
-        res.status(400).json({ error: "Name und Avatar-URL werden benötigt." });
+    if (name === undefined || userId === undefined) {
+        res.status(400).json({ error: "Name und userId werden benötigt." });
         return;
     }
 
     try {
         const contact = await prisma.chatContact.create({
-            data: { name, avatarUrl },
+            data: { name, userId },
+            include: { user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } },
         });
         res.status(201).json({ contact });
     } catch (error) {

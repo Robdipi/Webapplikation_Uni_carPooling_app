@@ -1,0 +1,70 @@
+CampusRide Datenbankschema (SQLite)
+====================================
+
+┌─────────────────────────────────────────────────────────────┐
+│  User                                                       │
+├─────────────────────────────────────────────────────────────┤
+│  id            TEXT (PK, cuid)                              │
+│  email         TEXT (unique)                                │
+│  username      TEXT (unique)                                │
+│  passwordHash  TEXT                                         │
+│  firstName     TEXT                                         │
+│  lastName      TEXT                                         │
+│  birthDate     TEXT                                         │
+│  course        TEXT                                         │
+│  avatarUrl     TEXT (default: "")                           │
+│  createdAt     DATETIME (default: now)                      │
+│  updatedAt     DATETIME (auto)                              │
+│                                                             │
+│  rides         1:N → Ride                                   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  Ride                                                       │
+├─────────────────────────────────────────────────────────────┤
+│  id              TEXT (PK, cuid)                            │
+│  departureName   TEXT                                       │
+│  destinationName TEXT                                       │
+│  departureLat    REAL                                       │
+│  departureLng    REAL                                       │
+│  destinationLat  REAL                                       │
+│  destinationLng  REAL                                       │
+│  distanceKm      REAL                                       │
+│  durationMinutes INTEGER                                    │
+│  driverId        TEXT (FK → User.id, CASCADE DELETE)        │
+│  departureTime   TEXT                                       │
+│  seatsAvailable  INTEGER                                    │
+│  price           REAL                                       │
+│  extra           TEXT                                       │
+│  createdAt       DATETIME (default: now)                    │
+│  updatedAt       DATETIME (auto)                            │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ChatContact                                                │
+├─────────────────────────────────────────────────────────────┤
+│  id        TEXT (PK, cuid)                                  │
+│  name      TEXT                                             │
+│  userId    TEXT (FK → User.id, CASCADE DELETE)              │
+│                                                             │
+│  user      N:1 → User                                       │
+│  messages  1:N → ChatMessage                                │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ChatMessage                                                │
+├─────────────────────────────────────────────────────────────┤
+│  id        TEXT (PK, cuid)                                  │
+│  contactId TEXT (FK → ChatContact.id, CASCADE DELETE)       │
+│  sender    TEXT ("me" | "contact")                          │
+│  type      TEXT ("text" | "image")                          │
+│  content   TEXT                                             │
+│  sentAt    TEXT                                             │
+└─────────────────────────────────────────────────────────────┘
+
+
+Beziehungen
+===========
+User    1 ──── N Ride         (via driverId, onDelete: CASCADE)
+User    1 ──── N ChatContact  (via userId, onDelete: CASCADE)
+ChatContact 1 ──── N ChatMessage  (via contactId, onDelete: CASCADE)

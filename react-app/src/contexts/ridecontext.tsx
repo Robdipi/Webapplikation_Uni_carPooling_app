@@ -28,6 +28,7 @@ export interface Ride {
     durationMinutes: number;
     driverId: string;
     driverName: string;
+    driverAvatarUrl: string;
     departureTime: string;
     seatsAvailable: number;
     price: number;

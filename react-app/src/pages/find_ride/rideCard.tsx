@@ -40,6 +40,13 @@ const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, onSelect })
                 onClick={handleClick}
             >
                 <article className="ride-card">
+                    {ride.driverAvatarUrl !== "" && (
+                        <img
+                            className="ride-driver-avatar"
+                            src={ride.driverAvatarUrl}
+                            alt={`Profilbild von ${ride.driverName}`}
+                        />
+                    )}
                     <div className="ride-info">
                         <div className="details">
                             <h3>

@@ -238,13 +238,31 @@ describe("Rides", () => {
 
 describe("Chat", () => {
     it("creates a contact, sends a message, verifies it in DB, then clears chat", async () => {
+        // Register a user for the contact
+        const uniqueValue = Date.now();
+        const registerRes = await request(app)
+            .post("/api/auth/register")
+            .send({
+                email: `chat-test-${uniqueValue}@example.com`,
+                username: `chat-test-user-${uniqueValue}`,
+                password: "12345",
+                firstName: "Chat",
+                lastName: "Test",
+                birthDate: "2000-01-01",
+                course: "AIN",
+            });
+
+        const userId = registerRes.body.user.id as string;
+
         // Create contact
         const contactRes = await request(app)
             .post("/api/chat/contacts")
-            .send({ name: "Test Kontakt", avatarUrl: "https://example.com/avatar.jpg" });
+            .send({ name: "Test Kontakt", userId });
 
         expect(contactRes.status).toBe(201);
         expect(contactRes.body.contact.name).toBe("Test Kontakt");
+        expect(contactRes.body.contact.userId).toBe(userId);
+        expect(contactRes.body.contact.user.firstName).toBe("Chat");
 
         const contactId = contactRes.body.contact.id as string;
 
@@ -304,6 +322,9 @@ describe("Chat", () => {
             where: { contactId },
         });
         expect(msgsAfter).toHaveLength(0);
+
+        // Cleanup: delete the test contact
+        await prisma.chatContact.delete({ where: { id: contactId } });
     });
 
     it("rejects message creation with missing fields", async () => {
@@ -321,7 +342,7 @@ describe("Chat", () => {
             .send({ name: "Nur Name" });
 
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe("Name und Avatar-URL werden benötigt.");
+        expect(response.body.error).toBe("Name und userId werden benötigt.");
     });
 });
 

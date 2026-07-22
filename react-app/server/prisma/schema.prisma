@@ -23,6 +23,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   rides        Ride[]
+  chatContacts ChatContact[]
 }
 
 model Ride {
@@ -50,8 +51,9 @@ model Ride {
 model ChatContact {
   id        String   @id @default(cuid())
   name      String
-  avatarUrl String
+  userId    String
 
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  ChatMessage[]
 }
 

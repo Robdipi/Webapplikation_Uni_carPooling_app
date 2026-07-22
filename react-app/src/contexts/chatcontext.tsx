@@ -12,10 +12,18 @@ import {
     clearChatRequest,
 } from "../api/chatApi";
 
+export interface ChatContactUser {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string;
+}
+
 export interface ChatContact {
     id: string;
     name: string;
-    avatarUrl: string;
+    userId: string;
+    user: ChatContactUser;
 }
 
 export type MessageSender = "me" | "contact";
@@ -48,26 +56,37 @@ interface ChatContextProviderProps {
 
 const CHAT_SELECTED_CONTACT_STORAGE_KEY = "campusride-selected-contact";
 
+const fallbackUser: ChatContactUser = {
+    id: "fallback",
+    firstName: "Unbekannt",
+    lastName: "",
+    avatarUrl: "",
+};
+
 const fallbackContacts: ChatContact[] = [
     {
         id: "lisa",
         name: "Lisa Müller",
-        avatarUrl: "/src/assets/exampleProfilePics/1.jpg",
+        userId: "fallback",
+        user: fallbackUser,
     },
     {
         id: "max",
         name: "Max Weber",
-        avatarUrl: "/src/assets/exampleProfilePics/2.jpg",
+        userId: "fallback",
+        user: fallbackUser,
     },
     {
         id: "sarah",
         name: "Sarah Fischer",
-        avatarUrl: "/src/assets/exampleProfilePics/3.jpg",
+        userId: "fallback",
+        user: fallbackUser,
     },
     {
         id: "jonas",
         name: "Jonas Klein",
-        avatarUrl: "/src/assets/exampleProfilePics/4.jpg",
+        userId: "fallback",
+        user: fallbackUser,
     },
 ];
 
@@ -172,7 +191,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     const selectedContact = useMemo(() => {
         return (
             contacts.find((contact) => contact.id === selectedContactId) ??
-            contacts[0] ?? { id: "", name: "", avatarUrl: "" }
+            contacts[0] ?? { id: "", name: "", userId: "", user: fallbackUser }
         );
     }, [contacts, selectedContactId]);
 
