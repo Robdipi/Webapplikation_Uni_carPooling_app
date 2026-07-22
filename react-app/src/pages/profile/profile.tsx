@@ -116,6 +116,16 @@ const ProfilePage: React.FC = () => {
                             </p>
                         ) : isEditing ? (
                             <form onSubmit={handleSave}>
+                                {draftProfile.avatarUrl !== "" && (
+                                    <div className="form-group">
+                                        <label>Aktuelles Profilbild</label>
+                                        <img
+                                            src={draftProfile.avatarUrl}
+                                            alt="Profilbild"
+                                            style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover" }}
+                                        />
+                                    </div>
+                                )}
                                 <ProfileInput
                                     label="Vorname"
                                     name="firstName"
@@ -153,6 +163,12 @@ const ProfilePage: React.FC = () => {
                                     value={draftProfile.course}
                                     onChange={handleInputChange}
                                 />
+                                <ProfileInput
+                                    label="Profilbild-URL (optional)"
+                                    name="avatarUrl"
+                                    value={draftProfile.avatarUrl}
+                                    onChange={handleInputChange}
+                                />
 
                                 <div className="edit-button-wrapper">
                                     <button
@@ -169,6 +185,16 @@ const ProfilePage: React.FC = () => {
                             </form>
                         ) : (
                             <>
+                                {profile.avatarUrl !== "" && (
+                                    <div className="form-group">
+                                        <label>Profilbild</label>
+                                        <img
+                                            src={profile.avatarUrl}
+                                            alt="Profilbild"
+                                            style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover" }}
+                                        />
+                                    </div>
+                                )}
                                 <ProfileField label="Vorname" value={profile.firstName} />
                                 <ProfileField label="Nachname" value={profile.lastName} />
                                 <ProfileField label="Geburtsdatum" value={profile.birthDate} />

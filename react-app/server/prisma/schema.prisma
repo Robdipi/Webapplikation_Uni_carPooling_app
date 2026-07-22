@@ -17,7 +17,51 @@ model User {
   lastName     String
   birthDate    String
   course       String
+  avatarUrl    String   @default("")
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  rides        Ride[]
+}
+
+model Ride {
+  id                 String   @id @default(cuid())
+  departureName      String
+  destinationName    String
+  departureLat       Float
+  departureLng       Float
+  destinationLat     Float
+  destinationLng     Float
+  distanceKm         Float
+  durationMinutes    Int
+  driverId           String
+  departureTime      String
+  seatsAvailable     Int
+  price              Float
+  extra              String
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  driver             User     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+model ChatContact {
+  id        String   @id @default(cuid())
+  name      String
+  avatarUrl String
+
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  contactId String
+  sender    String
+  type      String
+  content   String
+  sentAt    String
+
+  contact   ChatContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
 }

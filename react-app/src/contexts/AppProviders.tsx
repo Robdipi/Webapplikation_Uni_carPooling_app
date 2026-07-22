@@ -11,11 +11,11 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
     return (
         <GlobalContextProvider>
-            <RideContextProvider>
-                <UserContextProvider>
+            <UserContextProvider>
+                <RideContextProvider>
                     <ChatContextProvider>{children}</ChatContextProvider>
-                </UserContextProvider>
-            </RideContextProvider>
+                </RideContextProvider>
+            </UserContextProvider>
         </GlobalContextProvider>
     );
 }

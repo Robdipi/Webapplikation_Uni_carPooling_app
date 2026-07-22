@@ -13,6 +13,7 @@ export interface UserProfile {
     city: string;
     pricePerKm: string;
     course: string;
+    avatarUrl: string;
 }
 
 export interface RegisteredUser {
@@ -30,6 +31,7 @@ export interface RegisterUserInput {
     lastName: string;
     birthDate: string;
     course: string;
+    avatarUrl?: string;
 }
 
 export interface LoginUserInput {
@@ -62,6 +64,7 @@ const defaultProfile: UserProfile = {
     city: "Konstanz",
     pricePerKm: "0,60 €",
     course: "Allgemeine Informatik (AIN)",
+    avatarUrl: "",
 };
 
 const AUTH_TOKEN_STORAGE_KEY = "campusRideAuthToken";
@@ -84,6 +87,7 @@ function toRegisteredUser(apiUser: ApiUser): RegisteredUser {
             city: "Konstanz",
             pricePerKm: "0,60 €",
             course: apiUser.profile.course,
+            avatarUrl: apiUser.profile.avatarUrl,
         },
     };
 }
@@ -162,6 +166,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
                 lastName: input.lastName.trim(),
                 birthDate: input.birthDate.trim(),
                 course: input.course.trim(),
+                avatarUrl: input.avatarUrl?.trim() || undefined,
             });
 
             const registeredUser = toRegisteredUser(response.user);

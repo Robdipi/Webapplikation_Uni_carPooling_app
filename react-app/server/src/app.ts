@@ -36,6 +36,7 @@ interface RegisterRequestBody {
     lastName?: string;
     birthDate?: string;
     course?: string;
+    avatarUrl?: string;
 }
 
 interface LoginRequestBody {
@@ -66,6 +67,7 @@ function publicUser(user: User) {
             lastName: user.lastName,
             birthDate: user.birthDate,
             course: user.course,
+            avatarUrl: user.avatarUrl,
         },
     };
 }
@@ -139,6 +141,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
         lastName,
         birthDate,
         course,
+        avatarUrl,
     } = req.body as RegisterRequestBody;
 
     if (
@@ -193,6 +196,18 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
+        const defaultAvatars = [
+            "/src/assets/exampleProfilePics/1.jpg",
+            "/src/assets/exampleProfilePics/2.jpg",
+            "/src/assets/exampleProfilePics/3.jpg",
+            "/src/assets/exampleProfilePics/4.jpg",
+        ];
+
+        const resolvedAvatarUrl =
+            avatarUrl !== undefined && avatarUrl.trim() !== ""
+                ? avatarUrl.trim()
+                : defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
+
         const newUser = await prisma.user.create({
             data: {
                 email: normalizedEmail,
@@ -202,6 +217,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
                 lastName: lastName.trim(),
                 birthDate: birthDate.trim(),
                 course: course.trim(),
+                avatarUrl: resolvedAvatarUrl,
             },
         });
 
@@ -317,3 +333,256 @@ app.get(
         }
     },
 );
+
+// ── Rides ────────────────────────────────────────────────────────────────────
+
+interface CreateRideRequestBody {
+    departureName?: string;
+    destinationName?: string;
+    departureLat?: number;
+    departureLng?: number;
+    destinationLat?: number;
+    destinationLng?: number;
+    distanceKm?: number;
+    durationMinutes?: number;
+    driverId?: string;
+    departureTime?: string;
+    seatsAvailable?: number;
+    price?: number;
+    extra?: string;
+}
+
+type RideWithDriver = {
+    id: string;
+    departureName: string;
+    destinationName: string;
+    departureLat: number;
+    departureLng: number;
+    destinationLat: number;
+    destinationLng: number;
+    distanceKm: number;
+    durationMinutes: number;
+    driverId: string;
+    departureTime: string;
+    seatsAvailable: number;
+    price: number;
+    extra: string;
+    driver: { firstName: string; lastName: string };
+};
+
+function publicRide(ride: RideWithDriver) {
+    return {
+        id: ride.id,
+        departureName: ride.departureName,
+        destinationName: ride.destinationName,
+        departureCoords: { lat: ride.departureLat, lng: ride.departureLng },
+        destinationCoords: { lat: ride.destinationLat, lng: ride.destinationLng },
+        distanceKm: ride.distanceKm,
+        durationMinutes: ride.durationMinutes,
+        driverId: ride.driverId,
+        driverName: `${ride.driver.firstName} ${ride.driver.lastName}`,
+        departureTime: ride.departureTime,
+        seatsAvailable: ride.seatsAvailable,
+        price: ride.price,
+        extra: ride.extra,
+    };
+}
+
+app.get("/api/rides", async (_req: Request, res: Response) => {
+    try {
+        const rides = await prisma.ride.findMany({
+            orderBy: { createdAt: "desc" },
+            include: { driver: { select: { firstName: true, lastName: true } } },
+        });
+
+        res.json({ rides: rides.map(publicRide) });
+    } catch (error) {
+        console.error("Get rides failed:", error);
+        res.status(500).json({ error: "Fahrten konnten nicht geladen werden." });
+    }
+});
+
+app.post("/api/rides", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+    const body = req.body as CreateRideRequestBody;
+
+    if (
+        body.departureName === undefined ||
+        body.destinationName === undefined ||
+        body.departureLat === undefined ||
+        body.departureLng === undefined ||
+        body.destinationLat === undefined ||
+        body.destinationLng === undefined ||
+        body.distanceKm === undefined ||
+        body.durationMinutes === undefined ||
+        body.driverId === undefined ||
+        body.departureTime === undefined ||
+        body.seatsAvailable === undefined ||
+        body.price === undefined ||
+        body.extra === undefined
+    ) {
+        res.status(400).json({ error: "Es fehlen Pflichtfelder." });
+        return;
+    }
+
+    try {
+        const created = await prisma.ride.create({
+            data: {
+                departureName: body.departureName,
+                destinationName: body.destinationName,
+                departureLat: body.departureLat,
+                departureLng: body.departureLng,
+                destinationLat: body.destinationLat,
+                destinationLng: body.destinationLng,
+                distanceKm: body.distanceKm,
+                durationMinutes: body.durationMinutes,
+                driverId: body.driverId,
+                departureTime: body.departureTime,
+                seatsAvailable: body.seatsAvailable,
+                price: body.price,
+                extra: body.extra,
+            },
+        });
+
+        const ride = await prisma.ride.findUnique({
+            where: { id: created.id },
+            include: { driver: { select: { firstName: true, lastName: true } } },
+        });
+
+        res.status(201).json({ ride: publicRide(ride!) });
+    } catch (error) {
+        console.error("Create ride failed:", error);
+        res.status(500).json({ error: "Fahrt konnte nicht erstellt werden." });
+    }
+});
+
+app.put(
+    "/api/rides/:id",
+    authenticateToken,
+    async (req: AuthenticatedRequest, res: Response) => {
+        const { id } = req.params;
+        const body = req.body as Partial<CreateRideRequestBody>;
+
+        const data: Record<string, string | number> = {};
+        if (body.departureName !== undefined) data.departureName = body.departureName;
+        if (body.destinationName !== undefined) data.destinationName = body.destinationName;
+        if (body.departureLat !== undefined) data.departureLat = body.departureLat;
+        if (body.departureLng !== undefined) data.departureLng = body.departureLng;
+        if (body.destinationLat !== undefined) data.destinationLat = body.destinationLat;
+        if (body.destinationLng !== undefined) data.destinationLng = body.destinationLng;
+        if (body.distanceKm !== undefined) data.distanceKm = body.distanceKm;
+        if (body.durationMinutes !== undefined) data.durationMinutes = body.durationMinutes;
+        if (body.departureTime !== undefined) data.departureTime = body.departureTime;
+        if (body.seatsAvailable !== undefined) data.seatsAvailable = body.seatsAvailable;
+        if (body.price !== undefined) data.price = body.price;
+        if (body.extra !== undefined) data.extra = body.extra;
+
+        try {
+            await prisma.ride.update({
+                where: { id },
+                data,
+            });
+
+            const ride = await prisma.ride.findUnique({
+                where: { id },
+                include: { driver: { select: { firstName: true, lastName: true } } },
+            });
+
+            res.json({ ride: publicRide(ride!) });
+        } catch (error) {
+            console.error("Update ride failed:", error);
+            res.status(500).json({ error: "Fahrt konnte nicht aktualisiert werden." });
+        }
+    },
+);
+
+app.delete(
+    "/api/rides/:id",
+    authenticateToken,
+    async (req: AuthenticatedRequest, res: Response) => {
+        const { id } = req.params;
+
+        try {
+            await prisma.ride.delete({ where: { id } });
+            res.json({ success: true });
+        } catch (error) {
+            console.error("Delete ride failed:", error);
+            res.status(500).json({ error: "Fahrt konnte nicht gelöscht werden." });
+        }
+    },
+);
+
+// ── Chat ─────────────────────────────────────────────────────────────────────
+
+app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
+    try {
+        const contacts = await prisma.chatContact.findMany({
+            include: { messages: true },
+        });
+        res.json({ contacts });
+    } catch (error) {
+        console.error("Get chat contacts failed:", error);
+        res.status(500).json({ error: "Kontakte konnten nicht geladen werden." });
+    }
+});
+
+app.post("/api/chat/contacts", async (req: Request, res: Response) => {
+    const { name, avatarUrl } = req.body as { name?: string; avatarUrl?: string };
+
+    if (name === undefined || avatarUrl === undefined) {
+        res.status(400).json({ error: "Name und Avatar-URL werden benötigt." });
+        return;
+    }
+
+    try {
+        const contact = await prisma.chatContact.create({
+            data: { name, avatarUrl },
+        });
+        res.status(201).json({ contact });
+    } catch (error) {
+        console.error("Create chat contact failed:", error);
+        res.status(500).json({ error: "Kontakt konnte nicht erstellt werden." });
+    }
+});
+
+app.post("/api/chat/messages", async (req: Request, res: Response) => {
+    const { contactId, sender, type, content, sentAt } = req.body as {
+        contactId?: string;
+        sender?: string;
+        type?: string;
+        content?: string;
+        sentAt?: string;
+    };
+
+    if (
+        contactId === undefined ||
+        sender === undefined ||
+        type === undefined ||
+        content === undefined ||
+        sentAt === undefined
+    ) {
+        res.status(400).json({ error: "Alle Nachrichtenfelder werden benötigt." });
+        return;
+    }
+
+    try {
+        const message = await prisma.chatMessage.create({
+            data: { contactId, sender, type, content, sentAt },
+        });
+        res.status(201).json({ message });
+    } catch (error) {
+        console.error("Create chat message failed:", error);
+        res.status(500).json({ error: "Nachricht konnte nicht erstellt werden." });
+    }
+});
+
+app.delete("/api/chat/messages/:contactId", async (req: Request, res: Response) => {
+    const { contactId } = req.params;
+
+    try {
+        await prisma.chatMessage.deleteMany({ where: { contactId } });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Clear chat failed:", error);
+        res.status(500).json({ error: "Chat konnte nicht gelöscht werden." });
+    }
+});

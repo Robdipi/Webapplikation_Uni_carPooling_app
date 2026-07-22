@@ -3,6 +3,7 @@ export interface ApiUserProfile {
     lastName: string;
     birthDate: string;
     course: string;
+    avatarUrl: string;
 }
 
 export interface ApiUser {
@@ -25,6 +26,7 @@ export interface RegisterRequest {
     lastName: string;
     birthDate: string;
     course: string;
+    avatarUrl?: string;
 }
 
 export interface LoginRequest {

@@ -180,8 +180,7 @@ const CreateRidePage: React.FC = () => {
             destinationCoords,
             distanceKm,
             durationMinutes: calculateDurationMinutes(distanceKm),
-            driver: currentUser?.profile.firstName ?? "Unbekannt",
-            avatarUrl: "/images/lisa.jpg", //Todo implement avatars maybe probably not
+            driverId: currentUser?.id ?? "",
             departureTime: form.dateTime,
             seatsAvailable: form.seats,
             price: calculatePrice(distanceKm),

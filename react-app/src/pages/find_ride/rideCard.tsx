@@ -41,20 +41,12 @@ const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, onSelect })
             >
                 <article className="ride-card">
                     <div className="ride-info">
-                        <img
-                            src={ride.avatarUrl}
-                            alt={`Profilbild von ${ride.driver}`}
-                            className="avatar"
-                            onError={(event) => {
-                                event.currentTarget.style.display = "none";
-                            }}
-                        />
                         <div className="details">
                             <h3>
                                 {ride.departureName} &rarr; {ride.destinationName}
                             </h3>
                             <p>
-                                {ride.driver}, {formatDateTime(ride.departureTime)}, {ride.seatsAvailable} freie Plätze, <strong>€{ride.price}</strong>
+                                {ride.driverName}, {formatDateTime(ride.departureTime)}, {ride.seatsAvailable} freie Plätze, <strong>€{ride.price}</strong>
                             </p>
                             <p>
                                 ca. {ride.distanceKm.toFixed(1)} km · {ride.durationMinutes} min

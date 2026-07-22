@@ -38,6 +38,7 @@ const StartPage: React.FC = () => {
             lastName: String(formData.get("lastName") ?? ""),
             birthDate: String(formData.get("birthDate") ?? ""),
             course: String(formData.get("course") ?? ""),
+            avatarUrl: String(formData.get("avatarUrl") ?? "") || undefined,
         });
 
         if (!result.success) {
@@ -211,6 +212,18 @@ const StartPage: React.FC = () => {
                                             id="geburtstag"
                                             name="birthDate"
                                             required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="avatarUrl" className="logintext">
+                                            Profilbild-URL (optional):
+                                        </label>
+                                        <input
+                                            type="url"
+                                            id="avatarUrl"
+                                            name="avatarUrl"
+                                            placeholder="z.B. https://example.com/bild.jpg"
                                         />
                                     </div>
 

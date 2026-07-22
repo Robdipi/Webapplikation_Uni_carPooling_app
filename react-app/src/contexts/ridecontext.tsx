@@ -5,6 +5,13 @@ import {
     useEffect,
     useState,
 } from "react";
+import { useUserContext } from "./usercontext";
+import {
+    getRidesRequest,
+    createRideRequest,
+    updateRideRequest,
+    deleteRideRequest,
+} from "../api/rideApi";
 
 export interface Coordinates {
     lat: number;
@@ -19,8 +26,8 @@ export interface Ride {
     destinationCoords: Coordinates;
     distanceKm: number;
     durationMinutes: number;
-    driver: string;
-    avatarUrl: string;
+    driverId: string;
+    driverName: string;
     departureTime: string;
     seatsAvailable: number;
     price: number;
@@ -31,9 +38,9 @@ export type NewRide = Omit<Ride, "id">;
 
 interface RideContextValue {
     rides: Ride[];
-    addRide: (ride: NewRide) => Ride;
-    removeRide: (id: string) => void;
-    updateRide: (id: string, updatedFields: Partial<NewRide>) => void;
+    addRide: (ride: NewRide) => Promise<Ride>;
+    removeRide: (id: string) => Promise<void>;
+    updateRide: (id: string, updatedFields: Partial<NewRide>) => Promise<void>;
     clearRides: () => void;
 }
 
@@ -41,57 +48,52 @@ interface RideContextProviderProps {
     children: ReactNode;
 }
 
-const RIDES_STORAGE_KEY = "campusride-rides";
-
-function readRidesFromLocalStorage(): Ride[] {
-    try {
-        const stored = localStorage.getItem(RIDES_STORAGE_KEY);
-
-        if (stored === null) {
-            return [];
-        }
-
-        const parsed = JSON.parse(stored) as Ride[];
-
-        if (!Array.isArray(parsed)) {
-            return [];
-        }
-
-        // Alte Demo-Fahrten aus früheren Versionen nicht mehr anzeigen.
-        return parsed.filter((ride) => !ride.id.startsWith("demo-"));
-    } catch {
-        return [];
-    }
-}
-
 const RideContext = createContext<RideContextValue | undefined>(undefined);
 
 export function RideContextProvider({ children }: RideContextProviderProps) {
-    const [rides, setRides] = useState<Ride[]>(readRidesFromLocalStorage);
+    const [rides, setRides] = useState<Ride[]>([]);
+    const { authToken } = useUserContext();
 
     useEffect(() => {
-        localStorage.setItem(RIDES_STORAGE_KEY, JSON.stringify(rides));
-    }, [rides]);
+        async function loadRides() {
+            try {
+                const apiRides = await getRidesRequest();
+                setRides(apiRides);
+            } catch {
+                console.error("Fahrten konnten nicht geladen werden.");
+            }
+        }
 
-    const addRide = (ride: NewRide): Ride => {
-        const rideWithId: Ride = {
-            id: crypto.randomUUID(),
-            ...ride,
-        };
+        loadRides();
+    }, []);
 
-        setRides((previousRides) => [rideWithId, ...previousRides]);
-        return rideWithId;
+    const addRide = async (ride: NewRide): Promise<Ride> => {
+        if (authToken === null) {
+            throw new Error("Nicht angemeldet.");
+        }
+
+        const created = await createRideRequest(ride, authToken);
+        setRides((previous) => [created, ...previous]);
+        return created;
     };
 
-    const removeRide = (id: string) => {
-        setRides((previousRides) =>
-            previousRides.filter((ride) => ride.id !== id),
-        );
+    const removeRide = async (id: string) => {
+        if (authToken === null) {
+            throw new Error("Nicht angemeldet.");
+        }
+
+        await deleteRideRequest(id, authToken);
+        setRides((previous) => previous.filter((ride) => ride.id !== id));
     };
 
-    const updateRide = (id: string, updatedFields: Partial<NewRide>) => {
-        setRides((previousRides) =>
-            previousRides.map((ride) =>
+    const updateRide = async (id: string, updatedFields: Partial<NewRide>) => {
+        if (authToken === null) {
+            throw new Error("Nicht angemeldet.");
+        }
+
+        await updateRideRequest(id, updatedFields, authToken);
+        setRides((previous) =>
+            previous.map((ride) =>
                 ride.id === id ? { ...ride, ...updatedFields } : ride,
             ),
         );

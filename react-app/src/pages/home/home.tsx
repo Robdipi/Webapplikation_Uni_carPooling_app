@@ -81,7 +81,7 @@ const HomePage: React.FC = () => {
                             {selectedRide.departureName} &rarr; {selectedRide.destinationName}
                         </p>
                         <p>
-                            {selectedRide.driver} · {selectedRide.seatsAvailable} freie Plätze · €{selectedRide.price}
+                            {selectedRide.driverName} · {selectedRide.seatsAvailable} freie Plätze · €{selectedRide.price}
                         </p>
                     </section>
                 )}

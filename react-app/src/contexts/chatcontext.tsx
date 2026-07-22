@@ -6,6 +6,11 @@ import {
     useMemo,
     useState,
 } from "react";
+import {
+    getChatContactsRequest,
+    sendMessageRequest,
+    clearChatRequest,
+} from "../api/chatApi";
 
 export interface ChatContact {
     id: string;
@@ -41,33 +46,32 @@ interface ChatContextProviderProps {
     children: ReactNode;
 }
 
-const CHAT_MESSAGES_STORAGE_KEY = "campusride-chat-messages";
 const CHAT_SELECTED_CONTACT_STORAGE_KEY = "campusride-selected-contact";
 
-const initialContacts: ChatContact[] = [
+const fallbackContacts: ChatContact[] = [
     {
         id: "lisa",
         name: "Lisa Müller",
-        avatarUrl: "https://picsum.photos/seed/lisa/120/120",
+        avatarUrl: "/src/assets/exampleProfilePics/1.jpg",
     },
     {
         id: "max",
         name: "Max Weber",
-        avatarUrl: "https://picsum.photos/seed/max/120/120",
+        avatarUrl: "/src/assets/exampleProfilePics/2.jpg",
     },
     {
         id: "sarah",
         name: "Sarah Fischer",
-        avatarUrl: "https://picsum.photos/seed/sarah/120/120",
+        avatarUrl: "/src/assets/exampleProfilePics/3.jpg",
     },
     {
         id: "jonas",
         name: "Jonas Klein",
-        avatarUrl: "https://picsum.photos/seed/jonas/120/120",
+        avatarUrl: "/src/assets/exampleProfilePics/4.jpg",
     },
 ];
 
-const initialMessages: ChatMessage[] = [
+const fallbackMessages: ChatMessage[] = [
     {
         id: "msg-1",
         contactId: "lisa",
@@ -94,52 +98,83 @@ const initialMessages: ChatMessage[] = [
     },
 ];
 
-function readMessagesFromLocalStorage(): ChatMessage[] {
-    try {
-        const storedMessages = localStorage.getItem(CHAT_MESSAGES_STORAGE_KEY);
-
-        if (storedMessages === null) {
-            return initialMessages;
-        }
-
-        return JSON.parse(storedMessages) as ChatMessage[];
-    } catch {
-        return initialMessages;
-    }
-}
-
-function readSelectedContactIdFromLocalStorage(): string {
-    const storedContactId = localStorage.getItem(CHAT_SELECTED_CONTACT_STORAGE_KEY);
-    const contactExists = initialContacts.some(
+function readSelectedContactIdFromLocalStorage(
+    contacts: ChatContact[],
+): string {
+    const storedContactId = localStorage.getItem(
+        CHAT_SELECTED_CONTACT_STORAGE_KEY,
+    );
+    const contactExists = contacts.some(
         (contact) => contact.id === storedContactId,
     );
     if (storedContactId !== null && contactExists) {
         return storedContactId;
     }
-    return initialContacts[0].id;
+    return contacts.length > 0 ? contacts[0].id : "";
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
-    const [messages, setMessages] = useState<ChatMessage[]>(
-        readMessagesFromLocalStorage,
-    );
-    const [selectedContactId, setSelectedContactId] = useState<string>(
-        readSelectedContactIdFromLocalStorage,
-    );
+    const [contacts, setContacts] = useState<ChatContact[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [selectedContactId, setSelectedContactId] = useState<string>("");
 
     useEffect(() => {
-        localStorage.setItem(CHAT_MESSAGES_STORAGE_KEY, JSON.stringify(messages));
-    }, [messages]);
+        async function loadChat() {
+            try {
+                const apiContacts = await getChatContactsRequest();
+
+                if (apiContacts.length > 0) {
+                    setContacts(apiContacts);
+                    setSelectedContactId(
+                        readSelectedContactIdFromLocalStorage(apiContacts),
+                    );
+
+                    const allMessages: ChatMessage[] = [];
+                    for (const contact of apiContacts) {
+                        if (contact.messages) {
+                            allMessages.push(
+                                ...contact.messages.map((m) => ({
+                                    id: m.id,
+                                    contactId: m.contactId,
+                                    sender: m.sender as MessageSender,
+                                    type: m.type as ChatMessageType,
+                                    content: m.content,
+                                    sentAt: m.sentAt,
+                                })),
+                            );
+                        }
+                    }
+                    setMessages(allMessages);
+                } else {
+                    setContacts(fallbackContacts);
+                    setSelectedContactId(fallbackContacts[0].id);
+                    setMessages(fallbackMessages);
+                }
+            } catch {
+                setContacts(fallbackContacts);
+                setSelectedContactId(fallbackContacts[0].id);
+                setMessages(fallbackMessages);
+            }
+        }
+
+        loadChat();
+    }, []);
 
     useEffect(() => {
-        localStorage.setItem(CHAT_SELECTED_CONTACT_STORAGE_KEY, selectedContactId);
+        localStorage.setItem(
+            CHAT_SELECTED_CONTACT_STORAGE_KEY,
+            selectedContactId,
+        );
     }, [selectedContactId]);
 
-    const selectedContact =
-        initialContacts.find((contact) => contact.id === selectedContactId) ??
-        initialContacts[0];
+    const selectedContact = useMemo(() => {
+        return (
+            contacts.find((contact) => contact.id === selectedContactId) ??
+            contacts[0] ?? { id: "", name: "", avatarUrl: "" }
+        );
+    }, [contacts, selectedContactId]);
 
     const selectedMessages = useMemo(
         () =>
@@ -153,29 +188,58 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         setSelectedContactId(contactId);
     };
 
-    const sendMessage = (content: string) => {
+    const sendMessage = async (content: string) => {
         const trimmedContent = content.trim();
 
         if (trimmedContent === "") {
             return;
         }
 
-        const newMessage: ChatMessage = {
-            id: crypto.randomUUID(),
-            contactId: selectedContact.id,
-            sender: "me",
-            type: "text",
-            content: trimmedContent,
-            sentAt: new Date().toLocaleTimeString("de-DE", {
-                hour: "2-digit",
-                minute: "2-digit",
-            }),
-        };
+        const sentAt = new Date().toLocaleTimeString("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
 
-        setMessages((previousMessages) => [...previousMessages, newMessage]);
+        try {
+            const created = await sendMessageRequest(
+                selectedContact.id,
+                "me",
+                "text",
+                trimmedContent,
+                sentAt,
+            );
+
+            setMessages((previousMessages) => [
+                ...previousMessages,
+                {
+                    ...created,
+                    sender: created.sender as MessageSender,
+                    type: created.type as ChatMessageType,
+                },
+            ]);
+        } catch {
+            const fallbackMessage: ChatMessage = {
+                id: crypto.randomUUID(),
+                contactId: selectedContact.id,
+                sender: "me",
+                type: "text",
+                content: trimmedContent,
+                sentAt,
+            };
+            setMessages((previousMessages) => [
+                ...previousMessages,
+                fallbackMessage,
+            ]);
+        }
     };
 
-    const clearChat = (contactId: string) => {
+    const clearChat = async (contactId: string) => {
+        try {
+            await clearChatRequest(contactId);
+        } catch {
+            // Continue even if API fails
+        }
+
         setMessages((previousMessages) =>
             previousMessages.filter((message) => message.contactId !== contactId),
         );
@@ -190,7 +254,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     };
 
     const contextValue: ChatContextValue = {
-        contacts: initialContacts,
+        contacts,
         selectedContactId,
         selectedContact,
         selectedMessages,
