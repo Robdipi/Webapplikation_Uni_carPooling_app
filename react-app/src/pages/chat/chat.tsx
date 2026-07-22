@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
     type ChatContact,
     type ChatMessage,
@@ -68,11 +68,11 @@ const ContactItem: React.FC<ContactItemProps> = ({
             <img
                 className="profile-pic"
                 src={contact.user.avatarUrl}
-                alt={`Profilbild von ${contact.name}`}
+                alt={`Profilbild von ${contact.user.firstName}`}
             />
         )}
         <span className="contact-text">
-            <strong>{contact.name}</strong>
+            <strong>{contact.user.firstName} {contact.user.lastName}</strong>
             <span className="contact-preview">
                 {lastMessage?.content ?? "Noch keine Nachrichten"}
             </span>
@@ -97,14 +97,14 @@ const ContactItem: React.FC<ContactItemProps> = ({
     </button>
 );
 
-const MessageRow: React.FC<{ message: ChatMessage }> = ({ message }) => {
+const MessageRow: React.FC<{ message: ChatMessage; isMine: boolean }> = ({ message, isMine }) => {
     const messageClassName =
-        message.sender === "me" ? "message-bubble message-send" : "message-bubble message-received";
+        isMine ? "message-bubble message-send" : "message-bubble message-received";
 
     return (
         <div
             className={
-                message.sender === "me"
+                isMine
                     ? "message-row message-row-send"
                     : "message-row message-row-received"
             }
@@ -147,13 +147,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ selectedContact, onSend }) => {
     return (
         <div className="write-message-container-holder">
             <form className="write-message-container" onSubmit={handleSubmit}>
-                <button type="button" className="extra-btn" aria-label="Datei anhängen">
-                    📎
-                </button>
                 <input
                     type="text"
                     className="chat-input"
-                    placeholder={`Nachricht an ${selectedContact.name}`}
+                    placeholder={`Nachricht an ${selectedContact.user.firstName}`}
                     value={text}
                     onChange={(event) => setText(event.target.value)}
                 />
@@ -166,6 +163,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ selectedContact, onSend }) => {
 };
 
 const ChatPage: React.FC = () => {
+    const { currentUser } = useUserContext();
     const {
         contacts,
         selectedContactId,
@@ -178,8 +176,23 @@ const ChatPage: React.FC = () => {
         getLastMessage,
     } = useChatContext();
 
+    const location = useLocation();
     const mainRef = useRef<HTMLDivElement | null>(null);
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    const navStateApplied = useRef(false);
+
+    useEffect(() => {
+        if (navStateApplied.current) {
+            return;
+        }
+
+        const state = location.state as { selectedContactId?: string } | null;
+        if (state?.selectedContactId) {
+            navStateApplied.current = true;
+            selectContact(state.selectedContactId);
+            window.history.replaceState({}, "");
+        }
+    }, [location.state]);
 
     const pendingDeleteContact = pendingDeleteId !== null
         ? contacts.find((c) => c.id === pendingDeleteId)
@@ -223,11 +236,11 @@ const ChatPage: React.FC = () => {
                         <img
                             className="conversation-avatar"
                             src={selectedContact.user.avatarUrl}
-                            alt={`Profilbild von ${selectedContact.name}`}
+                            alt={`Profilbild von ${selectedContact.user.firstName}`}
                         />
                     )}
                     <div>
-                        <h2>{selectedContact.name}</h2>
+                        <h2>{selectedContact.user.firstName} {selectedContact.user.lastName}</h2>
                         <p>CampusRide Chat</p>
                     </div>
                     <button
@@ -242,11 +255,15 @@ const ChatPage: React.FC = () => {
                 <div className="chat-messages" ref={mainRef}>
                     {selectedMessages.length === 0 ? (
                         <p className="empty-chat-message">
-                            Noch keine Nachrichten mit {selectedContact.name}.
+                            Noch keine Nachrichten mit {selectedContact.user.firstName}.
                         </p>
                     ) : (
                         selectedMessages.map((message) => (
-                            <MessageRow key={message.id} message={message} />
+                            <MessageRow
+                                key={message.id}
+                                message={message}
+                                isMine={currentUser !== null && message.senderId === currentUser.id}
+                            />
                         ))
                     )}
                 </div>
@@ -261,7 +278,7 @@ const ChatPage: React.FC = () => {
                     <div className="confirm-dialog">
                         <h3>Chat löschen?</h3>
                         <p>
-                            Willst du den Chat mit <strong>{pendingDeleteContact.name}</strong> wirklich löschen?
+                            Willst du den Chat mit <strong>{pendingDeleteContact.user.firstName} {pendingDeleteContact.user.lastName}</strong> wirklich löschen?
                             Alle Nachrichten werden entfernt.
                         </p>
                         <div className="confirm-dialog-actions">

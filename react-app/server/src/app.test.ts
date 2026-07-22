@@ -257,10 +257,9 @@ describe("Chat", () => {
         // Create contact
         const contactRes = await request(app)
             .post("/api/chat/contacts")
-            .send({ name: "Test Kontakt", userId });
+            .send({ userId });
 
         expect(contactRes.status).toBe(201);
-        expect(contactRes.body.contact.name).toBe("Test Kontakt");
         expect(contactRes.body.contact.userId).toBe(userId);
         expect(contactRes.body.contact.user.firstName).toBe("Chat");
 
@@ -271,7 +270,7 @@ describe("Chat", () => {
             .post("/api/chat/messages")
             .send({
                 contactId,
-                sender: "me",
+                senderId: userId,
                 type: "text",
                 content: "Hallo, wie geht's?",
                 sentAt: "14:30",
@@ -279,7 +278,7 @@ describe("Chat", () => {
 
         expect(msgRes.status).toBe(201);
         expect(msgRes.body.message.content).toBe("Hallo, wie geht's?");
-        expect(msgRes.body.message.sender).toBe("me");
+        expect(msgRes.body.message.senderId).toBe(userId);
 
         // Verify in DB
         const dbMsg = await prisma.chatMessage.findUnique({
@@ -294,7 +293,7 @@ describe("Chat", () => {
             .post("/api/chat/messages")
             .send({
                 contactId,
-                sender: "contact",
+                senderId: userId,
                 type: "text",
                 content: "Mir gut, danke!",
                 sentAt: "14:31",
@@ -330,7 +329,7 @@ describe("Chat", () => {
     it("rejects message creation with missing fields", async () => {
         const response = await request(app)
             .post("/api/chat/messages")
-            .send({ contactId: "x", sender: "me" });
+            .send({ contactId: "x", senderId: "y" });
 
         expect(response.status).toBe(400);
         expect(response.body.error).toBe("Alle Nachrichtenfelder werden benötigt.");
@@ -339,10 +338,10 @@ describe("Chat", () => {
     it("rejects contact creation with missing fields", async () => {
         const response = await request(app)
             .post("/api/chat/contacts")
-            .send({ name: "Nur Name" });
+            .send({});
 
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe("Name und userId werden benötigt.");
+        expect(response.body.error).toBe("userId wird benötigt.");
     });
 
     it("deletes a contact and its messages", async () => {
@@ -363,7 +362,7 @@ describe("Chat", () => {
 
         const contactRes = await request(app)
             .post("/api/chat/contacts")
-            .send({ name: "Del Kontakt", userId });
+            .send({ userId });
 
         expect(contactRes.status).toBe(201);
         const contactId = contactRes.body.contact.id as string;
@@ -373,7 +372,7 @@ describe("Chat", () => {
             .post("/api/chat/messages")
             .send({
                 contactId,
-                sender: "me",
+                senderId: userId,
                 type: "text",
                 content: "Testnachricht",
                 sentAt: "12:00",

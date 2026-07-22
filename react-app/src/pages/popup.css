@@ -41,7 +41,7 @@
   height: 100%;
   background: var(--color-brand-white);
   padding: 20px;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+  box-shadow: -2px 0 5px var(--color-shadow-light);
   transition: right var(--animation-speed) ease;
   overflow-y: auto;
 }
@@ -88,7 +88,6 @@
   width: 100%;
   background: var(--gradient-brand-important-button);
   color: var(--color-brand-white);
-  color: #fff;
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;

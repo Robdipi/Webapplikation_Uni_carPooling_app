@@ -4,7 +4,7 @@ section {
     margin: 0 auto;
     padding: 1rem;
     background-color: var(--color-brand-white);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 10px var(--color-shadow-light);
     border-radius: 12px;
 }
 
@@ -34,7 +34,7 @@ section {
     padding: 10px;
     width: 100%;
     background: var(--gradient-brand-important-button);
-    color: #fff;
+    color: var(--color-brand-white);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -65,7 +65,7 @@ section {
     min-width: 250px;
     max-width: 400px;
     background-color: var(--color-brand-bg-shade-a);
-    color: white;
+    color: var(--color-brand-white);
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px var(--color-shadow-light);
@@ -94,6 +94,6 @@ section {
 }
 
 .success-message {
-    color: var(--color-price-number);
+    color: var(--color-success);
     font-weight: bold;
 }

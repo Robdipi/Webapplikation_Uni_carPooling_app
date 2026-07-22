@@ -17,6 +17,8 @@ CampusRide Datenbankschema (SQLite)
 │  updatedAt     DATETIME (auto)                              │
 │                                                             │
 │  rides         1:N → Ride                                   │
+│  chatContacts  1:N → ChatContact                            │
+│  sentMessages  1:N → ChatMessage                            │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
@@ -44,7 +46,6 @@ CampusRide Datenbankschema (SQLite)
 │  ChatContact                                                │
 ├─────────────────────────────────────────────────────────────┤
 │  id        TEXT (PK, cuid)                                  │
-│  name      TEXT                                             │
 │  userId    TEXT (FK → User.id, CASCADE DELETE)              │
 │                                                             │
 │  user      N:1 → User                                       │
@@ -56,10 +57,13 @@ CampusRide Datenbankschema (SQLite)
 ├─────────────────────────────────────────────────────────────┤
 │  id        TEXT (PK, cuid)                                  │
 │  contactId TEXT (FK → ChatContact.id, CASCADE DELETE)       │
-│  sender    TEXT ("me" | "contact")                          │
+│  senderId  TEXT (FK → User.id, CASCADE DELETE)              │
 │  type      TEXT ("text" | "image")                          │
 │  content   TEXT                                             │
 │  sentAt    TEXT                                             │
+│                                                             │
+│  contact   N:1 → ChatContact                                │
+│  sender    N:1 → User                                       │
 └─────────────────────────────────────────────────────────────┘
 
 
@@ -67,4 +71,5 @@ Beziehungen
 ===========
 User    1 ──── N Ride         (via driverId, onDelete: CASCADE)
 User    1 ──── N ChatContact  (via userId, onDelete: CASCADE)
+User    1 ──── N ChatMessage  (via senderId, onDelete: CASCADE)
 ChatContact 1 ──── N ChatMessage  (via contactId, onDelete: CASCADE)

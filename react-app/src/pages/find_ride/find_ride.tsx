@@ -140,13 +140,13 @@ const FindRidePage: React.FC = () => {
     });
     const [selectedRide, setSelectedRide] = useState<Ride | null>(rides[0] ?? null);
 
-    const handleChatWithDriver = async (driverId: string, driverName: string) => {
+    const handleChatWithDriver = async (driverId: string, _driverName: string) => {
         if (currentUser === null) {
             return;
         }
 
-        await addContact(driverName, driverId);
-        navigate("/chat");
+        const contact = await addContact(driverId);
+        navigate("/chat", { state: { selectedContactId: contact?.id } });
     };
 
     const filteredRides = useMemo(() => {
@@ -222,6 +222,7 @@ const FindRidePage: React.FC = () => {
                             isOwnRide={currentUser !== null && ride.driverId === currentUser.id}
                             onSelect={setSelectedRide}
                             onChatWithDriver={handleChatWithDriver}
+                            onOwnAvatarClick={() => navigate("/profile")}
                         />
                     ))}
                 </ul>

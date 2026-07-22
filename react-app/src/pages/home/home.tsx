@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
 import { type Ride, useRideContext } from "../../contexts/ridecontext";
+import { useChatContext } from "../../contexts/chatcontext";
 import RouteMapFromCoords from "./RouteMapFromCoords";
 import RideCard from "../find_ride/rideCard";
 import "../style.css";
@@ -40,7 +41,18 @@ const Footer: React.FC = () => (
 const HomePage: React.FC = () => {
     const { currentUser } = useUserContext();
     const { rides } = useRideContext();
+    const { addContact } = useChatContext();
+    const navigate = useNavigate();
     const [selectedRide, setSelectedRide] = useState<Ride | null>(rides[0] ?? null);
+
+    const handleChatWithDriver = async (driverId: string, _driverName: string) => {
+        if (currentUser === null) {
+            return;
+        }
+
+        const contact = await addContact(driverId);
+        navigate("/chat", { state: { selectedContactId: contact?.id } });
+    };
 
     useEffect(() => {
         if (rides.length === 0) {
@@ -95,6 +107,8 @@ const HomePage: React.FC = () => {
                             selected={selectedRide?.id === ride.id}
                             isOwnRide={currentUser !== null && ride.driverId === currentUser.id}
                             onSelect={setSelectedRide}
+                            onChatWithDriver={handleChatWithDriver}
+                            onOwnAvatarClick={() => navigate("/profile")}
                         />
                     ))}
                 </ul>

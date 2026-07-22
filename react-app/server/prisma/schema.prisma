@@ -17,6 +17,8 @@ model User {
   lastName     String
   birthDate    String
   course       String
+  city         String   @default("Konstanz")
+  pricePerKm   Float    @default(0.35)
   avatarUrl    String   @default("")
 
   createdAt    DateTime @default(now())
@@ -24,6 +26,7 @@ model User {
 
   rides        Ride[]
   chatContacts ChatContact[]
+  sentMessages ChatMessage[]
 }
 
 model Ride {
@@ -50,7 +53,6 @@ model Ride {
 
 model ChatContact {
   id        String   @id @default(cuid())
-  name      String
   userId    String
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -60,10 +62,11 @@ model ChatContact {
 model ChatMessage {
   id        String   @id @default(cuid())
   contactId String
-  sender    String
+  senderId  String
   type      String
   content   String
   sentAt    String
 
   contact   ChatContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  sender    User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext, UserProfile } from "../../contexts/usercontext";
+import { useGlobalContext } from "../../contexts/globalcontext";
 import "../style.css";
 import "./profile.css";
 
@@ -74,8 +75,10 @@ const Footer: React.FC = () => (
 
 const ProfilePage: React.FC = () => {
     const { currentUser, profile, setProfile } = useUserContext();
+    const { darkMode, setDarkMode } = useGlobalContext();
     const [draftProfile, setDraftProfile] = useState<UserProfile>(profile);
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const handleEdit = () => {
         setDraftProfile(profile);
@@ -87,17 +90,23 @@ const ProfilePage: React.FC = () => {
         setIsEditing(false);
     };
 
-    const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setProfile(draftProfile);
+        setIsSaving(true);
+        await setProfile(draftProfile);
+        setIsSaving(false);
         setIsEditing(false);
     };
 
     const handleInputChange = (name: keyof UserProfile, value: string) => {
         setDraftProfile((previousProfile) => ({
             ...previousProfile,
-            [name]: value,
+            [name]: name === "pricePerKm" ? parseFloat(value) || 0 : value,
         }));
+    };
+
+    const toggleDarkMode = () => {
+        setDarkMode((previous) => !previous);
     };
 
     return (
@@ -152,9 +161,10 @@ const ProfilePage: React.FC = () => {
                                     onChange={handleInputChange}
                                 />
                                 <ProfileInput
-                                    label="Preis pro km"
+                                    label="Preis pro km (€)"
                                     name="pricePerKm"
-                                    value={draftProfile.pricePerKm}
+                                    type="number"
+                                    value={String(draftProfile.pricePerKm)}
                                     onChange={handleInputChange}
                                 />
                                 <ProfileInput
@@ -178,8 +188,12 @@ const ProfilePage: React.FC = () => {
                                     >
                                         Abbrechen
                                     </button>
-                                    <button type="submit" className="create-ride-submit-button">
-                                        Änderungen speichern
+                                    <button
+                                        type="submit"
+                                        className="create-ride-submit-button"
+                                        disabled={isSaving}
+                                    >
+                                        {isSaving ? "Speichern..." : "Änderungen speichern"}
                                     </button>
                                 </div>
                             </form>
@@ -199,7 +213,7 @@ const ProfilePage: React.FC = () => {
                                 <ProfileField label="Nachname" value={profile.lastName} />
                                 <ProfileField label="Geburtsdatum" value={profile.birthDate} />
                                 <ProfileField label="Wohnort" value={profile.city} />
-                                <ProfileField label="Preis pro km" value={profile.pricePerKm} />
+                                <ProfileField label="Preis pro km" value={`${profile.pricePerKm.toFixed(2)} €`} />
                                 <ProfileField label="Studiengang" value={profile.course} />
 
                                 <div className="edit-button-wrapper">
@@ -213,6 +227,22 @@ const ProfilePage: React.FC = () => {
                                 </div>
                             </>
                         )}
+
+                        <div className="darkmode-section">
+                            <h3>Darstellung</h3>
+                            <label className="darkmode-toggle">
+                                <span className="darkmode-label">Dunkelmodus</span>
+                                <button
+                                    type="button"
+                                    className={`toggle-switch ${darkMode ? "toggle-on" : ""}`}
+                                    onClick={toggleDarkMode}
+                                    role="switch"
+                                    aria-checked={darkMode}
+                                >
+                                    <span className="toggle-knob" />
+                                </button>
+                            </label>
+                        </div>
                     </section>
                 </div>
             </main>

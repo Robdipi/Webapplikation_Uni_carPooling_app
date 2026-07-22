@@ -7,6 +7,7 @@ interface RideCardProps {
     isOwnRide?: boolean;
     onSelect?: (ride: Ride) => void;
     onChatWithDriver?: (driverId: string, driverName: string) => void;
+    onOwnAvatarClick?: () => void;
 }
 
 function formatDateTime(value: string): string {
@@ -29,14 +30,18 @@ function formatDateTime(value: string): string {
     });
 }
 
-const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, isOwnRide = false, onSelect, onChatWithDriver }) => {
+const RideCard: React.FC<RideCardProps> = ({ ride, selected = false, isOwnRide = false, onSelect, onChatWithDriver, onOwnAvatarClick }) => {
     const handleClick = () => {
         onSelect?.(ride);
     };
 
     const handleAvatarClick = (event: React.MouseEvent) => {
         event.stopPropagation();
-        onChatWithDriver?.(ride.driverId, ride.driverName);
+        if (isOwnRide) {
+            onOwnAvatarClick?.();
+        } else {
+            onChatWithDriver?.(ride.driverId, ride.driverName);
+        }
     };
 
     return (

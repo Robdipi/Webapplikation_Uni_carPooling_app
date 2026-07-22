@@ -2,6 +2,7 @@ import {
     createContext,
     useContext,
     useState,
+    useEffect,
     type Dispatch,
     type ReactNode,
     type SetStateAction,
@@ -16,10 +17,19 @@ interface GlobalContextProviderProps {
     children: ReactNode;
 }
 
+const DARK_MODE_KEY = "campusRideDarkMode";
+
 const GlobalContext = createContext<GlobalContextValue | undefined>(undefined);
 
 export function GlobalContextProvider({ children }: GlobalContextProviderProps) {
-    const [darkMode, setDarkMode] = useState<boolean>(false);
+    const [darkMode, setDarkMode] = useState<boolean>(() => {
+        return localStorage.getItem(DARK_MODE_KEY) === "true";
+    });
+
+    useEffect(() => {
+        localStorage.setItem(DARK_MODE_KEY, String(darkMode));
+        document.body.classList.toggle("dark", darkMode);
+    }, [darkMode]);
 
     return (
         <GlobalContext.Provider value={{ darkMode, setDarkMode }}>

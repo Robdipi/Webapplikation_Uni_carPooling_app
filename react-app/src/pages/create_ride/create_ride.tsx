@@ -131,14 +131,13 @@ function calculateDurationMinutes(distanceKm: number): number {
     return Math.max(5, Math.round((distanceKm / 45) * 60));
 }
 
-//Todo put UserPrice Data in here
-function calculatePrice(distanceKm: number): number {
-    return Math.max(2, Math.round(distanceKm * 0.35));
+function calculatePrice(distanceKm: number, pricePerKm: number): number {
+    return Math.max(2, Math.round(distanceKm * pricePerKm));
 }
 
 const CreateRidePage: React.FC = () => {
     const { addRide } = useRideContext();
-    const { currentUser } = useUserContext();
+    const { currentUser, profile } = useUserContext();
     const navigate = useNavigate();
 
     const [form, setForm] = useState<RideForm>({
@@ -183,7 +182,7 @@ const CreateRidePage: React.FC = () => {
             driverId: currentUser?.id ?? "",
             departureTime: form.dateTime,
             seatsAvailable: form.seats,
-            price: calculatePrice(distanceKm),
+            price: calculatePrice(distanceKm, profile.pricePerKm),
             extra: form.extra.trim(),
         };
 

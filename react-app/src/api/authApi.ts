@@ -3,6 +3,8 @@ export interface ApiUserProfile {
     lastName: string;
     birthDate: string;
     course: string;
+    city: string;
+    pricePerKm: number;
     avatarUrl: string;
 }
 
@@ -83,6 +85,37 @@ export async function getCurrentUserRequest(token: string): Promise<ApiUser> {
         headers: {
             Authorization: `Bearer ${token}`,
         },
+    });
+
+    if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+    }
+
+    const data = (await response.json()) as { user: ApiUser };
+    return data.user;
+}
+
+export interface UpdateProfileRequest {
+    firstName?: string;
+    lastName?: string;
+    birthDate?: string;
+    course?: string;
+    city?: string;
+    pricePerKm?: number;
+    avatarUrl?: string;
+}
+
+export async function updateProfileRequest(
+    token: string,
+    input: UpdateProfileRequest,
+): Promise<ApiUser> {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(input),
     });
 
     if (!response.ok) {

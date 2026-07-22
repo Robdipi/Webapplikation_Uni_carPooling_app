@@ -13,6 +13,7 @@ import {
     createChatContactRequest,
     deleteContactRequest,
 } from "../api/chatApi";
+import { useUserContext } from "./usercontext";
 
 export interface ChatContactUser {
     id: string;
@@ -23,19 +24,16 @@ export interface ChatContactUser {
 
 export interface ChatContact {
     id: string;
-    name: string;
     userId: string;
     user: ChatContactUser;
 }
-
-export type MessageSender = "me" | "contact";
 
 export type ChatMessageType = "text" | "image";
 
 export interface ChatMessage {
     id: string;
     contactId: string;
-    sender: MessageSender;
+    senderId: string;
     type: ChatMessageType;
     content: string;
     sentAt: string;
@@ -50,7 +48,7 @@ interface ChatContextValue {
     sendMessage: (content: string) => void;
     clearChat: (contactId: string) => void;
     deleteContact: (contactId: string) => void;
-    addContact: (name: string, userId: string) => Promise<ChatContact | null>;
+    addContact: (userId: string) => Promise<ChatContact | null>;
     getLastMessage: (contactId: string) => ChatMessage | undefined;
 }
 
@@ -70,27 +68,23 @@ const fallbackUser: ChatContactUser = {
 const fallbackContacts: ChatContact[] = [
     {
         id: "lisa",
-        name: "Lisa Müller",
         userId: "fallback",
-        user: { ...fallbackUser, avatarUrl: "/images/2.jpg" },
+        user: { ...fallbackUser, firstName: "Lisa", lastName: "Müller", avatarUrl: "/images/2.jpg" },
     },
     {
         id: "max",
-        name: "Max Weber",
         userId: "fallback",
-        user: { ...fallbackUser, avatarUrl: "/images/3.jpg" },
+        user: { ...fallbackUser, firstName: "Max", lastName: "Weber", avatarUrl: "/images/3.jpg" },
     },
     {
         id: "sarah",
-        name: "Sarah Fischer",
         userId: "fallback",
-        user: { ...fallbackUser, avatarUrl: "/images/4.jpg" },
+        user: { ...fallbackUser, firstName: "Sarah", lastName: "Fischer", avatarUrl: "/images/4.jpg" },
     },
     {
         id: "jonas",
-        name: "Jonas Klein",
         userId: "fallback",
-        user: { ...fallbackUser, avatarUrl: "/images/1.jpg" },
+        user: { ...fallbackUser, firstName: "Jonas", lastName: "Klein", avatarUrl: "/images/1.jpg" },
     },
 ];
 
@@ -98,7 +92,7 @@ const fallbackMessages: ChatMessage[] = [
     {
         id: "msg-1",
         contactId: "lisa",
-        sender: "contact",
+        senderId: "fallback-contact",
         type: "text",
         content: "Hey, ist der Platz nach Konstanz noch frei?",
         sentAt: "09:12",
@@ -106,7 +100,7 @@ const fallbackMessages: ChatMessage[] = [
     {
         id: "msg-2",
         contactId: "lisa",
-        sender: "me",
+        senderId: "fallback-me",
         type: "text",
         content: "Ja, ein Platz ist noch frei.",
         sentAt: "09:13",
@@ -114,7 +108,7 @@ const fallbackMessages: ChatMessage[] = [
     {
         id: "msg-3",
         contactId: "max",
-        sender: "contact",
+        senderId: "fallback-contact",
         type: "text",
         content: "Kannst du mich an der HTWG einsammeln?",
         sentAt: "Gestern",
@@ -139,6 +133,7 @@ function readSelectedContactIdFromLocalStorage(
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
+    const { currentUser } = useUserContext();
     const [contacts, setContacts] = useState<ChatContact[]>([]);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [selectedContactId, setSelectedContactId] = useState<string>("");
@@ -161,7 +156,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
                                 ...contact.messages.map((m) => ({
                                     id: m.id,
                                     contactId: m.contactId,
-                                    sender: m.sender as MessageSender,
+                                    senderId: m.senderId,
                                     type: m.type as ChatMessageType,
                                     content: m.content,
                                     sentAt: m.sentAt,
@@ -195,7 +190,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     const selectedContact = useMemo(() => {
         return (
             contacts.find((contact) => contact.id === selectedContactId) ??
-            contacts[0] ?? { id: "", name: "", userId: "", user: fallbackUser }
+            contacts[0] ?? { id: "", userId: "", user: fallbackUser }
         );
     }, [contacts, selectedContactId]);
 
@@ -214,7 +209,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     const sendMessage = async (content: string) => {
         const trimmedContent = content.trim();
 
-        if (trimmedContent === "") {
+        if (trimmedContent === "" || currentUser === null) {
             return;
         }
 
@@ -226,7 +221,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         try {
             const created = await sendMessageRequest(
                 selectedContact.id,
-                "me",
+                currentUser.id,
                 "text",
                 trimmedContent,
                 sentAt,
@@ -236,7 +231,6 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
                 ...previousMessages,
                 {
                     ...created,
-                    sender: created.sender as MessageSender,
                     type: created.type as ChatMessageType,
                 },
             ]);
@@ -244,7 +238,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
             const fallbackMessage: ChatMessage = {
                 id: crypto.randomUUID(),
                 contactId: selectedContact.id,
-                sender: "me",
+                senderId: currentUser.id,
                 type: "text",
                 content: trimmedContent,
                 sentAt,
@@ -288,7 +282,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         }
     };
 
-    const addContact = async (name: string, userId: string): Promise<ChatContact | null> => {
+    const addContact = async (userId: string): Promise<ChatContact | null> => {
         const existing = contacts.find((c) => c.userId === userId);
         if (existing) {
             setSelectedContactId(existing.id);
@@ -296,10 +290,9 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         }
 
         try {
-            const created = await createChatContactRequest(name, userId);
+            const created = await createChatContactRequest(userId);
             const newContact: ChatContact = {
                 id: created.id,
-                name: created.name,
                 userId: created.userId,
                 user: created.user,
             };

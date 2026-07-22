@@ -4,6 +4,7 @@ import {
     getCurrentUserRequest,
     loginUserRequest,
     registerUserRequest,
+    updateProfileRequest,
 } from "../api/authApi";
 
 export interface UserProfile {
@@ -11,7 +12,7 @@ export interface UserProfile {
     lastName: string;
     birthDate: string;
     city: string;
-    pricePerKm: string;
+    pricePerKm: number;
     course: string;
     avatarUrl: string;
 }
@@ -54,7 +55,7 @@ interface UserContextValue {
     registerUser: (input: RegisterUserInput) => Promise<AuthResult>;
     loginUser: (input: LoginUserInput) => Promise<AuthResult>;
     logoutUser: () => void;
-    setProfile: (profile: UserProfile) => void;
+    setProfile: (profile: UserProfile) => Promise<AuthResult>;
 }
 
 const defaultProfile: UserProfile = {
@@ -62,7 +63,7 @@ const defaultProfile: UserProfile = {
     lastName: "Mustermann",
     birthDate: "2000-01-01",
     city: "Konstanz",
-    pricePerKm: "0,60 €",
+    pricePerKm: 0.35,
     course: "Allgemeine Informatik (AIN)",
     avatarUrl: "",
 };
@@ -84,8 +85,8 @@ function toRegisteredUser(apiUser: ApiUser): RegisteredUser {
             firstName: apiUser.profile.firstName,
             lastName: apiUser.profile.lastName,
             birthDate: apiUser.profile.birthDate,
-            city: "Konstanz",
-            pricePerKm: "0,60 €",
+            city: apiUser.profile.city,
+            pricePerKm: apiUser.profile.pricePerKm,
             course: apiUser.profile.course,
             avatarUrl: apiUser.profile.avatarUrl,
         },
@@ -225,22 +226,35 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         setUsers([]);
     };
 
-    const setProfile = (profile: UserProfile) => {
-        if (currentUser === null) {
-            return;
+    const setProfile = async (profile: UserProfile): Promise<AuthResult> => {
+        if (currentUser === null || authToken === null) {
+            return { success: false, error: "Nicht angemeldet." };
         }
 
-        const updatedUser: RegisteredUser = {
-            ...currentUser,
-            profile,
-        };
+        try {
+            const updatedUser = await updateProfileRequest(authToken, {
+                firstName: profile.firstName,
+                lastName: profile.lastName,
+                birthDate: profile.birthDate,
+                course: profile.course,
+                city: profile.city,
+                pricePerKm: profile.pricePerKm,
+                avatarUrl: profile.avatarUrl,
+            });
 
-        setCurrentUser(updatedUser);
-        setUsers((previousUsers) =>
-            previousUsers.map((user) =>
-                user.id === updatedUser.id ? updatedUser : user,
-            ),
-        );
+            const mappedUser = toRegisteredUser(updatedUser);
+            setCurrentUser(mappedUser);
+            setUsers([mappedUser]);
+
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error instanceof Error
+                    ? error.message
+                    : "Profil konnte nicht gespeichert werden.",
+            };
+        }
     };
 
     const contextValue: UserContextValue = {

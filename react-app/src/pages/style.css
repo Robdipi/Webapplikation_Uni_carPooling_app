@@ -17,23 +17,194 @@
 --color-brand-highlight-b: #D72483;
 --color-brand-highlight-b-dark:#7A154B;
 --color-price-number: #10b981;
+--color-success: #10b981;
+
+--color-danger: #e74c3c;
+--color-danger-dark: #c0392b;
+--color-own-ride: #3498db;
+
+--color-bg-page: #f7f7f7;
+--color-bg-field: #f5f5f5;
+--color-bg-card: var(--color-brand-white);
+
+--color-border-input: #ccc;
 
 --color-shadow:rgba(0,0,0,0.5);
 --color-shadow-light:rgba(0,0,0,0.25);
+--color-shadow-medium:rgba(0,0,0,0.35);
+--color-shadow-heavy:rgba(0,0,0,0.7);
+
+--color-overlay:rgba(0,0,0,0.5);
+--color-delete-btn-bg:rgba(255, 255, 255, 0.15);
 
 /* I noticed they look very similar to a certain app*/
 --gradient-brand-important-button: linear-gradient(33deg, var(--color-brand-highlight-a),var(--color-brand-highlight-b));
 --gradient-brand-important-button-hover: linear-gradient(33deg, var(--color-brand-highlight-a-dark),var(--color-brand-highlight-b-dark));
 --gradient-brand-important-button-active: linear-gradient(33deg, var(--color-brand-black), var(--color-brand-black));
 }
-/*Put all darkmode colors here
-TODO make Darkmode when we have Javascript in lecture */
+/*Put all darkmode colors here */
 body.dark {
-  --color-brand-bg: #004d40;/* CampusRide Grün-Blau */
-  --color-brand-white: #0C0A3E;
-  --color-brand-black: #FFF;
+  --color-brand-bg: #1a1a2e;
+  --color-brand-bg-shade-a: #16213e;
+  --color-brand-bg-shade-b: #0f3460;
+  --color-brand-white: #1a1a2e;
+  --color-brand-black: #e0e0e0;
+  --color-brand-grey: #999;
+  --color-brand-middle-grey: #888;
+  --color-brand-dark-grey: #e0e0e0;
   --color-brand-highlight-a: #FC814A;
   --color-brand-highlight-b: #D72483;
+  --color-bg-page: #111122;
+  --color-bg-field: #16213e;
+  --color-border-input: #555;
+  --color-shadow: rgba(0,0,0,0.7);
+  --color-shadow-light: rgba(0,0,0,0.4);
+  --color-shadow-medium: rgba(0,0,0,0.5);
+  --color-shadow-heavy: rgba(0,0,0,0.8);
+  --color-overlay: rgba(0,0,0,0.7);
+  --color-delete-btn-bg: rgba(255, 255, 255, 0.1);
+}
+
+body.dark header {
+  background-color: var(--color-brand-bg-shade-a);
+}
+
+body.dark header,
+body.dark nav a,
+body.dark .open-btn,
+body.dark .logo,
+body.dark footer,
+body.dark footer a {
+  color: var(--color-brand-black);
+}
+
+body.dark footer {
+  background-color: var(--color-brand-bg-shade-a);
+}
+
+body.dark .profile-field {
+  background-color: var(--color-brand-bg-shade-b);
+  border-color: var(--color-brand-grey);
+  color: var(--color-brand-black);
+}
+
+body.dark input,
+body.dark textarea {
+  background-color: var(--color-brand-bg-shade-b);
+  color: var(--color-brand-black);
+  border-color: var(--color-brand-grey);
+}
+
+body.dark h1, body.dark h2, body.dark h3,
+body.dark h4, body.dark h5, body.dark h6,
+body.dark strong, body.dark label,
+body.dark .details h3 {
+  color: var(--color-brand-black);
+}
+
+body.dark p, body.dark span, body.dark div,
+body.dark .details p, body.dark .logintext,
+body.dark .contact-preview, body.dark .darkmode-label {
+  color: var(--color-brand-grey);
+}
+
+body.dark h2, body.dark .confirm-dialog h3 {
+  color: var(--color-brand-black);
+}
+
+body.dark .chat-conversation-header p,
+body.dark .empty-state,
+body.dark .empty-chat-message,
+body.dark .seachbar-label,
+body.dark .contact-preview {
+  color: var(--color-brand-grey);
+}
+
+body.dark .chat-messages {
+  background-color: var(--color-bg-page);
+}
+
+body.dark .chat-sidebar {
+  background-color: var(--color-brand-bg-shade-a);
+  color: var(--color-brand-grey);
+}
+
+body.dark .contact-item {
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-grey);
+}
+
+body.dark .contact-item-selected {
+  background-color: var(--color-brand-bg-shade-b);
+}
+
+body.dark .chat-conversation-header {
+  background-color: var(--color-brand-bg-shade-b);
+}
+
+body.dark .chat-conversation-header h2 {
+  color: var(--color-brand-black);
+}
+
+body.dark .chat-footer,
+body.dark .write-message-container-holder,
+body.dark .write-message-container,
+body.dark .chat-input {
+  background-color: var(--color-brand-bg-shade-b);
+  color: var(--color-brand-black);
+}
+
+body.dark .message-received {
+  background-color: var(--color-brand-bg-shade-a);
+  color: var(--color-brand-black);
+}
+
+body.dark .message-send {
+  background-color: var(--color-brand-bg-shade-b);
+  color: var(--color-brand-black);
+  border-color: var(--color-brand-grey);
+}
+
+body.dark .message-time {
+  color: var(--color-brand-grey);
+}
+
+body.dark .send-btn, body.dark .extra-btn {
+  color: var(--color-brand-black);
+}
+
+body.dark section,
+body.dark .ride-card,
+body.dark .campusride-map-card {
+  background-color: var(--color-brand-bg-shade-b);
+  color: var(--color-brand-grey);
+}
+
+body.dark .confirm-dialog {
+  background-color: var(--color-brand-bg-shade-a);
+  color: var(--color-brand-grey);
+}
+
+body.dark .confirm-dialog h3 {
+  color: var(--color-brand-black);
+}
+
+body.dark .login-popup {
+  background: var(--color-brand-bg-shade-a);
+  color: var(--color-brand-grey);
+}
+
+body.dark .login-popup h2,
+body.dark .login-popup button {
+  color: var(--color-brand-black);
+}
+
+body.dark .ride-list-button-own .ride-card {
+  border-color: var(--color-own-ride);
+}
+
+body.dark .success-message {
+  color: var(--color-success);
 }
 
 /* 1. Grund-Design (Konsistente Typografie & Farben) */
@@ -56,15 +227,15 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 10px var(--color-shadow-light);
 }
 
 main {
     flex: 1;
 }
 footer {
-    background-color: #004d40;
-    color: white;
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-white);
     padding: 1rem;
     justify-content: space-between;
     align-items: center;

@@ -67,6 +67,8 @@ function publicUser(user: User) {
             lastName: user.lastName,
             birthDate: user.birthDate,
             course: user.course,
+            city: user.city,
+            pricePerKm: user.pricePerKm,
             avatarUrl: user.avatarUrl,
         },
     };
@@ -334,6 +336,54 @@ app.get(
     },
 );
 
+interface UpdateProfileRequestBody {
+    firstName?: string;
+    lastName?: string;
+    birthDate?: string;
+    course?: string;
+    city?: string;
+    pricePerKm?: number;
+    avatarUrl?: string;
+}
+
+app.put(
+    "/api/auth/me",
+    authenticateToken,
+    async (req: AuthenticatedRequest, res: Response) => {
+        if (req.user === undefined) {
+            res.status(401).json({ error: "Nicht angemeldet." });
+            return;
+        }
+
+        const body = req.body as UpdateProfileRequestBody;
+
+        const data: Record<string, string | number> = {};
+        if (body.firstName !== undefined) data.firstName = body.firstName;
+        if (body.lastName !== undefined) data.lastName = body.lastName;
+        if (body.birthDate !== undefined) data.birthDate = body.birthDate;
+        if (body.course !== undefined) data.course = body.course;
+        if (body.city !== undefined) data.city = body.city;
+        if (body.pricePerKm !== undefined) data.pricePerKm = body.pricePerKm;
+        if (body.avatarUrl !== undefined) data.avatarUrl = body.avatarUrl;
+
+        try {
+            await prisma.user.update({
+                where: { id: req.user.userId },
+                data,
+            });
+
+            const user = await prisma.user.findUnique({
+                where: { id: req.user.userId },
+            });
+
+            res.json({ user: publicUser(user!) });
+        } catch (error) {
+            console.error("Update profile failed:", error);
+            res.status(500).json({ error: "Profil konnte nicht aktualisiert werden." });
+        }
+    },
+);
+
 // ── Rides ────────────────────────────────────────────────────────────────────
 
 interface CreateRideRequestBody {
@@ -518,7 +568,11 @@ app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
     try {
         const contacts = await prisma.chatContact.findMany({
             include: {
-                messages: true,
+                messages: {
+                    include: {
+                        sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+                    },
+                },
                 user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
             },
         });
@@ -530,16 +584,16 @@ app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
 });
 
 app.post("/api/chat/contacts", async (req: Request, res: Response) => {
-    const { name, userId } = req.body as { name?: string; userId?: string };
+    const { userId } = req.body as { userId?: string };
 
-    if (name === undefined || userId === undefined) {
-        res.status(400).json({ error: "Name und userId werden benötigt." });
+    if (userId === undefined) {
+        res.status(400).json({ error: "userId wird benötigt." });
         return;
     }
 
     try {
         const contact = await prisma.chatContact.create({
-            data: { name, userId },
+            data: { userId },
             include: { user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } },
         });
         res.status(201).json({ contact });
@@ -550,9 +604,9 @@ app.post("/api/chat/contacts", async (req: Request, res: Response) => {
 });
 
 app.post("/api/chat/messages", async (req: Request, res: Response) => {
-    const { contactId, sender, type, content, sentAt } = req.body as {
+    const { contactId, senderId, type, content, sentAt } = req.body as {
         contactId?: string;
-        sender?: string;
+        senderId?: string;
         type?: string;
         content?: string;
         sentAt?: string;
@@ -560,7 +614,7 @@ app.post("/api/chat/messages", async (req: Request, res: Response) => {
 
     if (
         contactId === undefined ||
-        sender === undefined ||
+        senderId === undefined ||
         type === undefined ||
         content === undefined ||
         sentAt === undefined
@@ -571,7 +625,7 @@ app.post("/api/chat/messages", async (req: Request, res: Response) => {
 
     try {
         const message = await prisma.chatMessage.create({
-            data: { contactId, sender, type, content, sentAt },
+            data: { contactId, senderId, type, content, sentAt },
         });
         res.status(201).json({ message });
     } catch (error) {
