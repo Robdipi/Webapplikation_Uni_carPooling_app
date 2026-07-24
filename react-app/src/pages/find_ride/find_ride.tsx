@@ -1,42 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
 import { type Ride, useRideContext } from "../../contexts/ridecontext";
 import { useChatContext } from "../../contexts/chatcontext";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import RideCard from "./rideCard";
 import "../style.css";
 import "../home/rout_recomendation.css";
 import "./searchbar.css";
 import RouteMapFromCoords from "../home/RouteMapFromCoords";
-
-const Header: React.FC = () => {
-    const { currentUser, logoutUser } = useUserContext();
-
-    return (
-        <header>
-            <div className="logo">CampusRide</div>
-            <nav>
-                <Link to="/home" className="open-btn">Home</Link>
-                <Link to="/chat" className="open-btn">Chat</Link>
-                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-                <Link to="/profile" className="open-btn">Profil</Link>
-                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
-                {currentUser !== null && (
-                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
-                )}
-            </nav>
-        </header>
-    );
-};
-
-const Footer: React.FC = () => (
-    <footer>
-        <Link to="/impressum" className="extra-info-btn">Impressum</Link>{" "}
-        | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
-        <a href="#" className="extra-info-btn">Kontakt</a>
-    </footer>
-);
 
 interface SearchCriteria {
     from: string;
@@ -123,8 +96,16 @@ function matchesTime(ride: Ride, time: string): boolean {
         return true;
     }
 
-    const rideTime = rideDate.toTimeString().slice(0, 5);
-    return rideTime >= time;
+    const rideHours = rideDate.getHours().toString().padStart(2, "0");
+    const rideMinutes = rideDate.getMinutes().toString().padStart(2, "0");
+    const rideTime = `${rideHours}:${rideMinutes}`;
+
+    const [searchHours, searchMinutes] = time.split(":").map(Number);
+    const [rideH, rideM] = rideTime.split(":").map(Number);
+    const searchTotal = searchHours * 60 + searchMinutes;
+    const rideTotal = rideH * 60 + rideM;
+
+    return Math.abs(rideTotal - searchTotal) <= 60;
 }
 
 const FindRidePage: React.FC = () => {

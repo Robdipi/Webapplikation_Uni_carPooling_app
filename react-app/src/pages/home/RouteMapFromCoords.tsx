@@ -4,53 +4,15 @@ import {
     Marker,
     Polyline,
     TileLayer,
-    useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import "../../utils/leafletIconFix";
 import type { Coordinates } from "../../contexts/ridecontext";
-
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-interface LeafletDefaultIconPrototype extends L.Icon.Default {
-    _getIconUrl?: () => string;
-}
-
-delete (L.Icon.Default.prototype as LeafletDefaultIconPrototype)._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: markerIcon2x,
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-});
+import MapUpdater from "../../components/MapUpdater";
 
 interface RouteMapFromCoordsProps {
     departureCoords: Coordinates;
     destinationCoords: Coordinates;
-}
-
-function MapUpdater({
-    start,
-    end,
-}: {
-    start: Coordinates;
-    end: Coordinates;
-}) {
-    const map = useMap();
-
-    useEffect(() => {
-        map.fitBounds(
-            [
-                [start.lat, start.lng],
-                [end.lat, end.lng],
-            ],
-            { padding: [40, 40] },
-        );
-    }, [start, end, map]);
-
-    return null;
 }
 
 const RouteMapFromCoords: React.FC<RouteMapFromCoordsProps> = ({

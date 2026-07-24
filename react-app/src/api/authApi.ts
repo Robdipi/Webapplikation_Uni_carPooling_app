@@ -1,3 +1,5 @@
+import { API_BASE_URL, readErrorMessage } from "./apiUtils";
+
 export interface ApiUserProfile {
     firstName: string;
     lastName: string;
@@ -34,17 +36,6 @@ export interface RegisterRequest {
 export interface LoginRequest {
     identifier: string;
     password: string;
-}
-
-const API_BASE_URL = "http://localhost:3001/api";
-
-async function readErrorMessage(response: Response): Promise<string> {
-    try {
-        const data = (await response.json()) as { error?: string };
-        return data.error ?? "Die Anfrage ist fehlgeschlagen.";
-    } catch {
-        return "Die Anfrage ist fehlgeschlagen.";
-    }
 }
 
 export async function registerUserRequest(input: RegisterRequest): Promise<AuthResponse> {

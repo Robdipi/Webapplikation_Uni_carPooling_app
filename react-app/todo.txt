@@ -1,0 +1,158 @@
+====================================
+  CampusRide – Code Review & Todo
+====================================
+
+KRITISCH (P0) – Sofort beheben
+--------------------------------
+
+[ ] Chat-Authentifizierung: Token wird nicht mitgegeben
+    Dateien: chatcontext.tsx (Zeile 144, 222, 255, 267, 293)
+    Problem: getChatContactsRequest(), sendMessageRequest(),
+    clearChatRequest(), deleteContactRequest(), createChatContactRequest()
+    werden ohne Token aufgerufen. Chat funktioniert nur mit Mock-Daten.
+    Lösung: Token aus UserContext holen und an alle API-Calls übergeben.
+
+[ ] Chat-Kontakte gehören keinem User – Datenschutz-Loch
+    Dateien: server/src/app.ts (Zeile 596-612), prisma/schema.prisma (Zeile 54-60)
+    Problem: GET /api/chat/contacts liefert ALLE Kontakte aus der DB.
+    Das ChatContact-Modell hat keinen Owner (nur userId = angesprochene Person).
+    Lösung: ownerId Feld zum ChatContact-Modell hinzufügen, Migration erstellen,
+    API-Endpunkte nach owner filtern.
+
+[ ] senderId/driverId werden vom Client gesteuert – Spoofing
+    Dateien: server/src/app.ts (Zeile 488, 656)
+    Problem: POST /api/rides und POST /api/chat/messages übernehmen
+    senderId/driverId direkt aus dem Request-Body statt aus dem JWT.
+    Lösung: req.user.userId als driverId/senderId verwenden.
+
+[ ] Chat-Operationen ohne Berechtigungsprüfung
+    Dateien: server/src/app.ts (Zeile 666-689)
+    Problem: Jeder eingeloggte User kann Nachrichten und Kontakte
+    jedes anderen löschen.
+    Lösung: Prüfen ob der User der Owner des Chats ist.
+
+
+HOCH (P1) – Vor dem Abgeben beheben
+--------------------------------------
+
+[ ] Passwort-Validierung fehlt – Test wird fehlschlagen
+    Dateien: server/src/app.ts (Zeile 179), app.test.ts (Zeile 82-98)
+    Problem: Test erwartet 400-Fehler bei Passwort < 8 Zeichen,
+    aber Server prüft nur auf leeres Passwort.
+    Lösung: Mindestlänge 8 Zeichen im Server-Code prüfen.
+
+[ ] Map-Komponenten rufen OSRM bei jedem Render neu ab
+    Dateien: RouteMapFromCoords.tsx (Zeile 51), MapUpdater.tsx (Zeile 21)
+    Problem: useEffect-Abhängigkeiten sind Objekte – neue Referenz
+    bei jedem Render = neuer API-Call.
+    Lösung: Koordinaten mit JSON.stringify vergleichen oder useMemo nutzen.
+
+[ ] Token-Ablauf wird nicht behandelt
+    Datei: usercontext.tsx
+    Problem: Bei abgelaufenem Token (nach 2h) schlagen API-Calls
+    still mit 401 fehl – kein Redirect zum Login.
+    Lösung: 401-Interceptor oder Token-Erneuerung implementieren.
+
+[ ] Impressum-Komponente definiert lokales Header-Komponent
+    Datei: impressum.tsx (Zeile 6-18)
+    Problem: Lokales Header-Component statt shared Header zu importieren.
+    Lösung: Import aus components/Header verwenden.
+
+
+MITTEL (P2) – Empfohlene Verbesserungen
+-----------------------------------------
+
+[ ] Ride-Collection wird nach Login nicht neu geladen
+    Datei: ridecontext.tsx (Zeile 58-69)
+    Problem: useEffect mit [] Dependency – nach Login werden keine
+    neuen Fahrten geladen.
+    Lösung: [currentUser] als Dependency hinzufügen.
+
+[ ] Chat-Daten werden nach Login/Logout nicht aktualisiert
+    Datei: chatcontext.tsx (Zeile 141-181)
+    Problem: Gleicher Bug wie RideContext – [] Dependency.
+    Lösung: [currentUser] als Dependency hinzufügen.
+
+[ ] addRide wird nicht awaited
+    Datei: create_ride.tsx (Zeile 137-150)
+    Problem: addRide() ist async, aber der Aufruf wird nicht awaited.
+    Bei Fehler bleibt isSaving permanent true.
+    Lösung: await und try/catch mit Fehlermeldung.
+
+[ ] handleSave im Profil behandelt keine Fehler
+    Datei: profile.tsx (Zeile 66-72)
+    Problem: Bei Fehler wird keine Feedback gezeigt.
+    Lösung: try/catch mit Fehlermeldung.
+
+[ ] Kein Error-Feedback bei Ride-Erstellung
+    Datei: create_ride.tsx (Zeile 112-151)
+    Problem: Bei Fehler wird setMessage nie aufgerufen.
+    Lösung: catch-Block mit Fehlermeldung ergänzen.
+
+[ ] OSRM/Nominatim ohne Response-Status-Prüfung
+    Dateien: RouteMap.tsx, RouteMapFromCoords.tsx, geocode.ts
+    Problem: HTTP-Errors (429, 500) werden nicht abgefangen.
+    Lösung: Prüfung auf response.ok vor JSON-Parsing.
+
+[ ] Context-Werte nicht memoisiert
+    Dateien: chatcontext.tsx (Zeile 315-326), ridecontext.tsx (Zeile 107-113),
+    usercontext.tsx (Zeile 252-262)
+    Problem: contextValue wird bei jedem Render neu erstellt.
+    Lösung: useMemo verwenden.
+
+[ ] selectContact nicht mit useCallback gepuffert
+    Datei: chatcontext.tsx (Zeile 205-207)
+    Problem: Verursacht unnötige Re-Renders der Kinder.
+    Lösung: useCallback verwenden.
+
+
+NIEDRIG (P3) – Nice-to-have
+------------------------------
+
+[ ] Unnötige React-Imports entfernen
+    Dateien: find_ride.tsx, rideCard.tsx, profile.tsx, chat.tsx, home.tsx,
+    NotFoundPage.tsx, impressum.tsx, StartPage.tsx, Header.tsx, Footer.tsx
+    Problem: Bei React 17+ JSX-Transform nicht mehr nötig.
+
+[ ] Unkonsistente Dateinamen
+    Problem: camelCase (chatcontext.tsx) vs PascalCase (AppProviders.tsx),
+    not_Found vs create_ride vs find_ride als Ordnernamen.
+
+[ ] type-Imports für verbatimModuleSyntax
+    Dateien: usercontext.tsx (Zeile 1), AppProviders.tsx (Zeile 1)
+    Problem: ReactNode sollte als type importiert werden.
+
+[ ] Non-null Assertions ohne Begründung
+    Dateien: server/src/app.ts (Zeile 388, 511, 560), main.tsx (Zeile 10)
+
+[ ] sendMessageRequest hat 6 Positionsparameter
+    Datei: chatApi.ts (Zeile 61-84)
+    Lösung: Request-Objekt als Parameter einführen.
+
+[ ] accessibility: Kein Skip-to-Content-Link
+[ ] accessibility: Chat-Delete ist <span> statt <button>
+[ ] accessibility: Suchfelder haben kein <label>
+[ ] accessibility: Keine ARIA-Live-Region für Chat-Nachrichten
+[ ] accessibility: Login/Register nutzt Checkbox-Hack statt State
+
+[ ] .gitignore deckt server/.env nicht ab (*.local reicht nicht)
+[ ] Kein Favicon definiert (index.html)
+[ ] Keine Ladezustände für Ride-Listen
+[ ] Keine Ride-Bearbeitung/Löschung in UI (API existiert bereits)
+[ ] "Copyright" und "Kontakt" Links im Footer/Startpage führen nirgendwohin
+[ ] Keine globalen Error-Boundary
+[ ] departureTime als String statt DateTime (Schema: Zeile 43)
+[ ] sentAt im Chat als String statt DateTime (Schema: Zeile 68)
+[ ] Keine Pagination bei GET /api/rides
+[ ] Keine Längenbegrenzung für Profil-Felder
+[ ] Hardcoded: OSRM-URL, Nominatim-URL, JWT-Ablauf, bcrypt-Runden,
+    Konstanz-Koordinaten, Geschwindigkeits-Annahme (45 km/h)
+
+
+DOCKER – Bereits behoben
+--------------------------
+
+[x] docker-compose.yml: Falsche Pfade (./server statt ./react-app/server)
+[x] Server-Dockerfile: COPY-Pfade passen nicht zum Build-Kontext
+[x] Server-Dockerfile: npm run build fehlte (tsc für TypeScript)
+[x] Client-.dockerignore: server/ Ordner nicht ausgeschlossen

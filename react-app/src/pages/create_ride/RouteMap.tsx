@@ -4,85 +4,17 @@ import {
     Marker,
     Polyline,
     TileLayer,
-    useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import "../../utils/leafletIconFix";
 import type { Coordinates } from "../../contexts/ridecontext";
+import { geocode } from "../../utils/geocode";
+import MapUpdater from "../../components/MapUpdater";
 import { useDebounce } from "./useDebounce";
-
-interface LeafletDefaultIconPrototype extends L.Icon.Default {
-    _getIconUrl?: () => string;
-}
-
-delete (L.Icon.Default.prototype as LeafletDefaultIconPrototype)._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: markerIcon2x,
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-});
 
 interface RouteMapProps {
     departure: string;
     destination: string;
-}
-
-function MapUpdater({
-    start,
-    end,
-}: {
-    start: Coordinates | null;
-    end: Coordinates | null;
-}) {
-    const map = useMap();
-
-    useEffect(() => {
-        if (start === null || end === null) {
-            return;
-        }
-
-        map.fitBounds(
-            [
-                [start.lat, start.lng],
-                [end.lat, end.lng],
-            ],
-            { padding: [40, 40] },
-        );
-    }, [start, end, map]);
-
-    return null;
-}
-
-async function geocode(address: string): Promise<Coordinates | null> {
-    if (address.trim() === "") {
-        return null;
-    }
-
-    try {
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`,
-        );
-
-        const data = (await response.json()) as Array<{
-            lat: string;
-            lon: string;
-        }>;
-
-        if (data.length === 0) {
-            return null;
-        }
-
-        return {
-            lat: Number(data[0].lat),
-            lng: Number(data[0].lon),
-        };
-    } catch {
-        return null;
-    }
 }
 
 const RouteMap: React.FC<RouteMapProps> = ({ departure, destination }) => {
@@ -154,7 +86,9 @@ const RouteMap: React.FC<RouteMapProps> = ({ departure, destination }) => {
                     />
                 ) : null}
 
-                <MapUpdater start={startPoint} end={endPoint} />
+                {startPoint !== null && endPoint !== null && (
+                    <MapUpdater start={startPoint} end={endPoint} />
+                )}
             </MapContainer>
         </div>
     );

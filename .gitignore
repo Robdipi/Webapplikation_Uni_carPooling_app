@@ -17,3 +17,6 @@ react-app/server/dev.db
 react-app/server/prisma/dev.db
 react-app/server/dev.db-journal
 react-app/server/prisma/dev.db-journal
+
+# Docker
+data/

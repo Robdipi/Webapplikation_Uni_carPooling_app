@@ -1,0 +1,28 @@
+services:
+  server:
+    build:
+      context: ./react-app/server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: file:/app/data/dev.db
+      JWT_SECRET: campusride-dev-secret
+      PORT: 3001
+      CORS_ORIGIN: http://localhost:5173
+    volumes:
+      - db-data:/app/data
+
+  client:
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:3001/api
+    depends_on:
+      - server
+
+volumes:
+  db-data:

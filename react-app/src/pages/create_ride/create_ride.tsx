@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
 import {
     type Coordinates,
     type NewRide,
     useRideContext,
 } from "../../contexts/ridecontext";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import { geocode } from "../../utils/geocode";
 import RouteMap from "./RouteMap";
 import "../style.css";
 import "./create_ride.css";
@@ -32,46 +35,6 @@ const knownPlaces: Record<string, Coordinates> = {
     "radolfzell bahnhof": { lat: 47.7389, lng: 8.9706 },
 };
 
-const Header: React.FC = () => {
-    const { currentUser, logoutUser } = useUserContext();
-
-    return (
-        <header>
-            <div className="logo">CampusRide</div>
-            <nav>
-                <Link to="/home" className="open-btn">Home</Link>
-                <Link to="/chat" className="open-btn">Chat</Link>
-                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-                <Link to="/profile" className="open-btn">Profil</Link>
-                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
-                {currentUser !== null && (
-                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
-                )}
-            </nav>
-        </header>
-    );
-};
-
-const Footer: React.FC = () => (
-    <footer>
-        <Link to="/impressum" className="extra-info-btn">Impressum</Link>{" "}
-        | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
-        <a href="#" className="extra-info-btn">Kontakt</a>
-    </footer>
-);
-
-const InfoBox: React.FC = () => (
-    <aside className="info-box">
-        <h3>Tipps für Fahrer</h3>
-        <ul>
-            <li>Spritkosten fair teilen</li>
-            <li>Pünktlich am Treffpunkt sein</li>
-            <li>Musikgeschmack absprechen</li>
-        </ul>
-    </aside>
-);
-
 function normalizePlaceName(value: string): string {
     return value.trim().toLowerCase();
 }
@@ -83,34 +46,9 @@ async function geocodeAddress(address: string): Promise<Coordinates | null> {
         return knownPlace;
     }
 
-    if (address.trim() === "") {
-        return null;
-    }
-
-    try {
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`,
-        );
-
-        const data = (await response.json()) as Array<{
-            lat: string;
-            lon: string;
-        }>;
-
-        if (data.length === 0) {
-            return null;
-        }
-
-        return {
-            lat: Number(data[0].lat),
-            lng: Number(data[0].lon),
-        };
-    } catch {
-        return null;
-    }
+    return geocode(address);
 }
 
-//we are lazy so just the the distance over air instead the distance of the poligon should be a good aproximation
 function calculateDistanceKm(start: Coordinates, end: Coordinates): number {
     const earthRadiusKm = 6371;
     const latDistance = ((end.lat - start.lat) * Math.PI) / 180;
@@ -126,7 +64,6 @@ function calculateDistanceKm(start: Coordinates, end: Coordinates): number {
     return Math.max(1, directDistance * 1.25);
 }
 
-// for simplicity we assume we drive 45kmh on avg
 function calculateDurationMinutes(distanceKm: number): number {
     return Math.max(5, Math.round((distanceKm / 45) * 60));
 }
@@ -134,6 +71,17 @@ function calculateDurationMinutes(distanceKm: number): number {
 function calculatePrice(distanceKm: number, pricePerKm: number): number {
     return Math.max(2, Math.round(distanceKm * pricePerKm));
 }
+
+const InfoBox: React.FC = () => (
+    <aside className="info-box">
+        <h3>Tipps für Fahrer</h3>
+        <ul>
+            <li>Spritkosten fair teilen</li>
+            <li>Pünktlich am Treffpunkt sein</li>
+            <li>Musikgeschmack absprechen</li>
+        </ul>
+    </aside>
+);
 
 const CreateRidePage: React.FC = () => {
     const { addRide } = useRideContext();

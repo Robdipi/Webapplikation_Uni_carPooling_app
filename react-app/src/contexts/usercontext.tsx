@@ -46,7 +46,6 @@ export interface AuthResult {
 }
 
 interface UserContextValue {
-    users: RegisteredUser[];
     currentUser: RegisteredUser | null;
     authToken: string | null;
     isLoggedIn: boolean;
@@ -118,7 +117,6 @@ function validateLoginInput(input: LoginUserInput): string | null {
 }
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
-    const [users, setUsers] = useState<RegisteredUser[]>([]);
     const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
     const [authToken, setAuthToken] = useState<string | null>(() =>
         localStorage.getItem(AUTH_TOKEN_STORAGE_KEY),
@@ -137,12 +135,10 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
                 const restoredUser = toRegisteredUser(apiUser);
 
                 setCurrentUser(restoredUser);
-                setUsers([restoredUser]);
             } catch {
                 localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
                 setAuthToken(null);
                 setCurrentUser(null);
-                setUsers([]);
             } finally {
                 setIsAuthLoading(false);
             }
@@ -175,7 +171,6 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
             localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.token);
             setCurrentUser(registeredUser);
             setAuthToken(response.token);
-            setUsers([registeredUser]);
 
             return { success: true };
         } catch (error) {
@@ -206,7 +201,6 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
             localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.token);
             setCurrentUser(loggedInUser);
             setAuthToken(response.token);
-            setUsers([loggedInUser]);
 
             return { success: true };
         } catch (error) {
@@ -223,7 +217,6 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
         localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
         setCurrentUser(null);
         setAuthToken(null);
-        setUsers([]);
     };
 
     const setProfile = async (profile: UserProfile): Promise<AuthResult> => {
@@ -244,7 +237,6 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
             const mappedUser = toRegisteredUser(updatedUser);
             setCurrentUser(mappedUser);
-            setUsers([mappedUser]);
 
             return { success: true };
         } catch (error) {
@@ -258,7 +250,6 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     };
 
     const contextValue: UserContextValue = {
-        users,
         currentUser,
         authToken,
         isLoggedIn: currentUser !== null,

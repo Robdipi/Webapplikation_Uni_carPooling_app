@@ -6,7 +6,10 @@ import jwt from "jsonwebtoken";
 import { PrismaClient, User } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
-const jwtSecret = process.env.JWT_SECRET ?? "campusride-dev-secret";
+const jwtSecret: string = process.env.JWT_SECRET ?? "";
+if (jwtSecret === "") {
+    throw new Error("JWT_SECRET environment variable is required");
+}
 
 const adapter = new PrismaBetterSqlite3({
     url: process.env.DATABASE_URL ?? "file:./dev.db",
@@ -16,7 +19,13 @@ export const prisma = new PrismaClient({ adapter });
 
 export const app = express();
 
-app.use(cors());
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",")
+    : ["http://localhost:5173"];
+
+app.use(cors({
+    origin: allowedOrigins,
+}));
 app.use(express.json());
 
 interface AuthTokenPayload {
@@ -513,6 +522,16 @@ app.put(
         const { id } = req.params;
         const body = req.body as Partial<CreateRideRequestBody>;
 
+        const existingRide = await prisma.ride.findUnique({ where: { id } });
+        if (existingRide === null) {
+            res.status(404).json({ error: "Fahrt wurde nicht gefunden." });
+            return;
+        }
+        if (existingRide.driverId !== req.user?.userId) {
+            res.status(403).json({ error: "Keine Berechtigung, diese Fahrt zu bearbeiten." });
+            return;
+        }
+
         const data: Record<string, string | number> = {};
         if (body.departureName !== undefined) data.departureName = body.departureName;
         if (body.destinationName !== undefined) data.destinationName = body.destinationName;
@@ -552,6 +571,16 @@ app.delete(
     async (req: AuthenticatedRequest, res: Response) => {
         const { id } = req.params;
 
+        const existingRide = await prisma.ride.findUnique({ where: { id } });
+        if (existingRide === null) {
+            res.status(404).json({ error: "Fahrt wurde nicht gefunden." });
+            return;
+        }
+        if (existingRide.driverId !== req.user?.userId) {
+            res.status(403).json({ error: "Keine Berechtigung, diese Fahrt zu löschen." });
+            return;
+        }
+
         try {
             await prisma.ride.delete({ where: { id } });
             res.json({ success: true });
@@ -564,7 +593,7 @@ app.delete(
 
 // ── Chat ─────────────────────────────────────────────────────────────────────
 
-app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
+app.get("/api/chat/contacts", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     try {
         const contacts = await prisma.chatContact.findMany({
             include: {
@@ -583,7 +612,7 @@ app.get("/api/chat/contacts", async (_req: Request, res: Response) => {
     }
 });
 
-app.post("/api/chat/contacts", async (req: Request, res: Response) => {
+app.post("/api/chat/contacts", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     const { userId } = req.body as { userId?: string };
 
     if (userId === undefined) {
@@ -603,7 +632,7 @@ app.post("/api/chat/contacts", async (req: Request, res: Response) => {
     }
 });
 
-app.post("/api/chat/messages", async (req: Request, res: Response) => {
+app.post("/api/chat/messages", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     const { contactId, senderId, type, content, sentAt } = req.body as {
         contactId?: string;
         senderId?: string;
@@ -634,7 +663,7 @@ app.post("/api/chat/messages", async (req: Request, res: Response) => {
     }
 });
 
-app.delete("/api/chat/messages/:contactId", async (req: Request, res: Response) => {
+app.delete("/api/chat/messages/:contactId", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     const { contactId } = req.params;
 
     try {
@@ -646,7 +675,7 @@ app.delete("/api/chat/messages/:contactId", async (req: Request, res: Response) 
     }
 });
 
-app.delete("/api/chat/contacts/:contactId", async (req: Request, res: Response) => {
+app.delete("/api/chat/contacts/:contactId", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     const { contactId } = req.params;
 
     try {

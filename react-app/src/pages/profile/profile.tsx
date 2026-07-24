@@ -2,29 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext, UserProfile } from "../../contexts/usercontext";
 import { useGlobalContext } from "../../contexts/globalcontext";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import "../style.css";
 import "./profile.css";
-
-const Header: React.FC = () => {
-    const { currentUser, logoutUser } = useUserContext();
-
-    return (
-        <header>
-            <div className="logo">CampusRide</div>
-            <nav>
-                <Link to="/home" className="open-btn">Home</Link>
-                <Link to="/chat" className="open-btn">Chat</Link>
-                <Link to="/create-ride" className="open-btn">Fahrt anbieten</Link>
-                <Link to="/find-ride" className="open-btn">Fahrt finden</Link>
-                <Link to="/profile" className="open-btn">Profil</Link>
-                <Link to="/" className="open-btn" onClick={logoutUser}>Abmelden</Link>
-                {currentUser !== null && (
-                    <span className="open-btn">Hallo {currentUser.profile.firstName}</span>
-                )}
-            </nav>
-        </header>
-    );
-};
 
 interface ProfileFieldProps {
     label: string;
@@ -63,14 +44,6 @@ const ProfileInput: React.FC<ProfileInputProps> = ({
             onChange={(event) => onChange(name, event.target.value)}
         />
     </div>
-);
-
-const Footer: React.FC = () => (
-    <footer>
-        <Link to="/impressum" className="extra-info-btn">Impressum</Link>{" "}
-        | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
-        <a href="#" className="extra-info-btn">Kontakt</a>
-    </footer>
 );
 
 const ProfilePage: React.FC = () => {

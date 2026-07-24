@@ -78,6 +78,10 @@ body.dark footer a {
   color: var(--color-brand-black);
 }
 
+body.dark .logout-btn {
+  color: #FFF;
+}
+
 body.dark footer {
   background-color: var(--color-brand-bg-shade-a);
 }
@@ -261,6 +265,19 @@ nav a {
     text-decoration: none;
 }
 .open-btn:hover {
+    background-color: var(--color-shadow);
+}
+
+.logout-btn {
+    padding: 10px;
+    border-radius: 10px;
+    color: var(--color-brand-white);
+    background: none;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+.logout-btn:hover {
     background-color: var(--color-shadow);
 }
 

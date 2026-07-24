@@ -71,6 +71,10 @@ section {
     box-shadow: 0 4px 12px var(--color-shadow-light);
 }
 
+body.dark .info-box {
+    color: #FFF;
+}
+
 .map-wrapper {
     width: 100%;
     max-width: 1100px;

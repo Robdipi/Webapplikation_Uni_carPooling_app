@@ -1,48 +1,14 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
     type ChatContact,
     type ChatMessage,
     useChatContext,
 } from "../../contexts/chatcontext";
 import { useUserContext } from "../../contexts/usercontext";
+import Header from "../../components/Header";
 import "../style.css";
 import "./chatstyle.css";
-
-const Header: React.FC = () => {
-    const { currentUser, logoutUser } = useUserContext();
-
-    return (
-        <header className="page-header">
-            <div className="logo">CampusRide</div>
-            <nav>
-                <Link to="/home" className="open-btn">
-                    Home
-                </Link>
-                <Link to="/chat" className="open-btn">
-                    Chat
-                </Link>
-                <Link to="/create-ride" className="open-btn">
-                    Fahrt anbieten
-                </Link>
-                <Link to="/find-ride" className="open-btn">
-                    Fahrt finden
-                </Link>
-                <Link to="/profile" className="open-btn">
-                    Profil
-                </Link>
-                <Link to="/" className="open-btn" onClick={logoutUser}>
-                    Abmelden
-                </Link>
-                {currentUser !== null && (
-                    <span className="open-btn">
-                        Hallo {currentUser.profile.firstName}
-                    </span>
-                )}
-            </nav>
-        </header>
-    );
-};
 
 interface ContactItemProps {
     contact: ChatContact;
@@ -214,7 +180,7 @@ const ChatPage: React.FC = () => {
 
     return (
         <div className="chat-page-layout">
-            <Header />
+            <Header className="page-header" />
 
             <aside className="chat-sidebar">
                 <h2 className="chat-sidebar-title">Chats</h2>

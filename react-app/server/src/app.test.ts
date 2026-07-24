@@ -1,8 +1,14 @@
 import request from "supertest";
 import { afterAll, describe, expect, it } from "vitest";
-import { app, prisma } from "./app";
+import { app, prisma } from "./app.js";
+
+const VALID_PASSWORD = "Testpass1";
 
 afterAll(async () => {
+    await prisma.chatMessage.deleteMany();
+    await prisma.chatContact.deleteMany();
+    await prisma.ride.deleteMany();
+    await prisma.user.deleteMany();
     await prisma.$disconnect();
 });
 
@@ -12,7 +18,7 @@ async function registerAndLogin(): Promise<string> {
     const registerData = {
         email: `test-${uniqueValue}@example.com`,
         username: `testuser-${uniqueValue}`,
-        password: "12345",
+        password: VALID_PASSWORD,
         firstName: "Test",
         lastName: "User",
         birthDate: "2000-01-01",
@@ -73,12 +79,30 @@ describe("Auth", () => {
         expect(response.body.error).toBe("Bitte fülle alle Pflichtfelder aus.");
     });
 
+    it("rejects registration with weak password", async () => {
+        const uniqueValue = Date.now();
+        const response = await request(app)
+            .post("/api/auth/register")
+            .send({
+                email: `weak-${uniqueValue}@example.com`,
+                username: `weak-user-${uniqueValue}`,
+                password: "12345",
+                firstName: "Weak",
+                lastName: "Test",
+                birthDate: "2000-01-01",
+                course: "AIN",
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Das Passwort muss mindestens 8 Zeichen lang sein.");
+    });
+
     it("rejects duplicate email", async () => {
         const uniqueValue = Date.now();
         const data = {
             email: `dup-${uniqueValue}@example.com`,
             username: `dup-user-${uniqueValue}`,
-            password: "12345",
+            password: VALID_PASSWORD,
             firstName: "Dup",
             lastName: "Test",
             birthDate: "2000-01-01",
@@ -103,7 +127,7 @@ describe("Auth", () => {
             .send({
                 email: `avatar-${uniqueValue}@example.com`,
                 username: `avatar-user-${uniqueValue}`,
-                password: "12345",
+                password: VALID_PASSWORD,
                 firstName: "Avatar",
                 lastName: "Test",
                 birthDate: "2000-01-01",
@@ -232,42 +256,65 @@ describe("Rides", () => {
 
         expect(response.status).toBe(500);
     });
+
+    it("rejects updating another user's ride", async () => {
+        const token1 = await registerAndLogin();
+        const me1 = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${token1}`);
+
+        const userId1 = me1.body.user.id as string;
+
+        const createRes = await request(app)
+            .post("/api/rides")
+            .set("Authorization", `Bearer ${token1}`)
+            .send(rideData(userId1));
+
+        const rideId = createRes.body.ride.id as string;
+
+        const token2 = await registerAndLogin();
+
+        const updateRes = await request(app)
+            .put(`/api/rides/${rideId}`)
+            .set("Authorization", `Bearer ${token2}`)
+            .send({ seatsAvailable: 1 });
+
+        expect(updateRes.status).toBe(403);
+
+        // Cleanup
+        await request(app)
+            .delete(`/api/rides/${rideId}`)
+            .set("Authorization", `Bearer ${token1}`);
+    });
 });
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
 
 describe("Chat", () => {
     it("creates a contact, sends a message, verifies it in DB, then clears chat", async () => {
-        // Register a user for the contact
-        const uniqueValue = Date.now();
-        const registerRes = await request(app)
-            .post("/api/auth/register")
-            .send({
-                email: `chat-test-${uniqueValue}@example.com`,
-                username: `chat-test-user-${uniqueValue}`,
-                password: "12345",
-                firstName: "Chat",
-                lastName: "Test",
-                birthDate: "2000-01-01",
-                course: "AIN",
-            });
+        const token = await registerAndLogin();
+        const me = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${token}`);
 
-        const userId = registerRes.body.user.id as string;
+        const userId = me.body.user.id as string;
 
         // Create contact
         const contactRes = await request(app)
             .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`)
             .send({ userId });
 
         expect(contactRes.status).toBe(201);
         expect(contactRes.body.contact.userId).toBe(userId);
-        expect(contactRes.body.contact.user.firstName).toBe("Chat");
+        expect(contactRes.body.contact.user.firstName).toBe("Test");
 
         const contactId = contactRes.body.contact.id as string;
 
         // Send message
         const msgRes = await request(app)
             .post("/api/chat/messages")
+            .set("Authorization", `Bearer ${token}`)
             .send({
                 contactId,
                 senderId: userId,
@@ -291,6 +338,7 @@ describe("Chat", () => {
         // Send another message
         await request(app)
             .post("/api/chat/messages")
+            .set("Authorization", `Bearer ${token}`)
             .send({
                 contactId,
                 senderId: userId,
@@ -300,7 +348,9 @@ describe("Chat", () => {
             });
 
         // GET contacts includes messages
-        const contactsRes = await request(app).get("/api/chat/contacts");
+        const contactsRes = await request(app)
+            .get("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`);
         expect(contactsRes.status).toBe(200);
 
         const contact = contactsRes.body.contacts.find(
@@ -311,7 +361,8 @@ describe("Chat", () => {
 
         // Clear chat
         const clearRes = await request(app)
-            .delete(`/api/chat/messages/${contactId}`);
+            .delete(`/api/chat/messages/${contactId}`)
+            .set("Authorization", `Bearer ${token}`);
 
         expect(clearRes.status).toBe(200);
         expect(clearRes.body.success).toBe(true);
@@ -323,12 +374,16 @@ describe("Chat", () => {
         expect(msgsAfter).toHaveLength(0);
 
         // Cleanup: delete the test contact
-        await prisma.chatContact.delete({ where: { id: contactId } });
+        await request(app)
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${token}`);
     });
 
     it("rejects message creation with missing fields", async () => {
+        const token = await registerAndLogin();
         const response = await request(app)
             .post("/api/chat/messages")
+            .set("Authorization", `Bearer ${token}`)
             .send({ contactId: "x", senderId: "y" });
 
         expect(response.status).toBe(400);
@@ -336,8 +391,10 @@ describe("Chat", () => {
     });
 
     it("rejects contact creation with missing fields", async () => {
+        const token = await registerAndLogin();
         const response = await request(app)
             .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`)
             .send({});
 
         expect(response.status).toBe(400);
@@ -345,23 +402,16 @@ describe("Chat", () => {
     });
 
     it("deletes a contact and its messages", async () => {
-        const uniqueValue = Date.now();
-        const registerRes = await request(app)
-            .post("/api/auth/register")
-            .send({
-                email: `del-test-${uniqueValue}@example.com`,
-                username: `del-test-user-${uniqueValue}`,
-                password: "12345",
-                firstName: "Del",
-                lastName: "Test",
-                birthDate: "2000-01-01",
-                course: "AIN",
-            });
+        const token = await registerAndLogin();
+        const me = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${token}`);
 
-        const userId = registerRes.body.user.id as string;
+        const userId = me.body.user.id as string;
 
         const contactRes = await request(app)
             .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`)
             .send({ userId });
 
         expect(contactRes.status).toBe(201);
@@ -370,6 +420,7 @@ describe("Chat", () => {
         // Send a message to the contact
         await request(app)
             .post("/api/chat/messages")
+            .set("Authorization", `Bearer ${token}`)
             .send({
                 contactId,
                 senderId: userId,
@@ -380,7 +431,8 @@ describe("Chat", () => {
 
         // Delete the contact
         const deleteRes = await request(app)
-            .delete(`/api/chat/contacts/${contactId}`);
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${token}`);
 
         expect(deleteRes.status).toBe(200);
         expect(deleteRes.body.success).toBe(true);
@@ -396,6 +448,16 @@ describe("Chat", () => {
             where: { contactId },
         });
         expect(msgsAfter).toHaveLength(0);
+    });
+
+    it("rejects chat endpoints without auth token", async () => {
+        const contactsRes = await request(app).get("/api/chat/contacts");
+        expect(contactsRes.status).toBe(401);
+
+        const msgRes = await request(app)
+            .post("/api/chat/messages")
+            .send({ contactId: "x", senderId: "y", type: "text", content: "hi", sentAt: "now" });
+        expect(msgRes.status).toBe(401);
     });
 });
 
