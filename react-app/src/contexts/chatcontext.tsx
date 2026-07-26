@@ -65,55 +65,9 @@ const fallbackUser: ChatContactUser = {
     avatarUrl: "",
 };
 
-const fallbackContacts: ChatContact[] = [
-    {
-        id: "lisa",
-        userId: "fallback",
-        user: { ...fallbackUser, firstName: "Lisa", lastName: "Müller", avatarUrl: "/images/2.jpg" },
-    },
-    {
-        id: "max",
-        userId: "fallback",
-        user: { ...fallbackUser, firstName: "Max", lastName: "Weber", avatarUrl: "/images/3.jpg" },
-    },
-    {
-        id: "sarah",
-        userId: "fallback",
-        user: { ...fallbackUser, firstName: "Sarah", lastName: "Fischer", avatarUrl: "/images/4.jpg" },
-    },
-    {
-        id: "jonas",
-        userId: "fallback",
-        user: { ...fallbackUser, firstName: "Jonas", lastName: "Klein", avatarUrl: "/images/1.jpg" },
-    },
-];
+const fallbackContacts: ChatContact[] = [];
 
-const fallbackMessages: ChatMessage[] = [
-    {
-        id: "msg-1",
-        contactId: "lisa",
-        senderId: "fallback-contact",
-        type: "text",
-        content: "Hey, ist der Platz nach Konstanz noch frei?",
-        sentAt: "09:12",
-    },
-    {
-        id: "msg-2",
-        contactId: "lisa",
-        senderId: "fallback-me",
-        type: "text",
-        content: "Ja, ein Platz ist noch frei.",
-        sentAt: "09:13",
-    },
-    {
-        id: "msg-3",
-        contactId: "max",
-        senderId: "fallback-contact",
-        type: "text",
-        content: "Kannst du mich an der HTWG einsammeln?",
-        sentAt: "Gestern",
-    },
-];
+const fallbackMessages: ChatMessage[] = [];
 
 function readSelectedContactIdFromLocalStorage(
     contacts: ChatContact[],

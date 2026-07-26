@@ -2,34 +2,67 @@
   CampusRide - Example Login Data
 =========================================
 
---- Demo Account (README) ---
+Alle 4 Accounts werden beim Serverstart automatisch erstellt.
+Passwort für alle: CampusRide1
 
-  Email:      demo@example.com
-  Username:   demouser
-  Password:   12345
-  Vorname:    Demo
-  Nachname:   User
-  Geburtstag: 2000-01-01
-  Studiengang: AIN
+--- User 1: Lisa Müller ---
 
---- Test Account (app.test.ts) ---
-
-  Email:      test-{timestamp}@uni-konstanz.de
-  Username:   testuser-{timestamp}
-  Password:   Testpass1
-  Vorname:    Test
-  Nachname:   User
-  Geburtstag: 2000-01-01
-  Studiengang: AIN
-
---- Default Profile (Fallback) ---
-
-  Vorname:    Max
-  Nachname:   Mustermann
-  Geburtstag: 2000-01-01
+  Email:      lisa.m@htwg-konstanz.de
+  Username:   lisa_m
+  Password:   CampusRide1
+  Vorname:    Lisa
+  Nachname:   Müller
+  Geburtstag: 2001-03-15
+  Studiengang: WI
   Stadt:      Konstanz
   Preis/km:   0.35
-  Studiengang: Allgemeine Informatik (AIN)
+
+--- User 2: Max Weber ---
+
+  Email:      max.w@uni-konstanz.de
+  Username:   max_w
+  Password:   CampusRide1
+  Vorname:    Max
+  Nachname:   Weber
+  Geburtstag: 2000-07-22
+  Studiengang: AIN
+  Stadt:      Konstanz
+  Preis/km:   0.35
+
+--- User 3: Sarah Fischer ---
+
+  Email:      sarah.f@htwg-konstanz.de
+  Username:   sarah_f
+  Password:   CampusRide1
+  Vorname:    Sarah
+  Nachname:   Fischer
+  Geburtstag: 2002-01-10
+  Studiengang: MCL
+  Stadt:      Konstanz
+  Preis/km:   0.35
+
+--- User 4: Jonas Klein ---
+
+  Email:      jonas.k@uni-konstanz.de
+  Username:   jonas_k
+  Password:   CampusRide1
+  Vorname:    Jonas
+  Nachname:   Klein
+  Geburtstag: 2000-11-05
+  Studiengang: AIN
+  Stadt:      Konstanz
+  Preis/km:   0.35
+
+--- Example Ride (Lisa Müller als Fahrerin) ---
+
+  Abfahrt:       HTWG Konstanz
+  Ziel:          Universität Konstanz
+  Entfernung:    3.5 km
+  Dauer:         10 Min.
+  Plätze:        3
+  Preis:         3,50 €
+  Extra:         Nichtraucher, Kofferraum frei
+  Abfahrtszeit:  2026-07-28 08:00
 
 --- Server Config ---
 
