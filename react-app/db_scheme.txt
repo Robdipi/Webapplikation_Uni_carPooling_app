@@ -12,6 +12,8 @@ CampusRide Datenbankschema (SQLite)
 │  lastName      TEXT                                         │
 │  birthDate     TEXT                                         │
 │  course        TEXT                                         │
+│  city          TEXT (default: "Konstanz")                   │
+│  pricePerKm    REAL (default: 0.35)                         │
 │  avatarUrl     TEXT (default: "")                           │
 │  createdAt     DATETIME (default: now)                      │
 │  updatedAt     DATETIME (auto)                              │

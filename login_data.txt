@@ -1,0 +1,40 @@
+=========================================
+  CampusRide - Example Login Data
+=========================================
+
+--- Demo Account (README) ---
+
+  Email:      demo@example.com
+  Username:   demouser
+  Password:   12345
+  Vorname:    Demo
+  Nachname:   User
+  Geburtstag: 2000-01-01
+  Studiengang: AIN
+
+--- Test Account (app.test.ts) ---
+
+  Email:      test-{timestamp}@uni-konstanz.de
+  Username:   testuser-{timestamp}
+  Password:   Testpass1
+  Vorname:    Test
+  Nachname:   User
+  Geburtstag: 2000-01-01
+  Studiengang: AIN
+
+--- Default Profile (Fallback) ---
+
+  Vorname:    Max
+  Nachname:   Mustermann
+  Geburtstag: 2000-01-01
+  Stadt:      Konstanz
+  Preis/km:   0.35
+  Studiengang: Allgemeine Informatik (AIN)
+
+--- Server Config ---
+
+  JWT_SECRET:       campusride-dev-secret
+  DATABASE_URL:     file:./dev.db
+  PORT:             3001
+  CORS_ORIGIN:      http://localhost:5173
+  API_BASE_URL:     http://localhost:3001/api
