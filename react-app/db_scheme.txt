@@ -48,9 +48,11 @@ CampusRide Datenbankschema (SQLite)
 │  ChatContact                                                │
 ├─────────────────────────────────────────────────────────────┤
 │  id        TEXT (PK, cuid)                                  │
+│  ownerId   TEXT (FK → User.id, CASCADE DELETE)              │
 │  userId    TEXT (FK → User.id, CASCADE DELETE)              │
 │                                                             │
-│  user      N:1 → User                                       │
+│  owner     N:1 → User (ChatOwner)                           │
+│  user      N:1 → User (ChatUser)                            │
 │  messages  1:N → ChatMessage                                │
 └─────────────────────────────────────────────────────────────┘
 
@@ -72,6 +74,7 @@ CampusRide Datenbankschema (SQLite)
 Beziehungen
 ===========
 User    1 ──── N Ride         (via driverId, onDelete: CASCADE)
-User    1 ──── N ChatContact  (via userId, onDelete: CASCADE)
+User    1 ──── N ChatContact  (via ownerId, onDelete: CASCADE)  [ChatOwner]
+User    1 ──── N ChatContact  (via userId, onDelete: CASCADE)   [ChatUser]
 User    1 ──── N ChatMessage  (via senderId, onDelete: CASCADE)
 ChatContact 1 ──── N ChatMessage  (via contactId, onDelete: CASCADE)

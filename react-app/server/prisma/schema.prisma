@@ -25,7 +25,8 @@ model User {
   updatedAt    DateTime @updatedAt
 
   rides        Ride[]
-  chatContacts ChatContact[]
+  ownedChatContacts ChatContact[] @relation("ChatOwner")
+  chatContacts ChatContact[] @relation("ChatUser")
   sentMessages ChatMessage[]
 }
 
@@ -53,9 +54,11 @@ model Ride {
 
 model ChatContact {
   id        String   @id @default(cuid())
+  ownerId   String
   userId    String
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  owner     User     @relation("ChatOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  user      User     @relation("ChatUser", fields: [userId], references: [id], onDelete: Cascade)
   messages  ChatMessage[]
 }
 

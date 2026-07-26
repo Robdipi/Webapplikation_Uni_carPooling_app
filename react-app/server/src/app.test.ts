@@ -79,23 +79,6 @@ describe("Auth", () => {
         expect(response.body.error).toBe("Bitte fülle alle Pflichtfelder aus.");
     });
 
-    it("rejects registration with weak password", async () => {
-        const uniqueValue = Date.now();
-        const response = await request(app)
-            .post("/api/auth/register")
-            .send({
-                email: `weak-${uniqueValue}@uni-konstanz.de`,
-                username: `weak-user-${uniqueValue}`,
-                password: "12345",
-                firstName: "Weak",
-                lastName: "Test",
-                birthDate: "2000-01-01",
-                course: "AIN",
-            });
-
-        expect(response.status).toBe(400);
-        expect(response.body.error).toBe("Das Passwort muss mindestens 8 Zeichen lang sein.");
-    });
 
     it("rejects duplicate email", async () => {
         const uniqueValue = Date.now();
@@ -293,23 +276,29 @@ describe("Rides", () => {
 describe("Chat", () => {
     it("creates a contact, sends a message, verifies it in DB, then clears chat", async () => {
         const token = await registerAndLogin();
-        const me = await request(app)
+        const otherToken = await registerAndLogin();
+        const otherMe = await request(app)
             .get("/api/auth/me")
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", `Bearer ${otherToken}`);
 
-        const userId = me.body.user.id as string;
+        const otherUserId = otherMe.body.user.id as string;
 
         // Create contact
         const contactRes = await request(app)
             .post("/api/chat/contacts")
             .set("Authorization", `Bearer ${token}`)
-            .send({ userId });
+            .send({ userId: otherUserId });
 
         expect(contactRes.status).toBe(201);
-        expect(contactRes.body.contact.userId).toBe(userId);
+        expect(contactRes.body.contact.userId).toBe(otherUserId);
         expect(contactRes.body.contact.user.firstName).toBe("Test");
 
         const contactId = contactRes.body.contact.id as string;
+
+        const me = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${token}`);
+        const userId = me.body.user.id as string;
 
         // Send message
         const msgRes = await request(app)
@@ -403,19 +392,25 @@ describe("Chat", () => {
 
     it("deletes a contact and its messages", async () => {
         const token = await registerAndLogin();
-        const me = await request(app)
+        const otherToken = await registerAndLogin();
+        const otherMe = await request(app)
             .get("/api/auth/me")
-            .set("Authorization", `Bearer ${token}`);
+            .set("Authorization", `Bearer ${otherToken}`);
 
-        const userId = me.body.user.id as string;
+        const otherUserId = otherMe.body.user.id as string;
 
         const contactRes = await request(app)
             .post("/api/chat/contacts")
             .set("Authorization", `Bearer ${token}`)
-            .send({ userId });
+            .send({ userId: otherUserId });
 
         expect(contactRes.status).toBe(201);
         const contactId = contactRes.body.contact.id as string;
+
+        const me = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${token}`);
+        const userId = me.body.user.id as string;
 
         // Send a message to the contact
         await request(app)

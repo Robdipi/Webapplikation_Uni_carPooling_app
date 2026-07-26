@@ -605,6 +605,7 @@ app.delete(
 app.get("/api/chat/contacts", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     try {
         const contacts = await prisma.chatContact.findMany({
+            where: { ownerId: req.user!.userId },
             include: {
                 messages: {
                     include: {
@@ -629,11 +630,38 @@ app.post("/api/chat/contacts", authenticateToken, async (req: AuthenticatedReque
         return;
     }
 
+    const ownerId = req.user!.userId;
+
+    if (ownerId === userId) {
+        res.status(400).json({ error: "Kann keinen Kontakt mit sich selbst erstellen." });
+        return;
+    }
+
     try {
+        const existing = await prisma.chatContact.findFirst({
+            where: { ownerId, userId },
+        });
+
+        if (existing !== null) {
+            res.status(201).json({ contact: existing });
+            return;
+        }
+
         const contact = await prisma.chatContact.create({
-            data: { userId },
+            data: { ownerId, userId },
             include: { user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } },
         });
+
+        const reverseExists = await prisma.chatContact.findFirst({
+            where: { ownerId: userId, userId: ownerId },
+        });
+
+        if (reverseExists === null) {
+            await prisma.chatContact.create({
+                data: { ownerId: userId, userId: ownerId },
+            });
+        }
+
         res.status(201).json({ contact });
     } catch (error) {
         console.error("Create chat contact failed:", error);
@@ -665,6 +693,19 @@ app.post("/api/chat/messages", authenticateToken, async (req: AuthenticatedReque
         const message = await prisma.chatMessage.create({
             data: { contactId, senderId, type, content, sentAt },
         });
+
+        const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
+        if (contact !== null) {
+            const reverse = await prisma.chatContact.findFirst({
+                where: { ownerId: contact.userId, userId: contact.ownerId },
+            });
+            if (reverse !== null) {
+                await prisma.chatMessage.create({
+                    data: { contactId: reverse.id, senderId, type, content, sentAt },
+                });
+            }
+        }
+
         res.status(201).json({ message });
     } catch (error) {
         console.error("Create chat message failed:", error);
@@ -676,7 +717,16 @@ app.delete("/api/chat/messages/:contactId", authenticateToken, async (req: Authe
     const { contactId } = req.params;
 
     try {
+        const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
         await prisma.chatMessage.deleteMany({ where: { contactId } });
+        if (contact !== null) {
+            const reverse = await prisma.chatContact.findFirst({
+                where: { ownerId: contact.userId, userId: contact.ownerId },
+            });
+            if (reverse !== null) {
+                await prisma.chatMessage.deleteMany({ where: { contactId: reverse.id } });
+            }
+        }
         res.json({ success: true });
     } catch (error) {
         console.error("Clear chat failed:", error);
@@ -688,6 +738,16 @@ app.delete("/api/chat/contacts/:contactId", authenticateToken, async (req: Authe
     const { contactId } = req.params;
 
     try {
+        const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
+        if (contact !== null) {
+            const reverse = await prisma.chatContact.findFirst({
+                where: { ownerId: contact.userId, userId: contact.ownerId },
+            });
+            if (reverse !== null) {
+                await prisma.chatMessage.deleteMany({ where: { contactId: reverse.id } });
+                await prisma.chatContact.delete({ where: { id: reverse.id } });
+            }
+        }
         await prisma.chatMessage.deleteMany({ where: { contactId } });
         await prisma.chatContact.delete({ where: { id: contactId } });
         res.json({ success: true });
