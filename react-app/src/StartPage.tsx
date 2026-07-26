@@ -127,13 +127,13 @@ const StartPage: React.FC = () => {
                                 <form onSubmit={handleRegister}>
                                     <div className="form-group">
                                         <label htmlFor="user-id-register" className="logintext">
-                                            E-Mail:
+                                            Universitäts-E-Mail:
                                         </label>
                                         <input
                                             type="email"
                                             id="user-id-register"
                                             name="email"
-                                            placeholder="z.B. alex@example.com"
+                                            placeholder="z.B. alex@uni-konstanz.de"
                                             required
                                         />
                                     </div>

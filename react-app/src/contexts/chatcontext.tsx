@@ -133,7 +133,7 @@ function readSelectedContactIdFromLocalStorage(
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 export function ChatContextProvider({ children }: ChatContextProviderProps) {
-    const { currentUser } = useUserContext();
+    const { currentUser, authToken } = useUserContext();
     const [contacts, setContacts] = useState<ChatContact[]>([]);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [selectedContactId, setSelectedContactId] = useState<string>("");
@@ -141,7 +141,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     useEffect(() => {
         async function loadChat() {
             try {
-                const apiContacts = await getChatContactsRequest();
+                const apiContacts = await getChatContactsRequest(authToken ?? "");
 
                 if (apiContacts.length > 0) {
                     setContacts(apiContacts);
@@ -178,7 +178,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         }
 
         loadChat();
-    }, []);
+    }, [authToken]);
 
     useEffect(() => {
         localStorage.setItem(
@@ -225,6 +225,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
                 "text",
                 trimmedContent,
                 sentAt,
+                authToken ?? "",
             );
 
             setMessages((previousMessages) => [
@@ -252,7 +253,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
 
     const clearChat = async (contactId: string) => {
         try {
-            await clearChatRequest(contactId);
+            await clearChatRequest(contactId, authToken ?? "");
         } catch {
             // Continue even if API fails
         }
@@ -264,7 +265,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
 
     const deleteContact = async (contactId: string) => {
         try {
-            await deleteContactRequest(contactId);
+            await deleteContactRequest(contactId, authToken ?? "");
         } catch {
             // Continue even if API fails
         }
@@ -290,7 +291,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         }
 
         try {
-            const created = await createChatContactRequest(userId);
+            const created = await createChatContactRequest(userId, authToken ?? "");
             const newContact: ChatContact = {
                 id: created.id,
                 userId: created.userId,

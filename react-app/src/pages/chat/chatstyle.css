@@ -106,7 +106,7 @@ body,
 
 .confirm-dialog p {
     margin: 0 0 20px 0;
-    color: var(--color-brand-grey);
+    color: var(--color-brand-black);
 }
 
 .confirm-dialog-actions {

@@ -16,7 +16,7 @@ async function registerAndLogin(): Promise<string> {
     const uniqueValue = Date.now();
 
     const registerData = {
-        email: `test-${uniqueValue}@example.com`,
+        email: `test-${uniqueValue}@uni-konstanz.de`,
         username: `testuser-${uniqueValue}`,
         password: VALID_PASSWORD,
         firstName: "Test",
@@ -84,7 +84,7 @@ describe("Auth", () => {
         const response = await request(app)
             .post("/api/auth/register")
             .send({
-                email: `weak-${uniqueValue}@example.com`,
+                email: `weak-${uniqueValue}@uni-konstanz.de`,
                 username: `weak-user-${uniqueValue}`,
                 password: "12345",
                 firstName: "Weak",
@@ -100,7 +100,7 @@ describe("Auth", () => {
     it("rejects duplicate email", async () => {
         const uniqueValue = Date.now();
         const data = {
-            email: `dup-${uniqueValue}@example.com`,
+            email: `dup-${uniqueValue}@uni-konstanz.de`,
             username: `dup-user-${uniqueValue}`,
             password: VALID_PASSWORD,
             firstName: "Dup",
@@ -125,7 +125,7 @@ describe("Auth", () => {
         const response = await request(app)
             .post("/api/auth/register")
             .send({
-                email: `avatar-${uniqueValue}@example.com`,
+                email: `avatar-${uniqueValue}@uni-konstanz.de`,
                 username: `avatar-user-${uniqueValue}`,
                 password: VALID_PASSWORD,
                 firstName: "Avatar",
@@ -458,6 +458,94 @@ describe("Chat", () => {
             .post("/api/chat/messages")
             .send({ contactId: "x", senderId: "y", type: "text", content: "hi", sentAt: "now" });
         expect(msgRes.status).toBe(401);
+    });
+});
+
+// ── Avatar-Click creates Chat Contact ───────────────────────────────────────
+
+describe("Avatar click creates chat contact", () => {
+    it("creates a chat contact when a passenger clicks the driver avatar on a ride listing", async () => {
+        // 1. Register a driver
+        const driverToken = await registerAndLogin();
+        const driverMe = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${driverToken}`);
+        const driverId = driverMe.body.user.id as string;
+        const driverFirstName = driverMe.body.user.profile.firstName as string;
+        const driverLastName = driverMe.body.user.profile.lastName as string;
+
+        // 2. Register a passenger
+        const passengerToken = await registerAndLogin();
+
+        // 3. Driver creates a ride
+        const createRes = await request(app)
+            .post("/api/rides")
+            .set("Authorization", `Bearer ${driverToken}`)
+            .send(rideData(driverId));
+
+        expect(createRes.status).toBe(201);
+        const rideId = createRes.body.ride.id as string;
+
+        // 4. Passenger sees the ride listing (GET /api/rides)
+        const listRes = await request(app).get("/api/rides");
+        expect(listRes.status).toBe(200);
+
+        const listedRide = listRes.body.rides.find(
+            (r: { id: string }) => r.id === rideId,
+        );
+        expect(listedRide).toBeDefined();
+        expect(listedRide.driverName).toBe(`${driverFirstName} ${driverLastName}`);
+
+        // 5. Passenger clicks the driver avatar → creates a chat contact
+        const contactRes = await request(app)
+            .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${passengerToken}`)
+            .send({ userId: driverId });
+
+        expect(contactRes.status).toBe(201);
+        expect(contactRes.body.contact.userId).toBe(driverId);
+        expect(contactRes.body.contact.user.firstName).toBe(driverFirstName);
+        expect(contactRes.body.contact.user.lastName).toBe(driverLastName);
+
+        const contactId = contactRes.body.contact.id as string;
+
+        // 6. Chat page would show the new contact
+        const contactsRes = await request(app)
+            .get("/api/chat/contacts")
+            .set("Authorization", `Bearer ${passengerToken}`);
+
+        expect(contactsRes.status).toBe(200);
+        const found = contactsRes.body.contacts.find(
+            (c: { id: string }) => c.id === contactId,
+        );
+        expect(found).toBeDefined();
+        expect(found.user.firstName).toBe(driverFirstName);
+
+        // 7. Clicking the same avatar again creates another contact
+        const duplicateRes = await request(app)
+            .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${passengerToken}`)
+            .send({ userId: driverId });
+
+        expect(duplicateRes.status).toBe(201);
+        const contactsAfter = await request(app)
+            .get("/api/chat/contacts")
+            .set("Authorization", `Bearer ${passengerToken}`);
+
+        expect(contactsAfter.status).toBe(200);
+        const passengerContacts = contactsAfter.body.contacts.filter(
+            (c: { userId: string }) => c.userId === driverId,
+        );
+        expect(passengerContacts.length).toBeGreaterThanOrEqual(1);
+
+        // Cleanup
+        await request(app)
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${passengerToken}`);
+
+        await request(app)
+            .delete(`/api/rides/${rideId}`)
+            .set("Authorization", `Bearer ${driverToken}`);
     });
 });
 

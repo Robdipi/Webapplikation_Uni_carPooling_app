@@ -193,6 +193,10 @@ body.dark .confirm-dialog h3 {
   color: var(--color-brand-black);
 }
 
+body.dark .confirm-dialog p {
+  color: var(--color-brand-black);
+}
+
 body.dark .login-popup {
   background: var(--color-brand-bg-shade-a);
   color: var(--color-brand-grey);

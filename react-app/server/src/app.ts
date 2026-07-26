@@ -5,6 +5,7 @@ import express, { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient, User } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { Verifier } from "academic-email-verifier";
 
 const jwtSecret: string = process.env.JWT_SECRET ?? "";
 if (jwtSecret === "") {
@@ -201,6 +202,14 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
         if (existingUser !== null) {
             res.status(409).json({
                 error: "E-Mail oder Benutzername ist bereits registriert.",
+            });
+            return;
+        }
+
+        const isAcademic = await Verifier.isAcademic(normalizedEmail);
+        if (!isAcademic) {
+            res.status(400).json({
+                error: "Nur Universitäts-E-Mails sind erlaubt.",
             });
             return;
         }
