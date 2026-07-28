@@ -7,51 +7,140 @@
 
 # Einleitung
 
+## Motivation
+
+//TODO
+
+## Kernfunktionen
+
 CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten. Sie ermöglicht es, Fahrten anzubieten und zu finden sowie miteinander in Kontakt zu treten, um die genauen Details der Fahrt zu besprechen.
 
 Da wir uns entschieden haben, dass CampusRide (wenn es ein echtes Produkt wäre) ein Non-Profit-Projekt wäre, überlassen wir den Nutzern die vollständige Freiheit über die Preisverhandlungen.
 
 Der Hauptzweck dieser Fahrten ist der regelmäßige Transit von und zum Campus. Andere Fahrten sind jedoch ebenfalls möglich.
 
-CampusRide verfügt über einen In-App-Chat, der die Verbindung zwischen Fahrern und Mitfahrern einfacher und sicherer macht. Dieser ist über jedes Fahrt-Listing erreichbar.
+CampusRide verfügt über einen In-App-Chat, der die Verbindung zwischen Fahrern und Mitfahrern einfacher und sicherer macht. Dieser ist über den Avater des Fahrers auf jedes Fahrt-Listing erreichbar.
 
-Bei der Suche und beim Anbieten von Fahrten wird OpenStreetMap integriert, um die Fahrt visuell darzustellen. Diese Routenansicht basiert ausschließlich auf Start- und Endpunkt der Fahrt und ist nicht bindend.
+Bei der Suche und beim Anbieten von Fahrten wird OpenStreetMap integriert, um die Fahrt visuell darzustellen. Diese Routenansicht basiert ausschließlich auf Start- und Endpunkt der Fahrt und ist nicht bindend. 
+
+Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrierung die email provider mit einer öffentlich verfügbaren Datenbank verglichen. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
 # Technologie-Stack
 
-Übersicht der eingesetzten Technologien:
-
-- Frontend
-- Backend
-- Datenbank
-- Tooling
-
-Kurze Begründung der Wahl der Technologien.
-
 ## Verwendete Technologien
+
+### React mit TypeScript und Vite
+
+React bildet das Fundament des Frontends. In Kombination mit TypeScript wird type-sicheres Programmieren gewährleistet – Fehler werden bereits zur Compile-Zeit erkannt, zur Laufzeit nicht mehr. Vite dient als Build-Tool und Entwicklungs-Server. Es überzeugt durch extrem kurze Hot-Module-Replacement-Zeiten, die den Entwicklungsfluss nicht unterbrechen.
+
+React Router v7 ermöglicht die clientseitige Navigation zwischen den verschiedenen Seiten (Startseite, Fahrt anbieten, Fahrt finden, Chat, Profil) ohne dass bei jeder Aktion eine vollständige Seite neu geladen werden muss. Geschützte Routen werden über eine eigene `ProtectedRoute`-Komponente abgesichert, die auf den Authentifizierungsstatus im UserContext prüft.
+
+### React Context für State-Management
+
+Anstatt eines externen State-Managements wie Redux wird die eingebaute React Context API verwendet. Vier spezialisierte Provider (`UserContext`, `RideContext`, `ChatContext`, `GlobalContext`) sind verschachtelt in `AppProviders` und stellen den globalen Zustand der Anwendung bereit. Dieser Ansatz ist für die Projektausreichend und vermeidet zusätzliche Abhängigkeiten.
+
+### Express.js
+
+Express ist das Backend-Framework. Es bietet einen schlanken, flexiblen Ansatz für die Erstellung von REST-APIs. Alle Endpunkte sind in einer einzigen Datei (`app.ts`) organisiert, was die Übersichtlichkeit für ein Projekt dieser Größe erhält.
 
 ### Prisma
 
-Prisma wird als Datenbank-ORM verwendet. Es erleichtert die Kommunikation zwischen Anwendung und Datenbank und ermöglicht eine typsichere Verwaltung der Datenmodelle.
+Prisma wird als Datenbank-ORM verwendet siehe Aufgabe besagt.
 
 ### OpenStreetMap
 
-OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet.
+OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet nicht für die Fahrt auswahl
 
 Gründe für die Auswahl:
 
-- kostenlos nutzbar
-- offene Datenbasis
-- viele verfügbare Tools und Erweiterungen
-- keine Abhängigkeit von proprietären Kartendiensten
+- kostenlos anders als die api von google maps
+- hilfreiche Tools die wir ursprünglich für eine verbesserte Suche gebraucht hätten
+- nix anderes eingefallen auser OSM und google maps
 
 ### express-rate-limit
 
-`express-rate-limit` wird als Sicherheitsmechanismus eingesetzt.
+`express-rate-limit` ist installiert wird aber nicht verwendet(hat mich beim testen von anderen Sachen aufgeregt) 
 
-Es schützt die Anwendung vor übermäßigen Anfragen und reduziert das Risiko von Denial-of-Service-Angriffen.
+Es sollte die Anwendung vor Denial-of-Service-Angriffen schützen.
+
+
+### jsonwebtoken und bcryptjs
+
+JWTs (JSON Web Tokens) werden für die Authentifizierung verwendet. Nach dem Login erhält der Client ein Token mit einer Gültigkeit von zwei Stunden. Für geschützte Anfragen wird dieses Token im `Authorization`-Header als `Bearer`-Token mitgesendet.
+
+bcryptjs übernimmt das Hashing der Passwörter mit einem Salt-Faktor von 10 Runden. Passwörter werden niemals im Klartext gespeichert.
+
+### academic-email-verifier
+
+Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z.B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird. 
+
+### Docker Compose
+
+Docker Compose ermöglicht das einheitliche Deployen der gesamten Anwendung (Frontend und Backend als separate Container) mit einem einzigen Befehl. Das Backend führt bei jedem Start automatisch Prisma-Migrationen aus und startet den Server. Das Frontend wird im Dev-Modus mit Vite gestartet.
+
+### Vitest und Supertest
+
+Vitest dient als Testframework für die Backend-Tests. Supertest ermöglicht das Testen von Express-Endpunkten ohne einen laufenden Server. Die Tests simulieren HTTP-Anfragen und prüfen die korrekte Antwort des Backends.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
@@ -77,6 +166,17 @@ Geplanter Umfang:
 
 ---
 
+
+
+
+
+
+
+
+
+
+
+
 # Umsetzung
 
 Für jeden Meilenstein:
@@ -93,22 +193,28 @@ Geplanter Umfang:
 
 **6–8 Seiten**
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
-# Testing & Qualitätssicherung
 
-Beschreibung der Teststrategie:
-
-- Was wird getestet?
-- Was wird nicht getestet und warum?
-- Welche Testabdeckung wurde erreicht?
-- Beispielhafte Testergebnisse
-
-Geplanter Umfang:
-
-**2 Seiten**
-
----
 
 # Betrieb
 
@@ -122,6 +228,18 @@ Geplanter Umfang:
 
 **1–2 Seiten**
 
+docker compose up --build in sowohl /react
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 # Reflexion & Fazit
@@ -131,6 +249,16 @@ Diskussion über:
 - Was lief gut?
 - Was würde beim nächsten Mal anders gemacht werden?
 - Was wurde gelernt?
+
+
+OpenStreetMap wird aktuell nicht zur auswahl von  Start- und Endpunkt verwendet wäre eine mögliche verbesserung
+
+Chat könnte gruppenchat für die fahrt sein wäre aber komplexer
+
+bessere Suche
+
+nicht mehr zeugs so übel aufschieben
+
 
 Geplanter Umfang:
 
