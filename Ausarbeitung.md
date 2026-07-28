@@ -57,16 +57,13 @@ Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrieru
 
 ## Verwendete Technologien
 
-### React mit TypeScript und Vite
 
-React bildet das Fundament des Frontends. In Kombination mit TypeScript wird type-sicheres Programmieren gewährleistet – Fehler werden bereits zur Compile-Zeit erkannt, zur Laufzeit nicht mehr. Vite dient als Build-Tool und Entwicklungs-Server. Es überzeugt durch extrem kurze Hot-Module-Replacement-Zeiten, die den Entwicklungsfluss nicht unterbrechen.
+ Zusammenfassung der erzwungenen Technologien: HTML5 (semantisch),       
+     CSS3 (Flexbox/Grid, Media Queries), npm, Vite (Bundler), TypeScript,    
+     React (Hooks, Context, Router), Express (Node.js), REST, SQLite/        
+     PostgreSQL/MongoDB, JWT, Vitest, Docker Compose. 
 
-React Router v7 ermöglicht die clientseitige Navigation zwischen den verschiedenen Seiten (Startseite, Fahrt anbieten, Fahrt finden, Chat, Profil) ohne dass bei jeder Aktion eine vollständige Seite neu geladen werden muss. Geschützte Routen werden über eine eigene `ProtectedRoute`-Komponente abgesichert, die auf den Authentifizierungsstatus im UserContext prüft.
-
-### React Context für State-Management
-
-Anstatt eines externen State-Managements wie Redux wird die eingebaute React Context API verwendet. Vier spezialisierte Provider (`UserContext`, `RideContext`, `ChatContext`, `GlobalContext`) sind verschachtelt in `AppProviders` und stellen den globalen Zustand der Anwendung bereit. Dieser Ansatz ist für die Projektausreichend und vermeidet zusätzliche Abhängigkeiten.
-
+### React 
 ### Express.js
 
 Express ist das Backend-Framework. Es bietet einen schlanken, flexiblen Ansatz für die Erstellung von REST-APIs. Alle Endpunkte sind in einer einzigen Datei (`app.ts`) organisiert, was die Übersichtlichkeit für ein Projekt dieser Größe erhält.
@@ -228,7 +225,7 @@ Geplanter Umfang:
 
 **1–2 Seiten**
 
-docker compose up --build in sowohl /react
+docker compose up --build in sowohl /react-app/server ;/react-app/
 
 
 
