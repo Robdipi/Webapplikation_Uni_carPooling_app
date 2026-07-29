@@ -274,7 +274,7 @@ Das Benutzerprofil wurde um Stadt, Kilometerpreis und Profilbild erweitert und k
 
 ## Meilenstein 4 – Betrieb, Fertigstellung und Abschluss
 
-Der vierte Meilenstein hatte das Ziel, den in M3 aufgebauten Full-Stack-Prototypen zu einer reproduzierbar startbaren und durchgängig nutzbaren Anwendung fertigzustellen. Im Mittelpunkt standen deshalb nicht mehr einzelne neue Vorlesungskonzepte, sondern der zuverlässige Betrieb der Gesamtanwendung, die Vervollständigung der persistenten Kernfunktionen, eine konkrete Performance-Maßnahme sowie die abschließende Dokumentation und Demonstration des Projekts.
+Der vierte Meilenstein hatte das Ziel, den in M3 aufgebauten Full-Stack-Prototypen zu einer reproduzierbar startbaren und durchgängig nutzbaren Anwendung fertigzustellen. Im Mittelpunkt standen deshalb nicht mehr einzelne neue Vorlesungskonzepte, sondern der zuverlässige Betrieb der Gesamtanwendung, die Vervollständigung der persistenten Kernfunktionen und eine konkrete Performance-Maßnahme.
 
 ### Vervollständigung der Full-Stack-Anwendung
 
