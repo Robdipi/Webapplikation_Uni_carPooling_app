@@ -12,7 +12,9 @@
 
 ## Projektidee
 
-CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten. Sie ermöglicht es, Fahrten von und zur Universität anzubieten und zu finden. Fahrer können die maximal erlaubten Umwege begrenzen. Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern. Die Registrierung ist auf akademische E-Mail-Adressen beschränkt.
+CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten.
+Sie ermöglicht es, Fahrten von und zur Universität anzubieten und zu finden (andere gehen auch)
+. Fahrer können die maximal erlaubten Umwege begrenzen. Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern. Die Registrierung ist auf akademische E-Mail-Adressen beschränkt.
 
 ## Bekannte Einschränkungen
 
@@ -21,7 +23,8 @@ CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten. Sie ermö
 - **Kein Gruppenchat**: Chats sind immer 1:1 zwischen zwei Personen. Ein Gruppenchat für alle Mitfahrer einer Fahrt wäre wünschenswert, aber deutlich komplexer.
 - **Eingeschränkte Suchfunktion**: Die Suche filtert nur nach Start, Ziel, Datum und Uhrzeit. Erweiterte Filter (z. B. maximale Entfernung, Preisbereich, Zwischenstopps) sind nicht vorhanden.
 - **express-rate-limit nicht aktiviert**: Die Bibliothek `express-rate-limit` ist installiert, wird aber nicht verwendet. Dadurch fehlt ein Schutz vor DoS-Angriffen auf die API.
-
+- **Kein Integrietest Zahlungsystem**: wir überlassen dem user wie er sich um die zahlung kümmert
+- **Schlechtes Preis System**: Preis ist in den Profil einstellungen als Kilometer preis anstatt bei jeder Fahrt mit dabei.
 ## Demo-Video
 
 https://youtu.be/Xr-0pmRnFbQ
