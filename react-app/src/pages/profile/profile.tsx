@@ -204,7 +204,7 @@ const ProfilePage: React.FC = () => {
                         <div className="darkmode-section">
                             <h3>Darstellung</h3>
                             <label className="darkmode-toggle">
-                                <span className="darkmode-label">Dunkelmodus</span>
+                                <span className="darkmode-label">Darkmode</span>
                                 <button
                                     type="button"
                                     className={`toggle-switch ${darkMode ? "toggle-on" : ""}`}

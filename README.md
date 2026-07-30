@@ -25,6 +25,7 @@ Sie ermöglicht es, Fahrten von und zur Universität anzubieten und zu finden (a
 - **express-rate-limit nicht aktiviert**: Die Bibliothek `express-rate-limit` ist installiert, wird aber nicht verwendet. Dadurch fehlt ein Schutz vor DoS-Angriffen auf die API.
 - **Kein Integrietest Zahlungsystem**: wir überlassen dem user wie er sich um die zahlung kümmert
 - **Schlechtes Preis System**: Preis ist in den Profil einstellungen als Kilometer preis anstatt bei jeder Fahrt mit dabei.
+- **Listen würden probleme haben bei vielen Seiten**: Wir haben keine Seiten von den ListenEinträge die wir haben es müssen also alle existierenden Fahrten gleichzeit angezeigt werden.
 ## Demo-Video
 
 https://youtu.be/Xr-0pmRnFbQ
