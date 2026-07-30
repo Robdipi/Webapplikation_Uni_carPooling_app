@@ -5,7 +5,7 @@
 
 ---
 
-# Einleitung
+# 1.Einleitung
 
 ## Motivation
 
@@ -53,7 +53,7 @@ Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrieru
 
 ---
 
-# Technologie-Stack
+# 2.Technologie-Stack
 
 Aus der Aufgabe:
 
@@ -139,7 +139,7 @@ Vitest dient als Testframework für die Backend-Tests. Supertest ermöglicht das
 
 ---
 
-# Architektur
+# 3.Architektur
 
 ## Aufbau der Anwendung
 
@@ -172,7 +172,7 @@ Geplanter Umfang:
 
 
 
-# Umsetzung
+# 4.Umsetzung
 
 ## Meilenstein 1 – Projektstart und Fundament
 
@@ -389,20 +389,20 @@ Danach ist das Frontend unter `http://localhost:5173` und das Backend unter `htt
 
 Als konkrete Performance-Maßnahme wird die Anzahl externer HTTP-Anfragen bei der Routendarstellung begrenzt. Während ein Benutzer Start- und Zieladresse eingibt, ändern sich die Eingabewerte mit nahezu jedem Tastendruck. Ohne Begrenzung würde jede dieser Änderungen unmittelbar neue Anfragen an den Geocoding-Dienst von OpenStreetMap und anschließend an den Routing-Dienst OSRM auslösen.
 
-Der Hook `useDebounce` verzögert die Verarbeitung der Adressen deshalb um 800 Millisekunden. Nur wenn innerhalb dieses Zeitraums keine weitere Eingabe erfolgt, werden die Adressen geocodiert und die Route neu geladen. Dadurch werden unnötige Netzwerkanfragen vermieden, externe Dienste weniger belastet und die Benutzeroberfläche muss seltener auf Zwischenergebnisse reagieren.
+Der Hook `useDebounce` verzögert die Verarbeitung der Adressen deshalb um 800 Millisekunden. Nur wenn innerhalb dieses Zeitraums keine weitere Eingabe erfolgt, werden die Adressen geocodiert und die Route neu geladen. Dadurch werden unnötige Netzwerkanfragen vermieden, externe Dienste weniger belastet und die Benutzeroberfläche muss seltener auf Zwischenergebnisse reagieren. Dies haben wurde schon in Meilenstein 2 implementiert da uns damals häufig die OSM Api gesperrt wurde.
 
 Ergänzend werden in mehreren Komponenten abgeleitete Daten mit `useMemo` berechnet. Dies betrifft beispielsweise die gefilterte Fahrtenliste und die zum ausgewählten Chatkontakt gehörenden Nachrichten. Die Berechnung wird dadurch nur erneut ausgeführt, wenn sich die jeweils relevanten Eingangsdaten ändern. Als M4-Performance-Aspekt steht jedoch vor allem das Debouncing im Vordergrund, da es unmittelbar die Anzahl der HTTP-Anfragen reduziert.
 
-### Testdaten und Qualitätssicherung
+### 5.Testdaten und Qualitätssicherung
 
-Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert. Die Testdatei `server/src/app.test.ts` enthält 17 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte, fehlende Authentifizierung und der Datenbankstatus geprüft.
+Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert um uns zeit beim debuggen zu sparen da wir bei den vielen änderungen an der Datenbank um den Chat funktionsfähig zu machen viele seltsame bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 17 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte, fehlende Authentifizierung und der Datenbankstatus geprüft.
 
-Ein umfangreicher Integrationstest bildet beispielsweise den Ablauf ab, bei dem ein Mitfahrer auf das Fahrerprofil einer Fahrt klickt, ein Chatkontakt entsteht und anschließend Nachrichten ausgetauscht werden können. Die Tests prüfen damit nicht nur isolierte Endpunkte, sondern auch zentrale Abläufe der fertigen Anwendung.
+Ein umfangreicher Integrationstest bildet beispielsweise den Ablauf ab, bei dem ein Mitfahrer auf das Fahrerprofil einer Fahrt klickt, ein Chatkontakt entsteht und anschließend Nachrichten ausgetauscht werden können. Die Tests prüfen damit nicht nur isolierte Endpunkte, sondern auch zentrale Abläufe der fertigen Anwendung. Viele von denen waren frühere Problem Fälle.
 
 
 ---
 
-# Betrieb
+# 6.Betrieb
 
 ## Starten der Anwendung
 
@@ -473,7 +473,7 @@ npm test
 
 ---
 
-# Reflexion & Fazit
+# 7.Reflexion & Fazit
 
 Diskussion über:
 
