@@ -56,7 +56,6 @@ Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrieru
 # 2.Technologie-Stack
 
 Aus der Aufgabe:
-
 - HTML, CSS
 - TypeScript
 - Npm
@@ -66,13 +65,24 @@ Aus der Aufgabe:
 Gewählt:
 
 ### Express.js
+Gründe für die Auswahl:
+- In der Vorlesung behandelt
 
 ### Vite
+Bundler
+
+Gründe für die Auswahl:
+- In der Vorlesung behandelt
 
 ### SQLite
+Datenbank
+
+Gründe für die Auswahl:
+- In der Vorlesung behandelt
+- Sql können wir schon
+- braucht keinen eigenen Datenbankserver wie PostgreSQL
 
 ### OpenStreetMap
-
 OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet nicht für die Fahrt auswahl
 
 Gründe für die Auswahl:
@@ -101,9 +111,15 @@ Gründe für die Auswahl:
 
 Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z.B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
 
-### Vitest und Supertest
+### Vitest 
+Vitest dient als Testframework für die Backend-Tests.
 
-Vitest dient als Testframework für die Backend-Tests. Supertest ermöglicht das Testen von Express-Endpunkten ohne einen laufenden Server. Die Tests simulieren HTTP-Anfragen und prüfen die korrekte Antwort des Backends.
+### Supertest
+Testen von Express-Endpunkten
+
+Gründe für die Auswahl:
+ - braucht keinen laufenden Server
+ - Simuliert HTTP-Anfragen und prüft die Antwort des Backends
 
 
 
@@ -162,11 +178,25 @@ Geplanter Umfang:
 ---
 
 
+## 3.3 Datenbankstruktur
+![Screenshot_2026-08-01_14-42-32.png](Screenshot_2026-08-01_14-42-32.png)
 
+### Primär- und Fremdschlüssel
 
+| Tabelle | Primärschlüssel | Fremdschlüssel | Verweist auf |
+|---|---|---|---|
+| User | `id` | – | – |
+| Ride | `id` | `driverId` | User.`id` |
+| ChatContact | `id` | `ownerId` | User.`id` |
+| ChatContact | `id` | `userId` | User.`id` |
+| ChatMessage | `id` | `contactId` | ChatContact.`id` |
+| ChatMessage | `id` | `senderId` | User.`id` |
 
-
-
+### Besonderheiten
+- 2 Variablen zum speichern jeder Positon, da ein ortsname nicht immer zu der gleichen position zeigt. Wir speichern also den Namen und die Kordinaten des Punktes
+- extra = Fahrt Beschreibung
+- Type ist ein String für uhrsprünglich geplannte Bild nachrichten
+- alle Zeiten sind String
 
 
 
