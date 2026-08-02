@@ -176,7 +176,39 @@ Geplanter Umfang:
 **3–4 Seiten**
 
 ---
-
+## 3.2 Komponentenstruktur
+```text
+AppProviders
+└── AppRoutes
+    ├── StartPage                    (Login-/Register-Overlays, Formulare)
+    ├── HomePage
+    │   ├── Header/ Footer                   (Navigation, Logout, Nutzername)
+    │   ├── RouteMapFromCoords       (Leaflet-Karte + OSRM-Route)
+    │   │   └── MapUpdater           (fitBounds auf Route)
+    │   └── RideCard                 (wiederverwendet aus find_ride)
+    ├── FindRidePage
+    │   ├── Header / Footer
+    │   ├── SearchBar                (von, nach, Datum, Uhrzeit)
+    │   ├── RouteMapFromCoords
+    │   └── RideCard[]
+    ├── CreateRidePage
+    │   ├── Header / Footer
+    │   ├── Formular                (Start, Ziel, Datum, Sitze, Extra)
+    │   ├── InfoBox
+    │   └── RouteMap                 (Geocoding via Nominatim, OSRM-Route)
+    │       └── MapUpdater
+    ├── ChatPage
+    │   ├── Header
+    │   ├── ContactItem[]            (Kontaktliste mit letzter Nachricht)
+    │   ├── MessageRow[]             (Sende-/Empfangsblase)
+    │   ├── ChatInput                (Textfeld + Senden-Button)
+    │   └── Bestätigungsdialog       (Chat löschen)
+    ├── ProfilePage
+    │   ├── Header / Footer
+    │   ├── ProfileField[] / ProfileInput[]  (Anzeige vs. Bearbeiten)
+    │   └── Darkmode-Toggle
+    └── NotFoundPage
+```
 
 ## 3.3 Datenbankstruktur
 ![Screenshot_2026-08-01_14-42-32.png](Screenshot_2026-08-01_14-42-32.png)
@@ -198,8 +230,12 @@ Geplanter Umfang:
 - Type ist ein String für uhrsprünglich geplannte Bild nachrichten
 - alle Zeiten sind String
 
+### 3.4 State-Verwaltung über Contexts
 
-
+- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den darkmode anzustellen.
+- **UserContext** – Session-Zustand: `currentUser`, `authToken`, `isLoggedIn`, `isAuthLoading`, `profile`. Persistiert das JWT in `localStorage` (`campusRideAuthToken`) und stellt beim App-Start den User über `GET /api/auth/me` wieder her. Bietet `registerUser`, `loginUser`, `logoutUser`, `setProfile`.
+- **RideContext** – lädt alle Fahrten einmal beim Mounten und hält sie im Speicher; bietet `addRide`, `removeRide`, `updateRide`, `clearRides`. Jede Methode ruft die API auf und aktualisiert dann den lokalen State (optimistisches Pattern, ohne Rollback).
+- **ChatContext** – Kontakte und Nachrichten; lädt beim Login alle Kontakte inkl. Nachrichten (`GET /api/chat/contacts`).
 
 
 # 4.Umsetzung
