@@ -7,11 +7,7 @@
 
 # 1.Einleitung
 
-## Motivation
 
-//TODO
-
-## Kernfunktionen
 
 CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten. Sie ermöglicht es, Fahrten anzubieten und zu finden sowie miteinander in Kontakt zu treten, um die genauen Details der Fahrt zu besprechen.
 
@@ -53,7 +49,7 @@ Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrieru
 
 ---
 
-# 2.Technologie-Stack
+# 2 Technologie-Stack
 
 Aus der Aufgabe:
 - HTML, CSS
@@ -122,95 +118,12 @@ Gründe für die Auswahl:
  - Simuliert HTTP-Anfragen und prüft die Antwort des Backends
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
 # 3.Architektur
 
-## Aufbau der Anwendung
-
-Beschreibung der:
-
-- Komponentenstruktur
-- API-Architektur
-- Datenbankstruktur
-
-Diagramme:
-
-- Komponentenbaum
-- ER-Diagramm
-- Sequenzdiagramm für einen Request
-
-Geplanter Umfang:
-
-**3–4 Seiten**
-
 ---
-## 3.2 Komponentenstruktur
-```text
-AppProviders
-└── AppRoutes
-    ├── StartPage                    (Login-/Register-Overlays, Formulare)
-    ├── HomePage
-    │   ├── Header/ Footer                   (Navigation, Logout, Nutzername)
-    │   ├── RouteMapFromCoords       (Leaflet-Karte + OSRM-Route)
-    │   │   └── MapUpdater           (fitBounds auf Route)
-    │   └── RideCard                 (wiederverwendet aus find_ride)
-    ├── FindRidePage
-    │   ├── Header / Footer
-    │   ├── SearchBar                (von, nach, Datum, Uhrzeit)
-    │   ├── RouteMapFromCoords
-    │   └── RideCard[]
-    ├── CreateRidePage
-    │   ├── Header / Footer
-    │   ├── Formular                (Start, Ziel, Datum, Sitze, Extra)
-    │   ├── InfoBox
-    │   └── RouteMap                 (Geocoding via Nominatim, OSRM-Route)
-    │       └── MapUpdater
-    ├── ChatPage
-    │   ├── Header
-    │   ├── ContactItem[]            (Kontaktliste mit letzter Nachricht)
-    │   ├── MessageRow[]             (Sende-/Empfangsblase)
-    │   ├── ChatInput                (Textfeld + Senden-Button)
-    │   └── Bestätigungsdialog       (Chat löschen)
-    ├── ProfilePage
-    │   ├── Header / Footer
-    │   ├── ProfileField[] / ProfileInput[]  (Anzeige vs. Bearbeiten)
-    │   └── Darkmode-Toggle
-    └── NotFoundPage
-```
-
-## 3.3 Datenbankstruktur
+## 3.1 Datenbankstruktur
 ![Screenshot_2026-08-01_14-42-32.png](Screenshot_2026-08-01_14-42-32.png)
 
 ### Primär- und Fremdschlüssel
@@ -230,12 +143,163 @@ AppProviders
 - Type ist ein String für uhrsprünglich geplannte Bild nachrichten
 - alle Zeiten sind String
 
-### 3.4 State-Verwaltung über Contexts
+---
+### 3.2 Contexts
 
-- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den darkmode anzustellen.
-- **UserContext** – Session-Zustand: `currentUser`, `authToken`, `isLoggedIn`, `isAuthLoading`, `profile`. Persistiert das JWT in `localStorage` (`campusRideAuthToken`) und stellt beim App-Start den User über `GET /api/auth/me` wieder her. Bietet `registerUser`, `loginUser`, `logoutUser`, `setProfile`.
-- **RideContext** – lädt alle Fahrten einmal beim Mounten und hält sie im Speicher; bietet `addRide`, `removeRide`, `updateRide`, `clearRides`. Jede Methode ruft die API auf und aktualisiert dann den lokalen State (optimistisches Pattern, ohne Rollback).
-- **ChatContext** – Kontakte und Nachrichten; lädt beim Login alle Kontakte inkl. Nachrichten (`GET /api/chat/contacts`).
+- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den darkmode anzustellen. im `localStorage`
+- **UserContext** – Session-Zustand: `currentUser`, `authToken`, `isLoggedIn`, `isAuthLoading`, `profile`. im `localStorage` (`campusRideAuthToken`) und stellt beim App-Start den User über `GET /api/auth/me` wieder her. Bietet `registerUser`, `loginUser`, `logoutUser`, `setProfile`.
+- **RideContext** – lädt alle Fahrten einmal beim Mounten und hält sie im Speicher; bietet `addRide`, `removeRide`, `updateRide`, `clearRides`.
+- **ChatContext** – Kontakte und Nachrichten; lädt beim Login alle Kontakte inkl. Nachrichten
+
+---
+### 3.3 Routing
+
+`src/routes/AppRoutes.tsx` definiert alle Routen. 
+
+| Route | Seite | Geschützt |
+|---|---|---|
+| `/` | `StartPage` (Login/Registrierung) | nein |
+| `/impressum` | `ImpressumPage` | nein |
+| `/home` | `HomePage` (Übersicht + Karte) | ja |
+| `/chat` | `ChatPage` | ja |
+| `/create-ride` | `CreateRidePage` | ja |
+| `/find-ride` | `FindRidePage` | ja |
+| `/profile` | `ProfilePage` | ja |
+| `*` | `NotFoundPage` (404) | nein |
+
+`src/routes/ProtectedRoute.tsx` zeigt während der Auth-Prüfung einen Ladeindikator (`isAuthLoading`) und leitet nicht eingeloggte Nutzer per `<Navigate to="/" replace>` zurück zur Startseite.
+
+---
+## 3.4 Komponentenstruktur
+```text
+AppProviders
+└── AppRoutes   
+    ├── StartPage                               (Login-/Register-Overlays, Formulare)
+    ├── HomePage
+    │   ├── Header/ Footer                      (Navigation, Logout, Nutzername)
+    │   ├── RouteMapFromCoords                  (Leaflet-Karte + OSRM-Route)
+    │   │   └── MapUpdater                      (fitBounds auf Route)
+    │   └── RideCard                            (wiederverwendet aus find_ride)
+    ├── FindRidePage
+    │   ├── Header / Footer
+    │   ├── SearchBar                           (von, nach, Datum, Uhrzeit)
+    │   ├── RouteMapFromCoords
+    │   └── RideCard[]
+    ├── CreateRidePage
+    │   ├── Header / Footer
+    │   ├── Formular                            (Start, Ziel, Datum, Sitze, Extra)
+    │   ├── InfoBox
+    │   └── RouteMap                            (Geocoding via Nominatim, OSRM-Route)
+    │       └── MapUpdater
+    ├── ChatPage
+    │   ├── Header
+    │   ├── ContactItem[]                       (Kontaktliste mit letzter Nachricht)
+    │   ├── MessageRow[]                        (Sende-/Empfangsblase)
+    │   ├── ChatInput                           (Textfeld + Senden-Button)
+    │   └── Bestätigungsdialog                  (Chat löschen)
+    ├── ProfilePage
+    │   ├── Header / Footer
+    │   ├── ProfileField[] / ProfileInput[]     (Anzeige vs. Bearbeiten)
+    │   └── Darkmode-Toggle
+    └── NotFoundPage
+```
+---
+## 3.5 API-Architektur
+
+Die API von CampusRide ist eine REST-Schnittstelle, über die ausschließlich JSON-Daten ausgetauscht werden. Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank: Das Frontend greift niemals direkt auf die Datenbank zu, sondern sendet HTTP-Anfragen an das Express-Backend. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten unter dem Pfadprefix `/api`.
+
+### Aufbau des Backends
+
+Das Backend liegt unter `react-app/server`. Die zentrale Datei `server/src/app.ts` definiert die Express-Anwendung und alle Endpunkte. Zwei Middlewares gelten für sämtliche Anfragen:
+
+- `cors` erlaubt dem auf Port 5173 laufenden Frontend die Kommunikation mit dem Backend auf Port 3001.
+- `express.json()` parst eingehende JSON-Bodies und stellt sie über `req.body` bereit.
+
+Die Route-Handler sind bewusst in einer einzigen Datei gehalten. Für den Umfang des Projekts ist dieser monolithische Aufbau übersichtlich und ausreichend; bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
+
+### Authentifizierung
+
+Die API unterscheidet öffentliche und geschützte Endpunkte. Öffentliche Endpunkte benötigen keine Anmeldung, geschützte Endpunkte verlangen ein gültiges JWT.
+
+Das JWT wird bei der Registrierung oder Anmeldung im Backend erzeugt, enthält die Benutzer-ID und die E-Mail-Adresse und ist zwei Stunden gültig. Das Frontend sendet es bei jeder geschützten Anfrage im HTTP-Header mit:
+
+```
+Authorization: Bearer <token>
+```
+
+Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Ist dies nicht der Fall, antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
+
+### Endpunkte im Überblick
+
+| Methode | Pfad | Zweck | Schutz |
+|---|---|---|---|
+| GET | `/api/health` | Gesundheitscheck | öffentlich |
+| GET | `/api/db-status` | DB-Status und User-Anzahl | öffentlich |
+| POST | `/api/auth/register` | Registrierung | öffentlich |
+| POST | `/api/auth/login` | Login | öffentlich |
+| GET | `/api/auth/me` | Aktuellen User abrufen | geschützt |
+| PUT | `/api/auth/me` | Profil aktualisieren | geschützt |
+| GET | `/api/rides` | Alle Fahrten abrufen | öffentlich |
+| POST | `/api/rides` | Fahrt erstellen | geschützt |
+| PUT | `/api/rides/:id` | Fahrt aktualisieren | geschützt |
+| DELETE | `/api/rides/:id` | Fahrt löschen | geschützt |
+| GET | `/api/chat/contacts` | Chat-Kontakte abrufen | geschützt |
+| POST | `/api/chat/contacts` | Chat-Kontakt erstellen | geschützt |
+| POST | `/api/chat/messages` | Nachricht senden | geschützt |
+| DELETE | `/api/chat/messages/:contactId` | Chat leeren | geschützt |
+| DELETE | `/api/chat/contacts/:contactId` | Kontakt löschen | geschützt |
+
+### Fehlerbehandlung
+
+Jeder Endpunkt validiert seine Eingaben und antwortet mit semantisch passenden HTTP-Statuscodes. Fehlende oder leere Pflichtfelder führen zu `400 Bad Request`, doppelte E-Mail-Adressen oder Benutzernamen zu `409 Conflict`, falsche Anmeldedaten zu `401 Unauthorized` und nicht vorhandene Ressourcen zu `404 Not Found`. Fehlerantworten folgen dabei einheitlich dem Schema `{ "error": "..." }`, das das Frontend über `readErrorMessage` auswertet und dem Nutzer sichtbar anzeigt.
+
+Die öffentlichen Repräsentationen `publicUser` und `publicRide` mappen die internen Datenbankobjekte auf eigene Antwortformate. Dadurch werden sensible Felder wie der `passwordHash` niemals an das Frontend übertragen und komplexe Strukturen wie die Fahrtenkoordinaten übersichtlich als `departureCoords` bzw. `destinationCoords` mit `lat` und `lng` geliefert.
+
+### API-Schicht im Frontend
+
+Das Frontend kapselt sämtliche `fetch`-Aufrufe in der API-Schicht `src/api/`. Komponenten und Contexts rufen nie direkt `fetch` auf, sondern Funktionen aus dieser Schicht:
+
+| Datei | Inhalt |
+|---|---|
+| `apiUtils.ts` | Basis-URL `API_BASE_URL` und Fehlerauswertung `readErrorMessage` |
+| `authApi.ts` | Registrierung, Login, Benutzer laden und Profil aktualisieren |
+| `rideApi.ts` | Fahrten laden, erstellen, aktualisieren und löschen |
+| `chatApi.ts` | Chatkontakte und Nachrichten verwalten |
+
+Jede Funktion baut die URL aus `API_BASE_URL` und dem Pfad zusammen, setzt die Header `Content-Type: application/json` und bei geschützten Aufrufen `Authorization: Bearer <token>`, prüft `response.ok` und wirft bei Fehlern eine `Error` mit der Servermeldung. Der Datenfluss bei einer geschützten Anfrage folgt damit immer demselben Muster:
+
+```
+Komponente → Context → api/ → fetch → Express → Prisma → SQLite → Antwort zurück
+```
+
+### Sequenzdiagramm für einen geschützten Request
+
+Das folgende Sequenzdiagramm zeigt den Ablauf einer geschützten Anfrage am Beispiel des Erstellens einer Fahrt über `POST /api/rides`:
+
+```mermaid
+sequenceDiagram
+    participant UI as CreateRidePage
+    participant RC as RideContext
+    participant RA as rideApi.ts
+    participant S as Express Backend
+    participant DB as SQLite (Prisma)
+
+    UI->>RC: addRide(newRide)
+    RC->>RA: createRideRequest(newRide, token)
+    RA->>S: POST /api/rides (Authorization: Bearer <JWT>)
+    S->>S: authenticateToken: JWT verifizieren
+    S->>S: Pflichtfelder validieren
+    S->>DB: prisma.ride.create(...)
+    DB-->>S: Ride (mit Fahrer)
+    S-->>RA: 201 { ride }
+    RA-->>RC: ApiRide
+    RC->>RC: rides = [neue Fahrt, ...rides]
+    RC-->>UI: Ride
+```
+
+### Externe APIs
+
+Ergänzend greift das Frontend direkt vom Browser aus auf externe Dienste zu: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über das eigene Backend.
 
 
 # 4.Umsetzung
@@ -624,7 +688,7 @@ Diskussion über:
   - OpenStreetMap wird aktuell nicht zur auswahl von  Start- und Endpunkt verwendet wäre eine mögliche verbesserung
   - Chat könnte gruppenchat für die fahrt sein wäre aber komplexer
   - bessere Suche
-
+- man kann fahrteb nicht mehr löschen
 nicht mehr zeugs so übel aufschieben
 
 - Was wurde gelernt?
