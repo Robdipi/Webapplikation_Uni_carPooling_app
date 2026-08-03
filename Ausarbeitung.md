@@ -620,8 +620,8 @@ docker compose up --build
 ```
 
 Dies startet zwei Container:
-- **Server** auf `http://localhost:5173`
-- **Client** auf `http://localhost:3001`
+- **Server** auf `http://localhost:3001`
+- **Client** auf `http://localhost:5173`
 
 Das Backend führt bei jedem Start automatisch Prisma-Migrationen aus und initialisiert Seed-Daten.
 4 Acounts und eine Fahrt. Loggin Daten:

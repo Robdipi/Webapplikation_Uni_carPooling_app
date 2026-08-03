@@ -13,12 +13,12 @@
 ## Projektidee
 
 CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten.
-Sie ermöglicht es, Fahrten von und zur Universität anzubieten und zu finden (andere gehen auch)
-. Fahrer können die maximal erlaubten Umwege begrenzen. Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern. Die Registrierung ist auf akademische E-Mail-Adressen beschränkt.
+Sie ermöglicht es, Fahrten von und zur Universität anzubieten und zu finden (andere gehen auch).
+Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern. Die Registrierung ist auf akademische E-Mail-Adressen beschränkt.
 
 ## Bekannte Einschränkungen
 
-- **Kein Echtzeit-Chat**: Der Chat basiert auf Polling (regelmäßige Anfragen an das Backend). Nachrichten anderer Nutzer werden erst beim nächsten Polling-Intervall sichtbar. Ein WebSocket-basierter Echtzeit-Chat wäre eine mögliche Verbesserung.
+- **Kein Echtzeit-Chat**: Neue Nachrichten anderer Nutzer werden erst nach erneutem Laden (z. B. Reload oder Wechsel des Kontakts) sichtbar. Ein WebSocket-basiertes oder Polling-basiertes Realtime-Update wäre eine mögliche Verbesserung.
 - **OpenStreetMap nur zur Anzeige**: Die Karte zeigt die Route zwischen Start- und Zielpunkt, wird aber nicht zur Auswahl dieser Punkte verwendet. Start und Ziel müssen manuell als Text eingegeben werden.
 - **Kein Gruppenchat**: Chats sind immer 1:1 zwischen zwei Personen. Ein Gruppenchat für alle Mitfahrer einer Fahrt wäre wünschenswert, aber deutlich komplexer.
 - **Eingeschränkte Suchfunktion**: Die Suche filtert nur nach Start, Ziel, Datum und Uhrzeit. Erweiterte Filter (z. B. maximale Entfernung, Preisbereich, Zwischenstopps) sind nicht vorhanden.
@@ -129,15 +129,15 @@ Die Anwendung ist als Single Page Application umgesetzt. SSR oder SSG ist nicht 
 | POST | `/api/auth/login` | Prüft Login-Daten und gibt ein JWT zurück | öffentlich |
 | GET | `/api/auth/me` | Gibt den aktuell eingeloggten User zurück | geschützt |
 | PUT | `/api/auth/me` | Aktualisiert das Profil des eingeloggten Users | geschützt |
-| GET | `/api/rides` | Liste aller Fahrten (mit optionalen Query-Parametern) | geschützt |
+| GET | `/api/rides` | Liste aller Fahrten | öffentlich |
 | POST | `/api/rides` | Neue Fahrt anlegen | geschützt |
 | PUT | `/api/rides/:id` | Fahrt aktualisieren (nur Fahrer) | geschützt |
 | DELETE | `/api/rides/:id` | Fahrt löschen (nur Fahrer) | geschützt |
-| GET | `/api/chats/contacts` | Chat-Kontakte des eingeloggten Users | geschützt |
-| POST | `/api/chats/contacts/:userId` | Chat-Kontakt anlegen | geschützt |
-| GET | `/api/chats/:contactId/messages` | Nachrichten mit einem Kontakt | geschützt |
-| POST | `/api/chats/:contactId/messages` | Nachricht senden | geschützt |
-| DELETE | `/api/chats/:contactId` | Chat-Kontakt entfernen | geschützt |
+| GET | `/api/chat/contacts` | Chat-Kontakte des eingeloggten Users (inkl. Nachrichten) | geschützt |
+| POST | `/api/chat/contacts` | Chat-Kontakt anlegen (`userId` im Body) | geschützt |
+| POST | `/api/chat/messages` | Nachricht senden | geschützt |
+| DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines Kontakts leeren | geschützt |
+| DELETE | `/api/chat/contacts/:contactId` | Kontakt samt Nachrichten löschen | geschützt |
 
 ## M1 – Projektstart & Fundament
 

@@ -1,8 +1,0 @@
-To start the project in a Docker container:
-
-docker compose up --build
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001
-
-The SQLite database is persisted in a Docker volume so data survives restarts.

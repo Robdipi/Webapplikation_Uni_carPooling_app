@@ -1,5 +1,7 @@
 test.html
 *.tmp.driveupload
+.idea/
+*.tsbuildinfo
 
 node_modules/
 react-app/node_modules/

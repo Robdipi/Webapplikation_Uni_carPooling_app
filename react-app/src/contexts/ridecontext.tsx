@@ -11,6 +11,7 @@ import {
     createRideRequest,
     updateRideRequest,
     deleteRideRequest,
+    type CreateRideRequest,
 } from "../api/rideApi";
 
 export interface Coordinates {
@@ -35,7 +36,7 @@ export interface Ride {
     extra: string;
 }
 
-export type NewRide = Omit<Ride, "id">;
+export type NewRide = CreateRideRequest;
 
 interface RideContextValue {
     rides: Ride[];
