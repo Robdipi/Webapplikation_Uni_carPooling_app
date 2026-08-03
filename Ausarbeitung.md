@@ -124,7 +124,7 @@ Gründe für die Auswahl:
 
 ---
 ## 3.1 Datenbankstruktur
-![Screenshot_2026-08-01_14-42-32.png](Screenshot_2026-08-01_14-42-32.png)
+![Screenshot_2026-08-01_14-42-32.png](Er_Diagramm.png)
 
 ### Primär- und Fremdschlüssel
 
@@ -720,3 +720,37 @@ Enthält:
 - wichtigste Ansichten
 - optionale Installationsanleitung
 - API-Dokumentation
+
+## A.1 Screenshots der fertigen Anwendung
+
+### Startseite
+
+![Screenshot der Startseite](screenshots/Startseite.png)
+
+### Registrierung
+
+![Screenshot der Registrierung](screenshots/Registrierung.png)
+
+### Home mit Karte
+
+![Screenshot der Home-Ansicht mit Karte](screenshots/Home_mit_Karte.png)
+
+### Fahrt erstellen
+
+![Screenshot der Fahrtensuche](screenshots/Fahrt_finden.png)
+
+### Profil
+
+![Screenshot der Fahrt-Erstellung](screenshots/Fahrt_erstellen.png)
+
+### Profil Darkmode
+
+![Screenshot des Chats](screenshots/Chat.png)
+
+### Chat
+
+![Screenshot des Profils](screenshots/Profil.png)
+
+### Fahrt finden
+
+![Screenshot der Anwendung im Darkmode](screenshots/Darkmode.png)
