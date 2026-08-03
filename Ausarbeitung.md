@@ -1,11 +1,11 @@
 # Webapplikation SS2026 CampusRide
 
-**Autoren:** Marlin Wießenenberg, Paul Boos, Robin Dietsche
+**Autoren:** Marlin Wießenberg, Paul Boos, Robin Dietsche
 **Datum:** 24. Juli 2026
 
 ---
 
-# 1.Einleitung
+# 1. Einleitung
 
 
 
@@ -15,11 +15,11 @@ Da wir uns entschieden haben, dass CampusRide (wenn es ein echtes Produkt wäre)
 
 Der Hauptzweck dieser Fahrten ist der regelmäßige Transit von und zum Campus. Andere Fahrten sind jedoch ebenfalls möglich.
 
-CampusRide verfügt über einen In-App-Chat, der die Verbindung zwischen Fahrern und Mitfahrern einfacher und sicherer macht. Dieser ist über den Avater des Fahrers auf jedes Fahrt-Listing erreichbar.
+CampusRide verfügt über einen In-App-Chat, der die Verbindung zwischen Fahrern und Mitfahrern einfacher und sicherer macht. Dieser ist über den Avatar des Fahrers auf jedes Fahrt-Listing erreichbar.
 
 Bei der Suche und beim Anbieten von Fahrten wird OpenStreetMap integriert, um die Fahrt visuell darzustellen. Diese Routenansicht basiert ausschließlich auf Start- und Endpunkt der Fahrt und ist nicht bindend.
 
-Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrierung die email provider mit einer öffentlich verfügbaren Datenbank verglichen.
+Um zu garantieren, dass nur Studenten die Webapp benutzen, wird bei der Registrierung der E-Mail-Provider mit einer öffentlich verfügbaren Datenbank verglichen.
 
 
 
@@ -54,7 +54,7 @@ Um zu garantieren das nur Studenten die webapp benutzen wird bei der Registrieru
 Aus der Aufgabe:
 - HTML, CSS
 - TypeScript
-- Npm
+- npm
 - React
 - Prisma
 
@@ -75,21 +75,21 @@ Datenbank
 
 Gründe für die Auswahl:
 - In der Vorlesung behandelt
-- Sql können wir schon
+- SQL können wir schon
 - braucht keinen eigenen Datenbankserver wie PostgreSQL
 
 ### OpenStreetMap
-OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet nicht für die Fahrt auswahl
+OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet, nicht für die Fahrtauswahl
 
 Gründe für die Auswahl:
 
-- kostenlos anders als die api von google maps
+- kostenlos, anders als die API von Google Maps
 - hilfreiche Tools die wir ursprünglich für eine verbesserte Suche gebraucht hätten
-- mir ist nix anderes eingefallen auser OSM und google maps
+- mir ist nichts anderes eingefallen außer OSM und Google Maps
 
 ### express-rate-limit
 
-`express-rate-limit` ist installiert wird aber nicht verwendet(hat mich beim testen von anderen Sachen aufgeregt)
+`express-rate-limit` ist installiert, wird aber nicht verwendet (hat mich beim Testen von anderen Sachen aufgeregt)
 
 Es sollte die Anwendung vor Denial-of-Service-Angriffen schützen.
 
@@ -102,8 +102,8 @@ bcryptjs übernimmt das Hashing der Passwörter mit einem Salt-Faktor von 10 Run
 
 ### academic-email-verifier
 Gründe für die Auswahl:
-- Locale Liste oder Datenbank wäre ungenau und müsste manuel angepasst werden auf änderungen
-- öffentlich und Kostenlos
+- Locale Liste oder Datenbank wäre ungenau und müsste manuell auf Änderungen angepasst werden
+- öffentlich und kostenlos
 
 Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z.B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
 
@@ -120,7 +120,7 @@ Gründe für die Auswahl:
 
 ---
 
-# 3.Architektur
+# 3. Architektur
 
 ---
 ## 3.1 Datenbankstruktur
@@ -138,9 +138,9 @@ Gründe für die Auswahl:
 | ChatMessage | `id` | `senderId` | User.`id` |
 
 ### Besonderheiten
-- 2 Variablen zum speichern jeder Positon, da ein ortsname nicht immer zu der gleichen position zeigt. Wir speichern also den Namen und die Kordinaten des Punktes
+- 2 Variablen zum Speichern jeder Position, da ein Ortsname nicht immer zu der gleichen Position zeigt. Wir speichern also den Namen und die Koordinaten des Punktes
 - extra = Fahrt Beschreibung
-- Type ist ein String für uhrsprünglich geplannte Bild nachrichten
+- Type ist ein String für ursprünglich geplante Bildnachrichten
 - alle Zeiten sind String
 
 ---
@@ -302,7 +302,7 @@ sequenceDiagram
 Ergänzend greift das Frontend direkt vom Browser aus auf externe Dienste zu: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über das eigene Backend.
 
 
-# 4.Umsetzung
+# 4. Umsetzung
 
 ## Meilenstein 1 – Projektstart und Fundament
 
@@ -513,21 +513,23 @@ Die gesamte Anwendung kann aus dem Projekt-Root mit folgendem Befehl gebaut und 
 docker compose up --build
 ```
 
+Vor dem ersten Start muss im Projekt-Root eine `.env`-Datei angelegt werden, die den `JWT_SECRET` enthält (Vorlage: `.env.example`). Docker Compose liest diese Datei automatisch ein und reicht den Wert per Variablen-Interpolation an den Backend-Container weiter (`JWT_SECRET: ${JWT_SECRET}`). Der `JWT_SECRET` steht damit nicht im Repository, sondern nur lokal auf dem Rechner der Entwickler. Er wird über `.gitignore` vom Versionsverwaltungssystem ausgeschlossen. Ein zufälliger Wert kann unter anderem mit `openssl rand -base64 32` erzeugt werden.
+
 Danach ist das Frontend unter `http://localhost:5173` und das Backend unter `http://localhost:3001` erreichbar. Um den Build-Kontext klein zu halten, schließen `.dockerignore`-Dateien unter anderem `node_modules`, lokale Umgebungsdateien, Build-Ausgaben und die lokale Entwicklungsdatenbank aus.
 
 ### Performance- und HTTP-Aspekt
 
 Als konkrete Performance-Maßnahme wird die Anzahl externer HTTP-Anfragen bei der Routendarstellung begrenzt. Während ein Benutzer Start- und Zieladresse eingibt, ändern sich die Eingabewerte mit nahezu jedem Tastendruck. Ohne Begrenzung würde jede dieser Änderungen unmittelbar neue Anfragen an den Geocoding-Dienst von OpenStreetMap und anschließend an den Routing-Dienst OSRM auslösen.
 
-Der Hook `useDebounce` verzögert die Verarbeitung der Adressen deshalb um 800 Millisekunden. Nur wenn innerhalb dieses Zeitraums keine weitere Eingabe erfolgt, werden die Adressen geocodiert und die Route neu geladen. Dadurch werden unnötige Netzwerkanfragen vermieden, externe Dienste weniger belastet und die Benutzeroberfläche muss seltener auf Zwischenergebnisse reagieren. Dies haben wurde schon in Meilenstein 2 implementiert da uns damals häufig die OSM Api gesperrt wurde.
+Der Hook `useDebounce` verzögert die Verarbeitung der Adressen deshalb um 800 Millisekunden. Nur wenn innerhalb dieses Zeitraums keine weitere Eingabe erfolgt, werden die Adressen geocodiert und die Route neu geladen. Dadurch werden unnötige Netzwerkanfragen vermieden, externe Dienste weniger belastet und die Benutzeroberfläche muss seltener auf Zwischenergebnisse reagieren. Das wurde schon in Meilenstein 2 implementiert, da uns damals häufig die OSM-API gesperrt wurde.
 
 Ergänzend werden in mehreren Komponenten abgeleitete Daten mit `useMemo` berechnet. Dies betrifft beispielsweise die gefilterte Fahrtenliste und die zum ausgewählten Chatkontakt gehörenden Nachrichten. Die Berechnung wird dadurch nur erneut ausgeführt, wenn sich die jeweils relevanten Eingangsdaten ändern. Als M4-Performance-Aspekt steht jedoch vor allem das Debouncing im Vordergrund, da es unmittelbar die Anzahl der HTTP-Anfragen reduziert.
 
 ### 5.Testdaten und Qualitätssicherung
 
-Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert um uns zeit beim debuggen zu sparen da wir bei den vielen änderungen an der Datenbank um den Chat funktionsfähig zu machen viele seltsame bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 17 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte, fehlende Authentifizierung und der Datenbankstatus geprüft.
+Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert, um uns Zeit beim Debuggen zu sparen, da wir bei den vielen Änderungen an der Datenbank, um den Chat funktionsfähig zu machen, viele seltsame Bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 17 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte, fehlende Authentifizierung und der Datenbankstatus geprüft.
 
-Ein umfangreicher Integrationstest bildet beispielsweise den Ablauf ab, bei dem ein Mitfahrer auf das Fahrerprofil einer Fahrt klickt, ein Chatkontakt entsteht und anschließend Nachrichten ausgetauscht werden können. Die Tests prüfen damit nicht nur isolierte Endpunkte, sondern auch zentrale Abläufe der fertigen Anwendung. Viele von denen waren frühere Problem Fälle.
+Ein umfangreicher Integrationstest bildet beispielsweise den Ablauf ab, bei dem ein Mitfahrer auf das Fahrerprofil einer Fahrt klickt, ein Chatkontakt entsteht und anschließend Nachrichten ausgetauscht werden können. Die Tests prüfen damit nicht nur isolierte Endpunkte, sondern auch zentrale Abläufe der fertigen Anwendung. Viele davon waren frühere Problemfälle.
 
 ---
 # 5. Testing und Qualitätssicherung
@@ -607,13 +609,13 @@ Insgesamt kombiniert CampusRide automatisierte API- und Integrationstests mit st
 
 ---
 
-# 6.Betrieb
+# 6. Betrieb
 
 ## Starten der Anwendung
 
 ### Variante 1: Docker Compose
 
-
+Vor dem Start wird im Projekt-Root eine `.env`-Datei benötigt (Vorlage: `.env.example`), die den `JWT_SECRET` enthält.
 
 ```bash
 docker compose up --build
@@ -624,7 +626,7 @@ Dies startet zwei Container:
 - **Client** auf `http://localhost:5173`
 
 Das Backend führt bei jedem Start automatisch Prisma-Migrationen aus und initialisiert Seed-Daten.
-4 Acounts und eine Fahrt. Loggin Daten:
+4 Accounts und eine Fahrt. Login-Daten:
 
 --- User 1: Lisa Müller ---
 Email:      lisa.m@htwg-konstanz.de
@@ -657,7 +659,7 @@ npm install
 npm run dev
 ```
 Erreichbar unter `http://localhost:5173`.
-Selbe Loggin Daten wie oben
+Selbe Login-Daten wie oben
 
 **Backend:**
 ```bash
@@ -678,18 +680,25 @@ npm test
 
 ---
 
-# 7.Reflexion & Fazit
+# 7. Reflexion & Fazit
 
 Diskussion über:
 
 - Was lief gut?
 - Was würde beim nächsten Mal anders gemacht werden?
   - Echtzeit-Chat:
-  - OpenStreetMap wird aktuell nicht zur auswahl von  Start- und Endpunkt verwendet wäre eine mögliche verbesserung
-  - Chat könnte gruppenchat für die fahrt sein wäre aber komplexer
+  - OpenStreetMap wird aktuell nicht zur Auswahl von Start- und Endpunkt verwendet, wäre eine mögliche Verbesserung
+  - Chat könnte Gruppenchat für die Fahrt sein, wäre aber komplexer
   - bessere Suche
-- man kann fahrteb nicht mehr löschen
-nicht mehr zeugs so übel aufschieben
+  - Fehlende Wert-Validierung: negative Sitzplätze oder Preise verhindern, Passwort-Mindestlänge einführen, Stringlängen begrenzen
+  - Commit-Historie professionalisieren: sprechende Messages statt „Docker finaly fucking works" oder „bug fixes round 2", AI-Agenten-Commits kennzeichnen
+  - Gesplittete Git-Identität (`robin` vs. `Robin`) über eine `.mailmap`-Datei bereinigen
+  - Flache Stack-Begründungen wie „In der Vorlesung behandelt" oder „mir ist nichts anderes eingefallen außer OSM und Google Maps" durch echte Abwägungen ersetzen
+  - Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden
+  - Preis-Modell: Preis pro Fahrt statt `pricePerKm` im Profil
+  - Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können
+- man kann Fahrten nicht mehr löschen
+nicht mehr Zeugs so übel aufschieben
 
 - Was wurde gelernt?
 

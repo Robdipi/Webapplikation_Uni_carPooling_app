@@ -23,14 +23,28 @@ Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern.
 - **Kein Gruppenchat**: Chats sind immer 1:1 zwischen zwei Personen. Ein Gruppenchat für alle Mitfahrer einer Fahrt wäre wünschenswert, aber deutlich komplexer.
 - **Eingeschränkte Suchfunktion**: Die Suche filtert nur nach Start, Ziel, Datum und Uhrzeit. Erweiterte Filter (z. B. maximale Entfernung, Preisbereich, Zwischenstopps) sind nicht vorhanden.
 - **express-rate-limit nicht aktiviert**: Die Bibliothek `express-rate-limit` ist installiert, wird aber nicht verwendet. Dadurch fehlt ein Schutz vor DoS-Angriffen auf die API.
-- **Kein Integrietest Zahlungsystem**: wir überlassen dem user wie er sich um die zahlung kümmert
-- **Schlechtes Preis System**: Preis ist in den Profil einstellungen als Kilometer preis anstatt bei jeder Fahrt mit dabei.
-- **Listen würden probleme haben bei vielen Seiten**: Wir haben keine Seiten von den ListenEinträge die wir haben es müssen also alle existierenden Fahrten gleichzeit angezeigt werden.
+- **Kein integriertes Zahlungssystem**: wir überlassen dem User, wie er sich um die Zahlung kümmert
+- **Schlechtes Preis System**: Preis ist in den Profileinstellungen als Kilometerpreis anstatt bei jeder Fahrt mit dabei.
+- **Keine Pagination**: Alle existierenden Fahrten werden auf einmal geladen. Bei vielen Fahrten wird die Liste unübersichtlich und die Antwort langsam.
+- **Fehlende Wert-Validierung**: Negative Sitzplätze oder Preise sind möglich, es gibt keine Passwort-Mindestlänge und unbegrenzte Stringlängen.
+- **Keine Buchungs-/Reservierungslogik**: Sitze existieren als Feld, werden aber nie reserviert.
+- **Unprofessionelle Commit-Historie**: Messages wie „Docker finaly fucking works" oder „bug fixes round 2"
+- **Flache Stack-Begründungen**: Gründe wie „In der Vorlesung behandelt" oder „mir ist nichts anderes eingefallen außer OSM und Google Maps" statt echter Abwägung.
 ## Demo-Video
 
 https://youtu.be/Xr-0pmRnFbQ
 
 ## Setup mit Docker Compose (empfohlen)
+
+Vor dem ersten Start wird im Projekt-Root eine `.env`-Datei benötigt, die den `JWT_SECRET` enthält (wird nie committet, `.gitignore`):
+
+```bash
+cp .env.example .env
+# JWT_SECRET in der .env mit einem zufälligen Wert füllen, z. B.:
+openssl rand -base64 32
+```
+
+Anschließend starten:
 
 ```bash
 docker compose up --build
