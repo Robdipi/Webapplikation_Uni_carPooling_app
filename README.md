@@ -209,7 +209,7 @@ Die App läuft unter `http://localhost:5173`.
 | JWT konsequent eingesetzt | `react-app/server/src/app.ts`; `react-app/src/contexts/usercontext.tsx`; `react-app/src/api/authApi.ts` | JWT-Erzeugung in Z. 46-56; Tokenprüfung in Z. 73-105; Token im Frontend in `usercontext.tsx` Z. 118-147, Z. 169-172, Z. 200-203; `Authorization`-Header in `authApi.ts` Z. 78-83 |
 | Geschützter Endpunkt | `react-app/server/src/app.ts` | `GET /api/auth/me` nutzt `authenticateToken` in Z. 283-319 |
 | Geschützte Frontend-Routen | `react-app/src/routes/ProtectedRoute.tsx`; `react-app/src/routes/AppRoutes.tsx` | Nicht eingeloggte User werden zu `/` geleitet in `ProtectedRoute.tsx` Z. 9-21; `/home`, `/chat`, `/create-ride`, `/find-ride`, `/profile` sind geschützt |
-| Tests | `react-app/server/src/app.test.ts`; `react-app/server/package.json` | 21 API-Tests für Health, Auth, Rides, Chats, Berechtigungen; Skripte `npm test` und `npm run test:watch` |
+| Tests | `react-app/server/src/app.test.ts`; `react-app/server/package.json` | 21 API-Tests für Auth, Rides, Chats, Berechtigungen, Integration und Datenbankstatus; Skripte `npm test` und `npm run test:watch` |
 | Keine echten Secrets im Repository | `.gitignore`; `react-app/server/.env.example` | `.env` wird ignoriert; `.env.example` enthält nur lokale Beispielwerte |
 
 ### Kurzbeschreibung der Authentifizierung

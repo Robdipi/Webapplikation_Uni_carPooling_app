@@ -100,7 +100,6 @@ Gründe für die Auswahl:
 
 # 3. Architektur
 
----
 ## 3.1 Datenbankstruktur
 ![Screenshot_2026-08-01_14-42-32.png](Er_Diagramm.png)
 
@@ -117,7 +116,7 @@ Gründe für die Auswahl:
 
 ### Besonderheiten
 - 2 Variablen zum Speichern jeder Position, da ein Ortsname nicht immer zu der gleichen Position zeigt. Wir speichern also den Namen und die Koordinaten des Punktes
-- extra = Fahrt Beschreibung
+- extra = Fahrt Beschreibung optional
 - Type ist ein String für ursprünglich geplante Bildnachrichten
 - alle Zeiten sind String
 
@@ -696,8 +695,6 @@ Geplanter Umfang:
 ---
 
 # Anhang
-
-Der Anhang enthält Screenshots der fertigen Anwendung (A.1), eine kurze Installationsanleitung (A.2) und eine Übersicht der REST-API (A.3).
 
 ## A.1 Screenshots der fertigen Anwendung
 
