@@ -175,7 +175,6 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
         try {
             const created = await sendMessageRequest(
                 selectedContact.id,
-                currentUser.id,
                 "text",
                 trimmedContent,
                 sentAt,
@@ -287,6 +286,7 @@ export function ChatContextProvider({ children }: ChatContextProviderProps) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useChatContext(): ChatContextValue {
     const context = useContext(ChatContext);
     if (context === undefined) {

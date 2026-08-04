@@ -149,9 +149,9 @@ Die Anwendung ist als Single Page Application umgesetzt. SSR oder SSG ist nicht 
 | DELETE | `/api/rides/:id` | Fahrt löschen (nur Fahrer) | geschützt |
 | GET | `/api/chat/contacts` | Chat-Kontakte des eingeloggten Users (inkl. Nachrichten) | geschützt |
 | POST | `/api/chat/contacts` | Chat-Kontakt anlegen (`userId` im Body) | geschützt |
-| POST | `/api/chat/messages` | Nachricht senden | geschützt |
-| DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines Kontakts leeren | geschützt |
-| DELETE | `/api/chat/contacts/:contactId` | Kontakt samt Nachrichten löschen | geschützt |
+| POST | `/api/chat/messages` | Nachricht senden (Absender aus JWT, nur im eigenen Kontakt) | geschützt |
+| DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines eigenen Kontakts leeren | geschützt |
+| DELETE | `/api/chat/contacts/:contactId` | Eigenen Kontakt samt Nachrichten löschen | geschützt |
 
 ## M1 – Projektstart & Fundament
 
@@ -209,7 +209,7 @@ Die App läuft unter `http://localhost:5173`.
 | JWT konsequent eingesetzt | `react-app/server/src/app.ts`; `react-app/src/contexts/usercontext.tsx`; `react-app/src/api/authApi.ts` | JWT-Erzeugung in Z. 46-56; Tokenprüfung in Z. 73-105; Token im Frontend in `usercontext.tsx` Z. 118-147, Z. 169-172, Z. 200-203; `Authorization`-Header in `authApi.ts` Z. 78-83 |
 | Geschützter Endpunkt | `react-app/server/src/app.ts` | `GET /api/auth/me` nutzt `authenticateToken` in Z. 283-319 |
 | Geschützte Frontend-Routen | `react-app/src/routes/ProtectedRoute.tsx`; `react-app/src/routes/AppRoutes.tsx` | Nicht eingeloggte User werden zu `/` geleitet in `ProtectedRoute.tsx` Z. 9-21; `/home`, `/chat`, `/create-ride`, `/find-ride`, `/profile` sind geschützt |
-| Tests | `react-app/server/src/app.test.ts`; `react-app/server/package.json` | 17 API-Tests für Health, Auth, Rides, Chats, Berechtigungen; Skripte `npm test` und `npm run test:watch` |
+| Tests | `react-app/server/src/app.test.ts`; `react-app/server/package.json` | 21 API-Tests für Health, Auth, Rides, Chats, Berechtigungen; Skripte `npm test` und `npm run test:watch` |
 | Keine echten Secrets im Repository | `.gitignore`; `react-app/server/.env.example` | `.env` wird ignoriert; `.env.example` enthält nur lokale Beispielwerte |
 
 ### Kurzbeschreibung der Authentifizierung

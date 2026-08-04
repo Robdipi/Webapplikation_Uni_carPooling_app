@@ -670,40 +670,42 @@ app.post("/api/chat/contacts", authenticateToken, async (req: AuthenticatedReque
 });
 
 app.post("/api/chat/messages", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-    const { contactId, senderId, type, content, sentAt } = req.body as {
+    const { contactId, type, content, sentAt } = req.body as {
         contactId?: string;
-        senderId?: string;
         type?: string;
         content?: string;
         sentAt?: string;
     };
 
-    if (
-        contactId === undefined ||
-        senderId === undefined ||
-        type === undefined ||
-        content === undefined ||
-        sentAt === undefined
-    ) {
+    if (contactId === undefined || type === undefined || content === undefined || sentAt === undefined) {
         res.status(400).json({ error: "Alle Nachrichtenfelder werden benötigt." });
         return;
     }
 
+    const senderId = req.user!.userId;
+
     try {
+        const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
+        if (contact === null) {
+            res.status(404).json({ error: "Kontakt wurde nicht gefunden." });
+            return;
+        }
+        if (contact.ownerId !== req.user!.userId) {
+            res.status(403).json({ error: "Keine Berechtigung, in diesem Chat zu schreiben." });
+            return;
+        }
+
         const message = await prisma.chatMessage.create({
             data: { contactId, senderId, type, content, sentAt },
         });
 
-        const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
-        if (contact !== null) {
-            const reverse = await prisma.chatContact.findFirst({
-                where: { ownerId: contact.userId, userId: contact.ownerId },
+        const reverse = await prisma.chatContact.findFirst({
+            where: { ownerId: contact.userId, userId: contact.ownerId },
+        });
+        if (reverse !== null) {
+            await prisma.chatMessage.create({
+                data: { contactId: reverse.id, senderId, type, content, sentAt },
             });
-            if (reverse !== null) {
-                await prisma.chatMessage.create({
-                    data: { contactId: reverse.id, senderId, type, content, sentAt },
-                });
-            }
         }
 
         res.status(201).json({ message });
@@ -718,14 +720,20 @@ app.delete("/api/chat/messages/:contactId", authenticateToken, async (req: Authe
 
     try {
         const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
+        if (contact === null) {
+            res.status(404).json({ error: "Kontakt wurde nicht gefunden." });
+            return;
+        }
+        if (contact.ownerId !== req.user!.userId) {
+            res.status(403).json({ error: "Keine Berechtigung, diesen Chat zu löschen." });
+            return;
+        }
         await prisma.chatMessage.deleteMany({ where: { contactId } });
-        if (contact !== null) {
-            const reverse = await prisma.chatContact.findFirst({
-                where: { ownerId: contact.userId, userId: contact.ownerId },
-            });
-            if (reverse !== null) {
-                await prisma.chatMessage.deleteMany({ where: { contactId: reverse.id } });
-            }
+        const reverse = await prisma.chatContact.findFirst({
+            where: { ownerId: contact.userId, userId: contact.ownerId },
+        });
+        if (reverse !== null) {
+            await prisma.chatMessage.deleteMany({ where: { contactId: reverse.id } });
         }
         res.json({ success: true });
     } catch (error) {
@@ -739,14 +747,20 @@ app.delete("/api/chat/contacts/:contactId", authenticateToken, async (req: Authe
 
     try {
         const contact = await prisma.chatContact.findUnique({ where: { id: contactId } });
-        if (contact !== null) {
-            const reverse = await prisma.chatContact.findFirst({
-                where: { ownerId: contact.userId, userId: contact.ownerId },
-            });
-            if (reverse !== null) {
-                await prisma.chatMessage.deleteMany({ where: { contactId: reverse.id } });
-                await prisma.chatContact.delete({ where: { id: reverse.id } });
-            }
+        if (contact === null) {
+            res.status(404).json({ error: "Kontakt wurde nicht gefunden." });
+            return;
+        }
+        if (contact.ownerId !== req.user!.userId) {
+            res.status(403).json({ error: "Keine Berechtigung, diesen Kontakt zu löschen." });
+            return;
+        }
+        const reverse = await prisma.chatContact.findFirst({
+            where: { ownerId: contact.userId, userId: contact.ownerId },
+        });
+        if (reverse !== null) {
+            await prisma.chatMessage.deleteMany({ where: { contactId: reverse.id } });
+            await prisma.chatContact.delete({ where: { id: reverse.id } });
         }
         await prisma.chatMessage.deleteMany({ where: { contactId } });
         await prisma.chatContact.delete({ where: { id: contactId } });

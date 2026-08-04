@@ -22,3 +22,6 @@ react-app/server/prisma/dev.db-journal
 
 # Docker
 data/
+
+# Interne Referenz-Dokumente (nicht für GitHub)
+reffrences/

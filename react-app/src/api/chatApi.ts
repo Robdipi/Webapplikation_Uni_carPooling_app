@@ -60,7 +60,6 @@ export async function createChatContactRequest(
 
 export async function sendMessageRequest(
     contactId: string,
-    senderId: string,
     type: string,
     content: string,
     sentAt: string,
@@ -72,7 +71,7 @@ export async function sendMessageRequest(
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ contactId, senderId, type, content, sentAt }),
+        body: JSON.stringify({ contactId, type, content, sentAt }),
     });
 
     if (!response.ok) {

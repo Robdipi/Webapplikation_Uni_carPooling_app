@@ -114,6 +114,7 @@ export function RideContextProvider({ children }: RideContextProviderProps) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRideContext(): RideContextValue {
     const context = useContext(RideContext);
 

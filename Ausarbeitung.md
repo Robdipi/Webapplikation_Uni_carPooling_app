@@ -527,7 +527,7 @@ Ergänzend werden in mehreren Komponenten abgeleitete Daten mit `useMemo` berech
 
 ### 5.Testdaten und Qualitätssicherung
 
-Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert, um uns Zeit beim Debuggen zu sparen, da wir bei den vielen Änderungen an der Datenbank, um den Chat funktionsfähig zu machen, viele seltsame Bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 17 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte, fehlende Authentifizierung und der Datenbankstatus geprüft.
+Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert, um uns Zeit beim Debuggen zu sparen, da wir bei den vielen Änderungen an der Datenbank, um den Chat funktionsfähig zu machen, viele seltsame Bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 21 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte samt Ownership-Checks, fehlende Authentifizierung und der Datenbankstatus geprüft.
 
 Ein umfangreicher Integrationstest bildet beispielsweise den Ablauf ab, bei dem ein Mitfahrer auf das Fahrerprofil einer Fahrt klickt, ein Chatkontakt entsteht und anschließend Nachrichten ausgetauscht werden können. Die Tests prüfen damit nicht nur isolierte Endpunkte, sondern auch zentrale Abläufe der fertigen Anwendung. Viele davon waren frühere Problemfälle.
 
@@ -540,7 +540,7 @@ Für die finale Version von CampusRide wurden die automatisierten Backend-Tests 
 
 Die Tests dienen damit nicht nur dazu, die Funktionsfähigkeit einzelner Endpunkte einmalig nachzuweisen. Sie sollen vor allem sicherstellen, dass bereits funktionierende Abläufe nach Änderungen am Backend weiterhin korrekt arbeiten und keine unbeabsichtigten Regressionen entstehen. Der Schwerpunkt liegt auf automatisierten API- und Integrationstests, da zentrale Funktionen wie Registrierung, Fahrtenverwaltung und Chat erst durch das Zusammenspiel von Express, Authentifizierung, Prisma und SQLite vollständig geprüft werden können.
 
-Die automatisierten Tests befinden sich in `react-app/server/src/app.test.ts`. Die finale Testsuite umfasst 17 Testfälle und geht damit deutlich über die in Meilenstein 3 geforderten drei bis fünf aussagekräftigen Tests hinaus. Geprüft werden insbesondere Registrierung und Authentifizierung, die CRUD-Operationen der Fahrtenverwaltung, Berechtigungsprüfungen, Chatfunktionen, fehlende oder ungültige Eingaben sowie der Datenbankstatus.
+Die automatisierten Tests befinden sich in `react-app/server/src/app.test.ts`. Die finale Testsuite umfasst 21 Testfälle und geht damit deutlich über die in Meilenstein 3 geforderten drei bis fünf aussagekräftigen Tests hinaus. Geprüft werden insbesondere Registrierung und Authentifizierung, die CRUD-Operationen der Fahrtenverwaltung, Berechtigungsprüfungen, Chatfunktionen samt Ownership-Checks, fehlende oder ungültige Eingaben sowie der Datenbankstatus.
 
 ### 5.2 Werkzeuge, Konfiguration und Ausführung
 
@@ -572,6 +572,8 @@ cd react-app/server
 npm test
 ```
 
+Damit Vitest ausschließlich die Quelldateien und nicht den kompilierten `dist/`-Ordner testet, ist die Suite in `server/vitest.config.ts` auf `src/**/*.test.ts` beschränkt. Dadurch bleibt die Anzahl der Testläufe deterministisch (21 Tests) und wird nicht durch veraltete Build-Artefakte verdoppelt.
+
 Während der Entwicklung kann alternativ `npm run test:watch` verwendet werden. Vitest bleibt dabei aktiv und führt die Tests nach Änderungen erneut aus. Damit ist die in Meilenstein 3 geforderte Ausführung über `npm test` eindeutig dokumentiert.
 
 Die einzelnen Testfälle orientieren sich am Schema **Arrange – Act – Assert**. Zunächst werden die benötigten Ausgangsdaten vorbereitet, beispielsweise ein Benutzer registriert und ein JWT erzeugt. Anschließend wird die zu prüfende Aktion über einen HTTP-Request ausgeführt. Abschließend kontrollieren Assertions den Statuscode, die Antwortdaten und bei Bedarf den Zustand der Datenbank. Hilfsfunktionen wie `registerAndLogin()` und `rideData()` reduzieren Wiederholungen und sorgen für einheitliche Testdaten.
@@ -586,7 +588,7 @@ Die Tests zur **Fahrtenverwaltung** decken die zentralen CRUD-Operationen ab. Ei
 
 Weitere Tests behandeln fehlerhafte oder unberechtigte Zugriffe. Das Erstellen einer Fahrt ohne JWT muss mit `401 Unauthorized` scheitern. Fehlende Fahrtdaten führen zu `400 Bad Request`. Außerdem wird sichergestellt, dass ein angemeldeter Benutzer die Fahrt eines anderen Benutzers nicht verändern darf; die API antwortet hier mit `403 Forbidden`. Ein erfolgreicher `PUT`-Request prüft dagegen, ob Sitzplatzzahl und Preis einer eigenen Fahrt korrekt aktualisiert werden.
 
-Der Bereich **Chat** testet den vollständigen Ablauf vom Erstellen eines Kontakts bis zum Austausch und Löschen von Nachrichten. Hierfür werden zwei Benutzer registriert, ein Chatkontakt angelegt und eine Nachricht gesendet. Die Nachricht wird anschließend direkt in der SQLite-Datenbank geprüft. Weitere Tests kontrollieren das Laden mehrerer Nachrichten, das Leeren eines Chats und das Entfernen eines Kontakts einschließlich der zugehörigen Nachrichten. Dadurch wird zugleich die relationale Datenintegrität des Prisma-Schemas überprüft.
+Der Bereich **Chat** testet den vollständigen Ablauf vom Erstellen eines Kontakts bis zum Austausch und Löschen von Nachrichten. Hierfür werden zwei Benutzer registriert, ein Chatkontakt angelegt und eine Nachricht gesendet. Die Nachricht wird anschließend direkt in der SQLite-Datenbank geprüft. Weitere Tests kontrollieren das Laden mehrerer Nachrichten, das Leeren eines Chats und das Entfernen eines Kontakts einschließlich der zugehörigen Nachrichten. Zusätzlich wird die Ownership-Prüfung abgesichert: Nachrichten an fremde Kontakte, das Leeren fremder Chats und das Löschen fremder Kontakte werden mit `403 Forbidden` abgelehnt. Dadurch wird zugleich die relationale Datenintegrität des Prisma-Schemas überprüft.
 
 Ein besonders anwendungsnaher Integrationstest bildet einen früheren Problemfall der Anwendung nach: Ein Fahrer erstellt eine Fahrt, ein Mitfahrer lädt die Fahrtenliste und klickt auf das Fahrerprofil. Dadurch wird ein Chatkontakt erzeugt, über den anschließend Nachrichten ausgetauscht werden können. Der Test verbindet Benutzerverwaltung, Fahrten und Chat in einem durchgängigen Szenario und prüft damit einen zentralen Ablauf der fertigen Anwendung.
 
@@ -598,11 +600,11 @@ Neben den automatisierten Laufzeittests wird die Codequalität durch **TypeScrip
 
 Auch der Frontend-Build enthält mit `"build": "tsc -b && vite build"` eine vorgeschaltete TypeScript-Prüfung. In `tsconfig.app.json` sind zusätzlich Regeln wie `noUnusedLocals`, `noUnusedParameters` und `noFallthroughCasesInSwitch` aktiviert. Damit werden ungenutzte Variablen, überflüssige Parameter und problematische `switch`-Strukturen bereits vor der Ausführung erkannt.
 
-Für die statische Analyse des Frontends wird außerdem **ESLint** eingesetzt. Die Konfiguration in `react-app/eslint.config.js` kombiniert empfohlene Regeln für JavaScript und TypeScript mit den Plugins `react-hooks` und `react-refresh`. Dadurch können beispielsweise fehlerhafte Hook-Verwendungen, nicht verwendeter Code oder riskante Muster erkannt werden. Die Prüfung wird mit `npm run lint` gestartet.
+Für die statische Analyse des Frontends wird außerdem **ESLint** eingesetzt. Die Konfiguration in `react-app/eslint.config.js` kombiniert empfohlene Regeln für JavaScript und TypeScript mit den Plugins `react-hooks` und `react-refresh`. Dadurch können beispielsweise fehlerhafte Hook-Verwendungen, nicht verwendeter Code oder riskante Muster erkannt werden. Die Prüfung wird mit `npm run lint` gestartet und läuft im aktuellen Stand fehlerfrei (0 Errors, 0 Warnings).
 
 Ein weiterer Teil der Qualitätssicherung ist die konsequente **Validierung und Fehlerbehandlung**. Das Backend prüft Pflichtfelder bei Registrierung, Login, Fahrten und Chatnachrichten und antwortet mit semantisch passenden HTTP-Statuscodes. Unauthentifizierte Zugriffe werden mit `401`, fehlende Berechtigungen mit `403`, nicht vorhandene Ressourcen mit `404` und Konflikte wie doppelte E-Mail-Adressen mit `409` behandelt. Die Fehlerantworten enthalten strukturierte JSON-Nachrichten, die vom Frontend ausgewertet und sichtbar dargestellt werden.
 
-Zur Sicherheit und Datenqualität werden Passwörter mit bcrypt gehasht. Geschützte Endpunkte verlangen ein JWT im `Authorization`-Header und überprüfen dieses in der Middleware `authenticateToken`. Besitzprüfungen verhindern, dass Benutzer fremde Fahrten bearbeiten oder löschen. Das Prisma-Schema ergänzt diese Maßnahmen durch eindeutige Constraints für E-Mail-Adresse und Benutzername sowie durch definierte Relationen und Löschregeln zwischen Benutzern, Fahrten, Chatkontakten und Nachrichten. Umgebungsvariablen und Secrets werden über `.gitignore` vom Repository ausgeschlossen.
+Zur Sicherheit und Datenqualität werden Passwörter mit bcrypt gehasht. Geschützte Endpunkte verlangen ein JWT im `Authorization`-Header und überprüfen dieses in der Middleware `authenticateToken`. Besitzprüfungen verhindern, dass Benutzer fremde Fahrten bearbeiten oder löschen. Auch die Chat-Endpunkte prüfen die Ownership: Der Absender einer Nachricht wird aus dem verifizierten JWT abgeleitet (nicht aus dem Request-Body), und Nachrichten können nur an eigene Kontakte gesendet, eigene Chats geleert und eigene Kontakte gelöscht werden. Das Prisma-Schema ergänzt diese Maßnahmen durch eindeutige Constraints für E-Mail-Adresse und Benutzername sowie durch definierte Relationen und Löschregeln zwischen Benutzern, Fahrten, Chatkontakten und Nachrichten. Umgebungsvariablen und Secrets werden über `.gitignore` vom Repository ausgeschlossen.
 
 Insgesamt kombiniert CampusRide automatisierte API- und Integrationstests mit statischer Typprüfung, Linting, Eingabevalidierung, strukturierter Fehlerbehandlung, Authentifizierungsprüfungen und Datenbank-Constraints. Dadurch wird die Qualität über mehrere Ebenen der Full-Stack-Anwendung hinweg abgesichert.
 
@@ -685,8 +687,11 @@ npm test
 Diskussion über:
 
 - Was lief gut?
+- Paul hat gut für mich m3 ich hab dann auch m4 für ihn übernommen
 - Was würde beim nächsten Mal anders gemacht werden?
   - Echtzeit-Chat:
+  - keine regelmäßigen comits in M4 weil ich quasy wusste das ich(robin) nur alleine dran arbeiten werde
+  - 
   - OpenStreetMap wird aktuell nicht zur Auswahl von Start- und Endpunkt verwendet, wäre eine mögliche Verbesserung
   - Chat könnte Gruppenchat für die Fahrt sein, wäre aber komplexer
   - bessere Suche
@@ -699,8 +704,13 @@ Diskussion über:
   - Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können
 - man kann Fahrten nicht mehr löschen
 nicht mehr Zeugs so übel aufschieben
+- keine fahrten übersicht
+- schlechte Team arbeit
+- ahonestopinion.ts is a stupid joke if you stumble over it
+- 
 
 - Was wurde gelernt?
+- Ai reviews are extremly helpful did a boatload of them
 
 
 
@@ -754,3 +764,4 @@ Enthält:
 ### Fahrt finden
 
 ![Screenshot der Anwendung im Darkmode](screenshots/Darkmode.png)
+

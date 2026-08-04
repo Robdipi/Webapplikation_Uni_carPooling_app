@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/usercontext";
 import { type Ride, useRideContext } from "../../contexts/ridecontext";
@@ -121,7 +121,7 @@ const FindRidePage: React.FC = () => {
     });
     const [selectedRide, setSelectedRide] = useState<Ride | null>(rides[0] ?? null);
 
-    const handleChatWithDriver = async (driverId: string, _driverName: string) => {
+    const handleChatWithDriver = async (driverId: string) => {
         if (currentUser === null) {
             return;
         }
@@ -152,19 +152,10 @@ const FindRidePage: React.FC = () => {
         });
     }, [rides, criteria]);
 
-    useEffect(() => {
-        if (filteredRides.length === 0) {
-            setSelectedRide(null);
-            return;
-        }
-
-        if (
-            selectedRide === null ||
-            !filteredRides.some((ride) => ride.id === selectedRide.id)
-        ) {
-            setSelectedRide(filteredRides[0]);
-        }
-    }, [filteredRides, selectedRide]);
+    const effectiveSelectedRide =
+        selectedRide !== null && filteredRides.some((ride) => ride.id === selectedRide.id)
+            ? selectedRide
+            : filteredRides[0] ?? null;
 
     return (
         <div>
@@ -174,21 +165,21 @@ const FindRidePage: React.FC = () => {
                 <SearchBar onSearch={setCriteria} />
 
                 <div className="campusride-map-card">
-                    {selectedRide === null ? (
+                    {effectiveSelectedRide === null ? (
                         <div className="empty-state">Keine passende Fahrt gefunden.</div>
                     ) : (
                         <RouteMapFromCoords
-                            departureCoords={selectedRide.departureCoords}
-                            destinationCoords={selectedRide.destinationCoords}
+                            departureCoords={effectiveSelectedRide.departureCoords}
+                            destinationCoords={effectiveSelectedRide.destinationCoords}
                         />
                     )}
                 </div>
 
-                {selectedRide !== null && (
+                {effectiveSelectedRide !== null && (
                     <section className="selected-ride-summary">
                         <h3>Ausgewählte Fahrt</h3>
                         <p>
-                            {selectedRide.departureName} &rarr; {selectedRide.destinationName}
+                            {effectiveSelectedRide.departureName} &rarr; {effectiveSelectedRide.destinationName}
                         </p>
                     </section>
                 )}
@@ -199,7 +190,7 @@ const FindRidePage: React.FC = () => {
                         <RideCard
                             key={ride.id}
                             ride={ride}
-                            selected={selectedRide?.id === ride.id}
+                            selected={effectiveSelectedRide?.id === ride.id}
                             isOwnRide={currentUser !== null && ride.driverId === currentUser.id}
                             onSelect={setSelectedRide}
                             onChatWithDriver={handleChatWithDriver}

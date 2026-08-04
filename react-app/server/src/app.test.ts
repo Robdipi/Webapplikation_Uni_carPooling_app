@@ -454,6 +454,111 @@ describe("Chat", () => {
             .send({ contactId: "x", senderId: "y", type: "text", content: "hi", sentAt: "now" });
         expect(msgRes.status).toBe(401);
     });
+
+    it("rejects sending messages to a contact owned by another user", async () => {
+        const token = await registerAndLogin();
+        const otherToken = await registerAndLogin();
+
+        const otherMe = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${otherToken}`);
+        const otherUserId = otherMe.body.user.id as string;
+
+        // Alice creates a contact with Bob (owner: Alice)
+        const contactRes = await request(app)
+            .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`)
+            .send({ userId: otherUserId });
+        expect(contactRes.status).toBe(201);
+        const contactId = contactRes.body.contact.id as string;
+
+        // Bob tries to send a message into Alice's contact row
+        const msgRes = await request(app)
+            .post("/api/chat/messages")
+            .set("Authorization", `Bearer ${otherToken}`)
+            .send({
+                contactId,
+                senderId: otherUserId,
+                type: "text",
+                content: "Hallo?",
+                sentAt: "10:00",
+            });
+
+        expect(msgRes.status).toBe(403);
+        expect(msgRes.body.error).toBe("Keine Berechtigung, in diesem Chat zu schreiben.");
+
+        // Cleanup: Alice deletes the contact
+        await request(app)
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${token}`);
+    });
+
+    it("rejects clearing a chat owned by another user", async () => {
+        const token = await registerAndLogin();
+        const otherToken = await registerAndLogin();
+
+        const otherMe = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${otherToken}`);
+        const otherUserId = otherMe.body.user.id as string;
+
+        const contactRes = await request(app)
+            .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`)
+            .send({ userId: otherUserId });
+        expect(contactRes.status).toBe(201);
+        const contactId = contactRes.body.contact.id as string;
+
+        const clearRes = await request(app)
+            .delete(`/api/chat/messages/${contactId}`)
+            .set("Authorization", `Bearer ${otherToken}`);
+
+        expect(clearRes.status).toBe(403);
+        expect(clearRes.body.error).toBe("Keine Berechtigung, diesen Chat zu löschen.");
+
+        await request(app)
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${token}`);
+    });
+
+    it("rejects deleting a contact owned by another user", async () => {
+        const token = await registerAndLogin();
+        const otherToken = await registerAndLogin();
+
+        const otherMe = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${otherToken}`);
+        const otherUserId = otherMe.body.user.id as string;
+
+        const contactRes = await request(app)
+            .post("/api/chat/contacts")
+            .set("Authorization", `Bearer ${token}`)
+            .send({ userId: otherUserId });
+        expect(contactRes.status).toBe(201);
+        const contactId = contactRes.body.contact.id as string;
+
+        const deleteRes = await request(app)
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${otherToken}`);
+
+        expect(deleteRes.status).toBe(403);
+        expect(deleteRes.body.error).toBe("Keine Berechtigung, diesen Kontakt zu löschen.");
+
+        await request(app)
+            .delete(`/api/chat/contacts/${contactId}`)
+            .set("Authorization", `Bearer ${token}`);
+    });
+
+    it("returns 404 when sending a message to a non-existent contact", async () => {
+        const token = await registerAndLogin();
+        const response = await request(app)
+            .post("/api/chat/messages")
+            .set("Authorization", `Bearer ${token}`)
+            .send({ contactId: "does-not-exist", type: "text", content: "hi", sentAt: "now" });
+
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("Kontakt wurde nicht gefunden.");
+    });
 });
 
 // ── Avatar-Click creates Chat Contact ───────────────────────────────────────

@@ -158,7 +158,7 @@ const ChatPage: React.FC = () => {
             selectContact(state.selectedContactId);
             window.history.replaceState({}, "");
         }
-    }, [location.state]);
+    }, [location.state, selectContact]);
 
     const pendingDeleteContact = pendingDeleteId !== null
         ? contacts.find((c) => c.id === pendingDeleteId)
