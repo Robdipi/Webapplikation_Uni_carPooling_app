@@ -29,7 +29,6 @@ export interface CreateRideRequest {
     destinationCoords: ApiCoordinates;
     distanceKm: number;
     durationMinutes: number;
-    driverId: string;
     departureTime: string;
     seatsAvailable: number;
     price: number;
@@ -66,7 +65,6 @@ export async function createRideRequest(
             destinationLng: input.destinationCoords.lng,
             distanceKm: input.distanceKm,
             durationMinutes: input.durationMinutes,
-            driverId: input.driverId,
             departureTime: input.departureTime,
             seatsAvailable: input.seatsAvailable,
             price: input.price,

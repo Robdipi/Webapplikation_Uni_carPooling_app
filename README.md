@@ -144,7 +144,7 @@ Die Anwendung ist als Single Page Application umgesetzt. SSR oder SSG ist nicht 
 | GET | `/api/auth/me` | Gibt den aktuell eingeloggten User zurück | geschützt |
 | PUT | `/api/auth/me` | Aktualisiert das Profil des eingeloggten Users | geschützt |
 | GET | `/api/rides` | Liste aller Fahrten | öffentlich |
-| POST | `/api/rides` | Neue Fahrt anlegen | geschützt |
+| POST | `/api/rides` | Neue Fahrt anlegen (Fahrer aus JWT abgeleitet) | geschützt |
 | PUT | `/api/rides/:id` | Fahrt aktualisieren (nur Fahrer) | geschützt |
 | DELETE | `/api/rides/:id` | Fahrt löschen (nur Fahrer) | geschützt |
 | GET | `/api/chat/contacts` | Chat-Kontakte des eingeloggten Users (inkl. Nachrichten) | geschützt |

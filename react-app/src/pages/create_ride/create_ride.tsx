@@ -85,7 +85,7 @@ const InfoBox: React.FC = () => (
 
 const CreateRidePage: React.FC = () => {
     const { addRide } = useRideContext();
-    const { currentUser, profile } = useUserContext();
+    const { profile } = useUserContext();
     const navigate = useNavigate();
 
     const [form, setForm] = useState<RideForm>({
@@ -127,7 +127,6 @@ const CreateRidePage: React.FC = () => {
             destinationCoords,
             distanceKm,
             durationMinutes: calculateDurationMinutes(distanceKm),
-            driverId: currentUser?.id ?? "",
             departureTime: form.dateTime,
             seatsAvailable: form.seats,
             price: calculatePrice(distanceKm, profile.pricePerKm),

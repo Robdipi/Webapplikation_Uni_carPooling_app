@@ -7,8 +7,6 @@
 
 # 1. Einleitung
 
-
-
 CampusRide ist eine Ridesharing-Webapp ausschließlich für Studenten. Sie ermöglicht es, Fahrten anzubieten und zu finden sowie miteinander in Kontakt zu treten, um die genauen Details der Fahrt zu besprechen.
 
 Da wir uns entschieden haben, dass CampusRide (wenn es ein echtes Produkt wäre) ein Non-Profit-Projekt wäre, überlassen wir den Nutzern die vollständige Freiheit über die Preisverhandlungen.
@@ -21,31 +19,11 @@ Bei der Suche und beim Anbieten von Fahrten wird OpenStreetMap integriert, um di
 
 Um zu garantieren, dass nur Studenten die Webapp benutzen, wird bei der Registrierung der E-Mail-Provider mit einer öffentlich verfügbaren Datenbank verglichen.
 
+Die Idee zu CampusRide entstand aus einer alltäglichen Erfahrung: Viele Studierende pendeln täglich zwischen Wohnort und Campus, fahren dabei aber oft alleine und mit freien Sitzplätzen. Gleichzeitig ist die Anbindung vieler Wohnorte an die Hochschulen und die Universität eingeschränkt. CampusRide bringt diese Personen zusammen: Fahrer stellen freie Plätze ein, Mitfahrer finden passende Fahrten und klären die Details direkt im integrierten Chat. Die Konzentration auf Studierende unterscheidet CampusRide bewusst von allgemeinen Mitfahrplattformen – durch die akademische E-Mail-Verifizierung entsteht eine geschlossene, vertrauenswürdige Nutzergruppe.
 
+Das Projekt wird von drei Studierenden im Rahmen des Moduls „Webapplikationen" entwickelt. Ziel ist eine vollständige Full-Stack-Anwendung, die alle im Kurs behandelten Konzepte – von semantischem HTML über React und Context bis hin zu einem eigenen Express-Backend mit SQLite – in einem zusammenhängenden Produkt vereint. Die Anwendung soll nicht nur technisch sauber umgesetzt sein, sondern auch realistisch betreibbar: reproduzierbarer Start per Docker Compose, automatisierte Tests und eine dokumentierte API gehören deshalb von Anfang an dazu.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Die vorliegende Ausarbeitung dokumentiert den Entwicklungsprozess. Kapitel 2 begründet den Technologie-Stack, Kapitel 3 beschreibt die Architektur und die API, Kapitel 4 schildert die Umsetzung entlang der vier Meilensteine. Kapitel 5 erläutert das Vorgehen bei Tests und Qualitätssicherung, Kapitel 6 den Betrieb der Anwendung. Kapitel 7 schließt mit einer ehrlichen Reflexion ab – was gut gelaufen ist, was wir im Nachhinein anders machen würden und was wir aus dem Projekt gelernt haben. Der Anhang enthält Screenshots der fertigen Anwendung sowie eine Übersicht der API-Endpunkte.
 
 ---
 
@@ -240,7 +218,7 @@ Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten
 | GET | `/api/auth/me` | Aktuellen User abrufen | geschützt |
 | PUT | `/api/auth/me` | Profil aktualisieren | geschützt |
 | GET | `/api/rides` | Alle Fahrten abrufen | öffentlich |
-| POST | `/api/rides` | Fahrt erstellen | geschützt |
+| POST | `/api/rides` | Fahrt erstellen (Fahrer aus dem JWT) | geschützt |
 | PUT | `/api/rides/:id` | Fahrt aktualisieren | geschützt |
 | DELETE | `/api/rides/:id` | Fahrt löschen | geschützt |
 | GET | `/api/chat/contacts` | Chat-Kontakte abrufen | geschützt |
@@ -525,7 +503,7 @@ Der Hook `useDebounce` verzögert die Verarbeitung der Adressen deshalb um 800 M
 
 Ergänzend werden in mehreren Komponenten abgeleitete Daten mit `useMemo` berechnet. Dies betrifft beispielsweise die gefilterte Fahrtenliste und die zum ausgewählten Chatkontakt gehörenden Nachrichten. Die Berechnung wird dadurch nur erneut ausgeführt, wenn sich die jeweils relevanten Eingangsdaten ändern. Als M4-Performance-Aspekt steht jedoch vor allem das Debouncing im Vordergrund, da es unmittelbar die Anzahl der HTTP-Anfragen reduziert.
 
-### 5.Testdaten und Qualitätssicherung
+### Testdaten und Qualitätssicherung
 
 Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert, um uns Zeit beim Debuggen zu sparen, da wir bei den vielen Änderungen an der Datenbank, um den Chat funktionsfähig zu machen, viele seltsame Bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 21 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte samt Ownership-Checks, fehlende Authentifizierung und der Datenbankstatus geprüft.
 
@@ -604,7 +582,7 @@ Für die statische Analyse des Frontends wird außerdem **ESLint** eingesetzt. D
 
 Ein weiterer Teil der Qualitätssicherung ist die konsequente **Validierung und Fehlerbehandlung**. Das Backend prüft Pflichtfelder bei Registrierung, Login, Fahrten und Chatnachrichten und antwortet mit semantisch passenden HTTP-Statuscodes. Unauthentifizierte Zugriffe werden mit `401`, fehlende Berechtigungen mit `403`, nicht vorhandene Ressourcen mit `404` und Konflikte wie doppelte E-Mail-Adressen mit `409` behandelt. Die Fehlerantworten enthalten strukturierte JSON-Nachrichten, die vom Frontend ausgewertet und sichtbar dargestellt werden.
 
-Zur Sicherheit und Datenqualität werden Passwörter mit bcrypt gehasht. Geschützte Endpunkte verlangen ein JWT im `Authorization`-Header und überprüfen dieses in der Middleware `authenticateToken`. Besitzprüfungen verhindern, dass Benutzer fremde Fahrten bearbeiten oder löschen. Auch die Chat-Endpunkte prüfen die Ownership: Der Absender einer Nachricht wird aus dem verifizierten JWT abgeleitet (nicht aus dem Request-Body), und Nachrichten können nur an eigene Kontakte gesendet, eigene Chats geleert und eigene Kontakte gelöscht werden. Das Prisma-Schema ergänzt diese Maßnahmen durch eindeutige Constraints für E-Mail-Adresse und Benutzername sowie durch definierte Relationen und Löschregeln zwischen Benutzern, Fahrten, Chatkontakten und Nachrichten. Umgebungsvariablen und Secrets werden über `.gitignore` vom Repository ausgeschlossen.
+Zur Sicherheit und Datenqualität werden Passwörter mit bcrypt gehasht. Geschützte Endpunkte verlangen ein JWT im `Authorization`-Header und überprüfen dieses in der Middleware `authenticateToken`. Besitzprüfungen verhindern, dass Benutzer fremde Fahrten bearbeiten oder löschen. Auch beim Anlegen einer Fahrt wird der Fahrer aus dem verifizierten JWT abgeleitet (nicht aus dem Request-Body), sodass niemand eine Fahrt im Namen eines anderen Users erstellen kann. Ebenso prüfen die Chat-Endpunkte die Ownership: Der Absender einer Nachricht wird aus dem JWT abgeleitet (nicht aus dem Request-Body), und Nachrichten können nur an eigene Kontakte gesendet, eigene Chats geleert und eigene Kontakte gelöscht werden. Das Prisma-Schema ergänzt diese Maßnahmen durch eindeutige Constraints für E-Mail-Adresse und Benutzername sowie durch definierte Relationen und Löschregeln zwischen Benutzern, Fahrten, Chatkontakten und Nachrichten. Umgebungsvariablen und Secrets werden über `.gitignore` vom Repository ausgeschlossen.
 
 Insgesamt kombiniert CampusRide automatisierte API- und Integrationstests mit statischer Typprüfung, Linting, Eingabevalidierung, strukturierter Fehlerbehandlung, Authentifizierungsprüfungen und Datenbank-Constraints. Dadurch wird die Qualität über mehrere Ebenen der Full-Stack-Anwendung hinweg abgesichert.
 
@@ -627,8 +605,7 @@ Dies startet zwei Container:
 - **Server** auf `http://localhost:3001`
 - **Client** auf `http://localhost:5173`
 
-Das Backend führt bei jedem Start automatisch Prisma-Migrationen aus und initialisiert Seed-Daten.
-4 Accounts und eine Fahrt. Login-Daten:
+Das Backend führt bei jedem Start automatisch Prisma-Migrationen aus und initialisiert Seed-Daten: 4 Testbenutzer und eine Beispiel-Fahrt. Login-Daten:
 
 --- User 1: Lisa Müller ---
 Email:      lisa.m@htwg-konstanz.de
@@ -661,7 +638,7 @@ npm install
 npm run dev
 ```
 Erreichbar unter `http://localhost:5173`.
-Selbe Login-Daten wie oben
+Dieselben Login-Daten wie oben
 
 **Backend:**
 ```bash
@@ -712,10 +689,6 @@ nicht mehr Zeugs so übel aufschieben
 - Was wurde gelernt?
 - Ai reviews are extremly helpful did a boatload of them
 
-
-
-
-
 Geplanter Umfang:
 
 **2 Seiten**
@@ -724,12 +697,7 @@ Geplanter Umfang:
 
 # Anhang
 
-Enthält:
-
-- Screenshots der fertigen Anwendung
-- wichtigste Ansichten
-- optionale Installationsanleitung
-- API-Dokumentation
+Der Anhang enthält Screenshots der fertigen Anwendung (A.1), eine kurze Installationsanleitung (A.2) und eine Übersicht der REST-API (A.3).
 
 ## A.1 Screenshots der fertigen Anwendung
 
@@ -747,21 +715,53 @@ Enthält:
 
 ### Fahrt erstellen
 
-![Screenshot der Fahrtensuche](screenshots/Fahrt_finden.png)
-
-### Profil
-
 ![Screenshot der Fahrt-Erstellung](screenshots/Fahrt_erstellen.png)
-
-### Profil Darkmode
-
-![Screenshot des Chats](screenshots/Chat.png)
-
-### Chat
-
-![Screenshot des Profils](screenshots/Profil.png)
 
 ### Fahrt finden
 
+![Screenshot der Fahrtsuche](screenshots/Fahrt_finden.png)
+
+### Profil
+
+![Screenshot des Profils](screenshots/Profil.png)
+
+### Chat
+
+![Screenshot des Chats](screenshots/Chat.png)
+
+### Darkmode
+
 ![Screenshot der Anwendung im Darkmode](screenshots/Darkmode.png)
+
+## A.2 Installationsanleitung (Kurzfassung)
+
+Die ausführliche Anleitung steht in der `README.md`. Der einfachste Weg, CampusRide zu starten, ist Docker Compose. Im Projekt-Root muss dafür eine `.env`-Datei existieren (Vorlage `.env.example`), die ein zufälliges `JWT_SECRET` enthält:
+
+```bash
+cp .env.example .env
+openssl rand -base64 32   # Wert in JWT_SECRET einfügen
+docker compose up --build
+```
+
+Danach läuft das Frontend unter `http://localhost:5173` und das Backend unter `http://localhost:3001`. Alternativ können Frontend (`react-app`) und Backend (`react-app/server`) mit `npm install` und `npm run dev` manuell gestartet werden; im Server-Ordner sind zuvor `npx prisma migrate dev` und `npx prisma generate` auszuführen. Die Tests laufen mit `npm test` im Ordner `react-app/server`.
+
+## A.3 API-Dokumentation
+
+| Methode | Pfad | Zweck | Schutz |
+|---|---|---|---|
+| GET | `/api/health` | Prüft, ob das Backend läuft | öffentlich |
+| GET | `/api/db-status` | Prüft die Verbindung zur SQLite-Datenbank | öffentlich |
+| POST | `/api/auth/register` | Registriert einen neuen User (nur akademische E-Mail) | öffentlich |
+| POST | `/api/auth/login` | Prüft Login-Daten und gibt ein JWT zurück | öffentlich |
+| GET | `/api/auth/me` | Gibt den aktuell eingeloggten User zurück | geschützt |
+| PUT | `/api/auth/me` | Aktualisiert das Profil des eingeloggten Users | geschützt |
+| GET | `/api/rides` | Liste aller Fahrten | öffentlich |
+| POST | `/api/rides` | Neue Fahrt anlegen (Fahrer aus dem JWT abgeleitet) | geschützt |
+| PUT | `/api/rides/:id` | Fahrt aktualisieren (nur Fahrer) | geschützt |
+| DELETE | `/api/rides/:id` | Fahrt löschen (nur Fahrer) | geschützt |
+| GET | `/api/chat/contacts` | Chat-Kontakte des eingeloggten Users (inkl. Nachrichten) | geschützt |
+| POST | `/api/chat/contacts` | Chat-Kontakt anlegen (`userId` im Body) | geschützt |
+| POST | `/api/chat/messages` | Nachricht senden (Absender aus JWT, nur im eigenen Kontakt) | geschützt |
+| DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines eigenen Kontakts leeren | geschützt |
+| DELETE | `/api/chat/contacts/:contactId` | Eigenen Kontakt samt Nachrichten löschen | geschützt |
 

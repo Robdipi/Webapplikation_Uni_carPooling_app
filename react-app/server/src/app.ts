@@ -413,7 +413,6 @@ interface CreateRideRequestBody {
     destinationLng?: number;
     distanceKm?: number;
     durationMinutes?: number;
-    driverId?: string;
     departureTime?: string;
     seatsAvailable?: number;
     price?: number;
@@ -483,7 +482,6 @@ app.post("/api/rides", authenticateToken, async (req: AuthenticatedRequest, res:
         body.destinationLng === undefined ||
         body.distanceKm === undefined ||
         body.durationMinutes === undefined ||
-        body.driverId === undefined ||
         body.departureTime === undefined ||
         body.seatsAvailable === undefined ||
         body.price === undefined ||
@@ -504,7 +502,7 @@ app.post("/api/rides", authenticateToken, async (req: AuthenticatedRequest, res:
                 destinationLng: body.destinationLng,
                 distanceKm: body.distanceKm,
                 durationMinutes: body.durationMinutes,
-                driverId: body.driverId,
+                driverId: req.user!.userId,
                 departureTime: body.departureTime,
                 seatsAvailable: body.seatsAvailable,
                 price: body.price,

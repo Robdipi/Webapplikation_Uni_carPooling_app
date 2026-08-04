@@ -32,7 +32,7 @@ async function registerAndLogin(): Promise<string> {
     return response.body.token as string;
 }
 
-function rideData(driverId: string) {
+function rideData() {
     return {
         departureName: "Konstanz HTWG",
         destinationName: "Universität Konstanz",
@@ -42,7 +42,6 @@ function rideData(driverId: string) {
         destinationLng: 9.1881,
         distanceKm: 3.5,
         durationMinutes: 10,
-        driverId,
         departureTime: "2026-07-25T14:00",
         seatsAvailable: 3,
         price: 5,
@@ -137,7 +136,7 @@ describe("Rides", () => {
         const createRes = await request(app)
             .post("/api/rides")
             .set("Authorization", `Bearer ${token}`)
-            .send(rideData(userId));
+            .send(rideData());
 
         expect(createRes.status).toBe(201);
         expect(createRes.body.ride.id).toEqual(expect.any(String));
@@ -181,7 +180,7 @@ describe("Rides", () => {
     it("rejects ride creation without auth token", async () => {
         const response = await request(app)
             .post("/api/rides")
-            .send(rideData("some-user-id"));
+            .send(rideData());
 
         expect(response.status).toBe(401);
     });
@@ -200,16 +199,11 @@ describe("Rides", () => {
 
     it("updates a ride's seats and price", async () => {
         const token = await registerAndLogin();
-        const me = await request(app)
-            .get("/api/auth/me")
-            .set("Authorization", `Bearer ${token}`);
-
-        const userId = me.body.user.id as string;
 
         const createRes = await request(app)
             .post("/api/rides")
             .set("Authorization", `Bearer ${token}`)
-            .send(rideData(userId));
+            .send(rideData());
 
         const rideId = createRes.body.ride.id as string;
 
@@ -229,29 +223,35 @@ describe("Rides", () => {
             .set("Authorization", `Bearer ${token}`);
     });
 
-    it("rejects ride creation with invalid driverId", async () => {
+    it("ignores a spoofed driverId in the body and uses the authenticated user", async () => {
         const token = await registerAndLogin();
+        const me = await request(app)
+            .get("/api/auth/me")
+            .set("Authorization", `Bearer ${token}`);
+
+        const userId = me.body.user.id as string;
 
         const response = await request(app)
             .post("/api/rides")
             .set("Authorization", `Bearer ${token}`)
-            .send(rideData("non-existent-user-id"));
+            .send({ ...rideData(), driverId: "someone-else" });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(201);
+        expect(response.body.ride.driverId).toBe(userId);
+
+        // Cleanup
+        await request(app)
+            .delete(`/api/rides/${response.body.ride.id}`)
+            .set("Authorization", `Bearer ${token}`);
     });
 
     it("rejects updating another user's ride", async () => {
         const token1 = await registerAndLogin();
-        const me1 = await request(app)
-            .get("/api/auth/me")
-            .set("Authorization", `Bearer ${token1}`);
-
-        const userId1 = me1.body.user.id as string;
 
         const createRes = await request(app)
             .post("/api/rides")
             .set("Authorization", `Bearer ${token1}`)
-            .send(rideData(userId1));
+            .send(rideData());
 
         const rideId = createRes.body.ride.id as string;
 
@@ -581,7 +581,7 @@ describe("Avatar click creates chat contact", () => {
         const createRes = await request(app)
             .post("/api/rides")
             .set("Authorization", `Bearer ${driverToken}`)
-            .send(rideData(driverId));
+            .send(rideData());
 
         expect(createRes.status).toBe(201);
         const rideId = createRes.body.ride.id as string;
