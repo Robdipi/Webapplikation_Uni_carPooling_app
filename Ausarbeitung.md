@@ -19,11 +19,7 @@ Bei der Suche und beim Anbieten von Fahrten wird OpenStreetMap integriert, um di
 
 Um zu garantieren, dass nur Studenten die Webapp benutzen, wird bei der Registrierung der E-Mail-Provider mit einer öffentlich verfügbaren Datenbank verglichen.
 
-Die Idee zu CampusRide entstand aus einer alltäglichen Erfahrung: Viele Studierende pendeln täglich zwischen Wohnort und Campus, fahren dabei aber oft alleine und mit freien Sitzplätzen. Gleichzeitig ist die Anbindung vieler Wohnorte an die Hochschulen und die Universität eingeschränkt. CampusRide bringt diese Personen zusammen: Fahrer stellen freie Plätze ein, Mitfahrer finden passende Fahrten und klären die Details direkt im integrierten Chat. Die Konzentration auf Studierende unterscheidet CampusRide bewusst von allgemeinen Mitfahrplattformen – durch die akademische E-Mail-Verifizierung entsteht eine geschlossene, vertrauenswürdige Nutzergruppe.
 
-Das Projekt wird von drei Studierenden im Rahmen des Moduls „Webapplikationen" entwickelt. Ziel ist eine vollständige Full-Stack-Anwendung, die alle im Kurs behandelten Konzepte – von semantischem HTML über React und Context bis hin zu einem eigenen Express-Backend mit SQLite – in einem zusammenhängenden Produkt vereint. Die Anwendung soll nicht nur technisch sauber umgesetzt sein, sondern auch realistisch betreibbar: reproduzierbarer Start per Docker Compose, automatisierte Tests und eine dokumentierte API gehören deshalb von Anfang an dazu.
-
-Die vorliegende Ausarbeitung dokumentiert den Entwicklungsprozess. Kapitel 2 begründet den Technologie-Stack, Kapitel 3 beschreibt die Architektur und die API, Kapitel 4 schildert die Umsetzung entlang der vier Meilensteine. Kapitel 5 erläutert das Vorgehen bei Tests und Qualitätssicherung, Kapitel 6 den Betrieb der Anwendung. Kapitel 7 schließt mit einer ehrlichen Reflexion ab – was gut gelaufen ist, was wir im Nachhinein anders machen würden und was wir aus dem Projekt gelernt haben. Der Anhang enthält Screenshots der fertigen Anwendung sowie eine Übersicht der API-Endpunkte.
 
 ---
 
@@ -184,7 +180,7 @@ AppProviders
 ## 3.5 API-Architektur
 
 Die API von CampusRide ist eine REST-Schnittstelle, über die ausschließlich JSON-Daten ausgetauscht werden.
-Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank: Das Frontend greift niemals direkt auf die Datenbank zu, sondern sendet HTTP-Anfragen an das Express-Backend. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten unter dem Pfadprefix `/api`.
+Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten.
 
 ### Aufbau des Backends
 
@@ -193,11 +189,11 @@ Das Backend liegt unter `react-app/server`. Die zentrale Datei `server/src/app.t
 - `cors` erlaubt dem auf Port 5173 laufenden Frontend die Kommunikation mit dem Backend auf Port 3001.
 - `express.json()` parst eingehende JSON-Bodies und stellt sie über `req.body` bereit.
 
-Die Route-Handler sind bewusst in einer einzigen Datei gehalten. Für den Umfang des Projekts ist dieser monolithische Aufbau übersichtlich und ausreichend; bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
+Die Route-Handler sind bewusst in einer einzigen Datei gehalten wegen des kleinen größe des Projects. Bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführ die die Datenbank mit 4 Beispiel Accounts und 1 Fahrt füllt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
 
 ### Authentifizierung
 
-Die API unterscheidet öffentliche und geschützte Endpunkte. Öffentliche Endpunkte benötigen keine Anmeldung, geschützte Endpunkte verlangen ein gültiges JWT.
+Die API unterscheidet öffentliche und geschützte Endpunkte. Öffentliche Endpunkte benötigen keine Anmeldung, geschützte Endpunkte brauchen ein gültiges JWT.
 
 Das JWT wird bei der Registrierung oder Anmeldung im Backend erzeugt, enthält die Benutzer-ID und die E-Mail-Adresse und ist zwei Stunden gültig. Das Frontend sendet es bei jeder geschützten Anfrage im HTTP-Header mit:
 
@@ -205,7 +201,7 @@ Das JWT wird bei der Registrierung oder Anmeldung im Backend erzeugt, enthält d
 Authorization: Bearer <token>
 ```
 
-Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Ist dies nicht der Fall, antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
+Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Fals nicht antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
 
 ### Endpunkte im Überblick
 
@@ -229,7 +225,7 @@ Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten
 
 ### Fehlerbehandlung
 
-Jeder Endpunkt validiert seine Eingaben und antwortet mit semantisch passenden HTTP-Statuscodes. Fehlende oder leere Pflichtfelder führen zu `400 Bad Request`, doppelte E-Mail-Adressen oder Benutzernamen zu `409 Conflict`, falsche Anmeldedaten zu `401 Unauthorized` und nicht vorhandene Ressourcen zu `404 Not Found`. Fehlerantworten folgen dabei einheitlich dem Schema `{ "error": "..." }`, das das Frontend über `readErrorMessage` auswertet und dem Nutzer sichtbar anzeigt.
+Jeder Endpunkt validiert seine Eingaben und antwortet mit semantisch passenden HTTP-Statuscodes. Fehlende oder leere Pflichtfelder führen zu `400 Bad Request`, doppelte E-Mail-Adressen oder Benutzernamen zu `409 Conflict`, falsche Anmeldedaten zu `401 Unauthorized` und nicht vorhandene Ressourcen zu `404 Not Found`. Fehler folgen dabei dem Schema `{ "error": "..." }`, das das Frontend über `readErrorMessage` auswertet und dem Nutzer anzeigt.
 
 Die öffentlichen Repräsentationen `publicUser` und `publicRide` mappen die internen Datenbankobjekte auf eigene Antwortformate. Dadurch werden sensible Felder wie der `passwordHash` niemals an das Frontend übertragen und komplexe Strukturen wie die Fahrtenkoordinaten übersichtlich als `departureCoords` bzw. `destinationCoords` mit `lat` und `lng` geliefert.
 
@@ -244,7 +240,7 @@ Das Frontend kapselt sämtliche `fetch`-Aufrufe in der API-Schicht `src/api/`. K
 | `rideApi.ts` | Fahrten laden, erstellen, aktualisieren und löschen |
 | `chatApi.ts` | Chatkontakte und Nachrichten verwalten |
 
-Jede Funktion baut die URL aus `API_BASE_URL` und dem Pfad zusammen, setzt die Header `Content-Type: application/json` und bei geschützten Aufrufen `Authorization: Bearer <token>`, prüft `response.ok` und wirft bei Fehlern eine `Error` mit der Servermeldung. Der Datenfluss bei einer geschützten Anfrage folgt damit immer demselben Muster:
+Jede Funktion baut die URL aus `API_BASE_URL` und dem Pfad zusammen, setzt die Header `Content-Type: application/json` und bei geschützten Aufrufen `Authorization: Bearer <token>`, prüft `response.ok` und wirft bei Fehlern eine `Error` mit der Servermeldung. Der Datenfluss bei einer geschützten Anfrage folgt damit:
 
 ```
 Komponente → Context → api/ → fetch → Express → Prisma → SQLite → Antwort zurück
@@ -252,7 +248,7 @@ Komponente → Context → api/ → fetch → Express → Prisma → SQLite → 
 
 ### Sequenzdiagramm für einen geschützten Request
 
-Das folgende Sequenzdiagramm zeigt den Ablauf einer geschützten Anfrage am Beispiel des Erstellens einer Fahrt über `POST /api/rides`:
+Das folgende Sequenzdiagramm zeigt den Ablauf einer geschützten Anfrage am Beispiel des erfolgreichen Erstellens einer Fahrt über `POST /api/rides`:
 
 ```mermaid
 sequenceDiagram
@@ -277,7 +273,8 @@ sequenceDiagram
 
 ### Externe APIs
 
-Ergänzend greift das Frontend direkt vom Browser aus auf externe Dienste zu: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über das eigene Backend.
+
+Ergänzend werden noch fremde Api's benutzt: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über unser Backend.
 
 
 # 4. Umsetzung
