@@ -183,7 +183,8 @@ AppProviders
 ---
 ## 3.5 API-Architektur
 
-Die API von CampusRide ist eine REST-Schnittstelle, über die ausschließlich JSON-Daten ausgetauscht werden. Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank: Das Frontend greift niemals direkt auf die Datenbank zu, sondern sendet HTTP-Anfragen an das Express-Backend. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten unter dem Pfadprefix `/api`.
+Die API von CampusRide ist eine REST-Schnittstelle, über die ausschließlich JSON-Daten ausgetauscht werden.
+Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank: Das Frontend greift niemals direkt auf die Datenbank zu, sondern sendet HTTP-Anfragen an das Express-Backend. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten unter dem Pfadprefix `/api`.
 
 ### Aufbau des Backends
 
