@@ -79,7 +79,7 @@ Gründe für die Auswahl:
 - Locale Liste oder Datenbank wäre ungenau und müsste manuell auf Änderungen angepasst werden
 - öffentlich und kostenlos
 
-Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z.B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
+Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z. B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
 
 ### Vitest 
 Vitest dient als Testframework für die Backend-Tests.
@@ -119,7 +119,7 @@ Gründe für die Auswahl:
 ---
 ### 3.2 Contexts
 
-- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den darkmode anzustellen. im `localStorage`
+- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den Darkmode anzustellen. im `localStorage`
 - **UserContext** – Session-Zustand: `currentUser`, `authToken`, `isLoggedIn`, `isAuthLoading`, `profile`. im `localStorage` (`campusRideAuthToken`) und stellt beim App-Start den User über `GET /api/auth/me` wieder her. Bietet `registerUser`, `loginUser`, `logoutUser`, `setProfile`.
 - **RideContext** – lädt alle Fahrten einmal beim Mounten und hält sie im Speicher; bietet `addRide`, `removeRide`, `updateRide`, `clearRides`.
 - **ChatContext** – Kontakte und Nachrichten; lädt beim Login alle Kontakte inkl. Nachrichten
@@ -189,7 +189,7 @@ Das Backend liegt unter `react-app/server`. Die zentrale Datei `server/src/app.t
 - `cors` erlaubt dem auf Port 5173 laufenden Frontend die Kommunikation mit dem Backend auf Port 3001.
 - `express.json()` parst eingehende JSON-Bodies und stellt sie über `req.body` bereit.
 
-Die Route-Handler sind bewusst in einer einzigen Datei gehalten wegen des kleinen größe des Projects. Bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführ die die Datenbank mit 4 Beispiel Accounts und 1 Fahrt füllt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
+Die Route-Handler sind bewusst in einer einzigen Datei gehalten wegen des kleinen Größe des Projekts. Bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt die die Datenbank mit 4 Beispiel Accounts und 1 Fahrt füllt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
 
 ### Authentifizierung
 
@@ -201,7 +201,7 @@ Das JWT wird bei der Registrierung oder Anmeldung im Backend erzeugt, enthält d
 Authorization: Bearer <token>
 ```
 
-Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Fals nicht antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
+Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Falls nicht antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
 
 ### Endpunkte im Überblick
 
@@ -274,7 +274,7 @@ sequenceDiagram
 ### Externe APIs
 
 
-Ergänzend werden noch fremde Api's benutzt: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über unser Backend.
+Ergänzend werden noch fremde APIs benutzt: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über unser Backend.
 
 
 # 4. Umsetzung
@@ -665,11 +665,11 @@ Diskussion über:
 ## Was lief gut
 
 - Die Ausarbeitung im Repository als Markdown zu schreiben hat sehr gut funktioniert. 
-- Die Teamarbeit war teilweise sehr gut, in M3 zum Beispiel hatte ich der Autor dieses Textes(Robin) keine Zeit an Web zu arbeiten da ich bei einem anderen Projekt sehr hinterher war das dringlicher war deswegen hab ichs mit Paul abgesprochen das er für mich übernimmt. Im Gegenzug hab ich dann für ihn den Programmierteil von M4 übernommen da sein Praktikum sehr früh anfing und er deswegen wenig Zeit hatte.
+- Die Teamarbeit war teilweise sehr gut, in M3 zum Beispiel hatte ich der Autor dieses Textes (Robin) keine Zeit an Web zu arbeiten da ich bei einem anderen Projekt sehr hinterher war das dringlicher war deswegen hab ichs mit Paul abgesprochen das er für mich übernimmt. Im Gegenzug hab ich dann für ihn den Programmierteil von M4 übernommen da sein Praktikum sehr früh anfing und er deswegen wenig Zeit hatte.
 - Wir haben gegen Ende des Projekts sehr viele AI-Agent Reviews machen lassen die uns sehr viele Probleme gezeigt haben die uns sonst nicht aufgefallen wären. z. B.: Man hätte Chats löschen können ohne Autorisierung zu einem Zeitpunkt und auch viele meiner Rechtschreibfehler
 
 
- ## Was würde beim nächsten Mal anders gemacht werden?
+## Was würde beim nächsten Mal anders gemacht werden?
 
 ### Funktionen
 Viele der in der bekannte Einschränkungen Sektion im README
@@ -691,11 +691,11 @@ beschriebenen Funktion würden wir beim nächsten Mal implementieren um das ganz
 ### Was wurde gelernt?
 - Eine Kartenanzeige zu machen mit einer API ist viel einfacher als ein Chat-Fenster zu machen anders als ursprünglich gedacht.
 - Kurzzeitige Designentscheidungen beißen einen schnell z. B. 
-in M2 haben wir im chatcontext bei einer Nachricht gespeichert ob sie von diesem  oder dem anderen User kam nicht deren UserIDs als wir dann später das exakt so in der Datenbanktabelle hatten gab es das Problem das der Chat aus beiden Perspektiven gleich aussah weil jeder User dachte `me` meint ihn selber. Dies auszubessern hat etwas gedauert, wesentlich länger als wenn man es gleich richtig gemacht hätte
+in M2 haben wir im chatcontext bei einer Nachricht gespeichert ob sie von diesem oder dem anderen User kam nicht deren UserIDs als wir dann später das exakt so in der Datenbanktabelle hatten gab es das Problem das der Chat aus beiden Perspektiven gleich aussah weil jeder User dachte `me` meint ihn selber. Dies auszubessern hat etwas gedauert, wesentlich länger als wenn man es gleich richtig gemacht hätte
 - AI-Agent Code Reviews sind sehr sehr hilfreich vor allem wenn kombiniert mit Vorlesungsunterlagen und den beiden PDFs über das Projekt. Wir haben uns sogar mit Hilfe des Agents eine Bewertung anhand der Bewertungskriterien geben lassen um zu sehen wo wir am besten unser Projekt verbessern. Während ich das schreibe gibt uns der Agent: 14/18 (Beim ersten warens 11 also ne gute Steigerung bisher)
 
 ### Fazit
- Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzigste Meilenstein in dem wir nichts aufgeshoben hatten, die extra zeit die wir damals hatten konnten wir damals nutzen um unsere app mit mehr css schöner zu machen als sie  sein hätten müssen z.b: ein/aus-fahrbares Login Fenster, animierte Knöpfe, darkmode vorbereitet,… . In M4 habe ich wenig aufgeschoben, aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehler zu hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir — ich (Robin) spreche jetzt mal für die anderen — zufrieden mit der App.
+Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzige Meilenstein in dem wir nichts aufgeschoben hatten, die extra Zeit die wir damals hatten konnten wir damals nutzen um unsere App mit mehr CSS schöner zu machen als sie sein hätten müssen z. B.: ein/aus-fahrbares Login-Fenster, animierte Knöpfe, Darkmode vorbereitet, … . In M4 habe ich wenig aufgeschoben, aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehler zu hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir — ich (Robin) spreche jetzt mal für die anderen — zufrieden mit der App.
 
 ---
 
@@ -768,5 +768,5 @@ Danach läuft das Frontend unter `http://localhost:5173` und das Backend unter `
 | DELETE | `/api/chat/contacts/:contactId` | Eigenen Kontakt samt Nachrichten löschen | geschützt |
 
 ## A.4 Trivia
-- ahonestopinion.ts ist ein dummer witz gelöscht, in neueren Versionen ,einfach Ignorieren
+- ahonestopinion.ts ist ein dummer Witz, gelöscht in neueren Versionen, einfach ignorieren.
 

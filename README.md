@@ -28,8 +28,6 @@ Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern.
 - **Keine Pagination**: Alle existierenden Fahrten werden auf einmal geladen. Bei vielen Fahrten wird die Liste unübersichtlich und die Antwort langsam.
 - **Fehlende Wert-Validierung**: Negative Sitzplätze oder Preise sind möglich, es gibt keine Passwort-Mindestlänge und unbegrenzte Stringlängen.
 - **Keine Buchungs-/Reservierungslogik**: Sitze existieren als Feld, werden aber nie reserviert.
-- **Unprofessionelle Commit-Historie**: Messages wie „Docker finaly fucking works" oder „bug fixes round 2"
-- **Flache Stack-Begründungen**: Gründe wie „In der Vorlesung behandelt" oder „mir ist nichts anderes eingefallen außer OSM und Google Maps" statt echter Abwägung.
 ## Demo-Video
 
 https://youtu.be/Xr-0pmRnFbQ
@@ -217,3 +215,21 @@ Die App läuft unter `http://localhost:5173`.
 Bei der Registrierung werden die Formulardaten an `POST /api/auth/register` gesendet. Das Backend prüft Pflichtfelder, verhindert doppelte E-Mail-Adressen oder Benutzernamen, prüft die E-Mail auf eine akademische Domain, hasht das Passwort mit bcrypt und speichert den User über Prisma in SQLite. Danach wird ein JWT erzeugt und zusammen mit den öffentlichen Userdaten ans Frontend zurückgegeben.
 
 Beim Login sendet das Frontend Benutzername/E-Mail und Passwort an `POST /api/auth/login`. Das Backend sucht den User, vergleicht das Passwort mit dem gespeicherten Hash und gibt bei Erfolg wieder ein JWT zurück. Für geschützte Anfragen wird das Token im `Authorization`-Header als `Bearer <token>` gesendet. Der Endpunkt `GET /api/auth/me` und die geschützten Frontend-Routen zeigen, dass nicht angemeldete Nutzer blockiert werden.
+
+## M4 – Betrieb, Fertigstellung & Abschluss
+
+### Kriterien-Zuordnung M4
+
+| Kriterium | Datei | Zeile / Hinweis |
+|---|---|---|
+| Vervollständigte Persistenz (Fahrten, Chats, Nachrichten) | `react-app/server/prisma/schema.prisma`; `react-app/server/src/app.ts` | Modelle `Ride` Z. 33-53, `ChatContact` Z. 55-63, `ChatMessage` Z. 65-75; Fahrten-CRUD in `app.ts` Z. 459-601, Chat-Endpunkte Z. 603-758 |
+| Profil persistent erweiterbar (Stadt, Kilometerpreis, Profilbild) | `react-app/server/prisma/schema.prisma`; `react-app/server/src/app.ts` | `city`, `pricePerKm`, `avatarUrl` in Schema Z. 20-22; `PUT /api/auth/me` in `app.ts` Z. 367-403 |
+| Akademische E-Mail-Prüfung | `react-app/server/src/app.ts` | `Verifier.isAcademic()` in Z. 209 (Import Z. 8); Registrierung Z. 147-258 |
+| Containerisierung mit Docker | `react-app/Dockerfile`; `react-app/server/Dockerfile` | Frontend-Container (Node 20, Vite `--host`) Z. 1-12; Backend-Container (Build-Tools, `prisma generate`, Build) Z. 1-21 |
+| Reproduzierbarer Start mit Docker Compose | `docker-compose.yml` | Services `server` Z. 2-14 und `client` Z. 16-25; benanntes Volume `db-data` Z. 27-28 |
+| Migrationen und Seed beim Start | `react-app/server/Dockerfile`; `react-app/server/src/index.ts`; `react-app/server/src/seed.ts` | `npx prisma migrate deploy` in Dockerfile Z. 21; `seed()` in `index.ts` Z. 7; idempotente Seed-Logik in `seed.ts` Z. 45-98 |
+| Secrets nicht im Repository | `.env.example`; `docker-compose.yml`; `.gitignore` | `JWT_SECRET: ${JWT_SECRET}` in `docker-compose.yml` Z. 10; `.env` in `.gitignore` Z. 15 |
+| Performance: HTTP-Anfragen begrenzen (Debounce) | `react-app/src/pages/create_ride/useDebounce.ts`; `react-app/src/pages/create_ride/RouteMap.tsx` | Hook in `useDebounce.ts` Z. 3-12; Verwendung mit 800 ms in `RouteMap.tsx` Z. 24-25 |
+| Performance: `useMemo` | `react-app/src/pages/find_ride/find_ride.tsx`; `react-app/src/contexts/chatcontext.tsx` | Gefilterte Fahrtenliste in `find_ride.tsx` Z. 133; ausgewählter Kontakt und Nachrichten in `chatcontext.tsx` Z. 144-151 |
+| Erweiterte automatisierte Tests | `react-app/server/src/app.test.ts` | 21 Tests für Auth, Rides, Chat, Berechtigungen, Integration (Avatar-Klick → Chat) und Datenbankstatus |
+| Dokumentation und Demo-Video | `README.md`; `Ausarbeitung.md` | Projektbeschreibung, Architektur, Setup und Testuser in `README.md`; schriftliche Ausarbeitung; Demo-Video: https://youtu.be/Xr-0pmRnFbQ |
