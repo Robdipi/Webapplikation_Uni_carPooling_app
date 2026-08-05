@@ -660,35 +660,42 @@ npm test
 
 Diskussion über:
 
-- Was lief gut?
-- Paul hat gut für mich m3 ich hab dann auch m4 für ihn übernommen
-- Was würde beim nächsten Mal anders gemacht werden?
-  - Echtzeit-Chat:
-  - keine regelmäßigen comits in M4 weil ich quasy wusste das ich(robin) nur alleine dran arbeiten werde
-  - 
-  - OpenStreetMap wird aktuell nicht zur Auswahl von Start- und Endpunkt verwendet, wäre eine mögliche Verbesserung
-  - Chat könnte Gruppenchat für die Fahrt sein, wäre aber komplexer
-  - bessere Suche
-  - Fehlende Wert-Validierung: negative Sitzplätze oder Preise verhindern, Passwort-Mindestlänge einführen, Stringlängen begrenzen
-  - Commit-Historie professionalisieren: sprechende Messages statt „Docker finaly fucking works" oder „bug fixes round 2", AI-Agenten-Commits kennzeichnen
-  - Gesplittete Git-Identität (`robin` vs. `Robin`) über eine `.mailmap`-Datei bereinigen
-  - Flache Stack-Begründungen wie „In der Vorlesung behandelt" oder „mir ist nichts anderes eingefallen außer OSM und Google Maps" durch echte Abwägungen ersetzen
-  - Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden
-  - Preis-Modell: Preis pro Fahrt statt `pricePerKm` im Profil
-  - Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können
-- man kann Fahrten nicht mehr löschen
-nicht mehr Zeugs so übel aufschieben
-- keine fahrten übersicht
-- schlechte Team arbeit
-- ahonestopinion.ts is a stupid joke if you stumble over it
-- 
 
-- Was wurde gelernt?
-- Ai reviews are extremly helpful did a boatload of them
 
-Geplanter Umfang:
+## Was lief gut
 
-**2 Seiten**
+- Die Ausarbeitung im Repository als Markdown zu schreiben hat sehr gut funktioniert. 
+- Die Teamarbeit war teilweise sehr gut, in M3 zum Beispiel hatte ich der Autor dieses Textes(Robin) keine Zeit an Web zu arbeiten da ich bei einem anderen Projekt sehr hinterher war das dringlicher war deswegen hab ichs mit Paul abgesprochen das er für mich übernimmt. Im Gegenzug hab ich dann für ihn den Programmierteil von M4 übernommen da sein Praktikum sehr früh anfing und er deswegen wenig Zeit hatte.
+- Wir haben gegen Ende des Projekts sehr viele AI-Agent Reviews machen lassen die uns sehr viele Probleme gezeigt haben die uns sonst nicht aufgefallen wären. z. B.: Man hätte Chats löschen können ohne Autorisierung zu einem Zeitpunkt und auch viele meiner Rechtschreibfehler
+
+
+ ## Was würde beim nächsten Mal anders gemacht werden?
+
+### Funktionen
+Viele der in der bekannte Einschränkungen Sektion im README
+beschriebenen Funktion würden wir beim nächsten Mal implementieren um das ganze Projekt funktionaler zu machen:
+- Echtzeit-Chat
+- OpenStreetMap als Routenauswahl
+- Gruppenchat für die einzelnen Fahrten
+- Wert/Passwort Validierung 
+- Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden. Ansonsten würden zu viele Fahrten in der Datenbank die Webseite sehr sehr langsam machen da sie alle geladen werden müssten.
+- anderes Preis-Modell unser aktuelles mit `pricePerKm` ist irgendwie doff
+- Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können und nicht alles über den Chat abgeklärt werden muss.
+- Eine Übersicht der eigenen Fahrten, in der man sie bearbeiten und löschen kann
+
+### Generell
+- Unregelmäßigen Commits wie in M4 vermeiden. Die meisten stammten daher das ich mir basierend auf wie bis zu diesem Zeitpunkt unser Projekt lief (siehe Commit-Historie) und das Paul mit seinem Praktikum beschäftigt war, wusste das ich(Robin) wahrscheinlich nur alleine dran arbeiten werde.
+- Unprofessionelle und nichtssagende Commit-Namen z. B. "Docker finaly fucking works" oder "missing_files2" vermeiden
+- Nicht mehr Zeugs so übel aufschieben. Wie an unserer "Commits over time" Tabelle gut abzulesen ist haben wir als Gruppe viel sehr aufgeschoben bis kurz vor die Abgabe
+
+### Was wurde gelernt?
+- Eine Kartenanzeige zu machen mit einer API ist viel einfacher als ein Chat-Fenster zu machen anders als ursprünglich gedacht.
+- Kurzzeitige Designentscheidungen beißen einen schnell z. B. 
+in M2 haben wir im chatcontext bei einer Nachricht gespeichert ob sie von diesem  oder dem anderen User kam nicht deren UserIDs als wir dann später das exakt so in der Datenbanktabelle hatten gab es das Problem das der Chat aus beiden Perspektiven gleich aussah weil jeder User dachte `me` meint ihn selber. Dies auszubessern hat etwas gedauert, wesentlich länger als wenn man es gleich richtig gemacht hätte
+- AI-Agent Code Reviews sind sehr sehr hilfreich vor allem wenn kombiniert mit Vorlesungsunterlagen und den beiden PDFs über das Projekt. Wir haben uns sogar mit Hilfe des Agents eine Bewertung anhand der Bewertungskriterien geben lassen um zu sehen wo wir am besten unser Projekt verbessern. Während ich das schreibe gibt uns der Agent: 14/18 (Beim ersten warens 11 also ne gute Steigerung bisher)
+
+### Fazit
+ Hauptgrund für die fehlenden extra features sehe ich das wir als gruppe sehr viel aufgeschoben haben. M1 war der einzigste Meilenstein in dem wir nichts aufgeshoben hatten, die extra zeit die wir damals hatten konnten wir damals nutzen um unsere app mit mehr css schöner zu machen als sie  sein hätten müssen z.b: ein/aus-fahrbares Login Fenster, animierte Knöpfe, darkmode vorbereitet,… . In M4 habe ich wenig aufgeschoben habe aber trotzdem nach dem ich das video gedreht hatte einen Schlussstrich gezogen was neue Features angeht um nicht plötzlich einen rießen Haufen extra Arbeit durch neue Fehler zu haben wärend wir an der Ausarbeitung schreiben. Letzendlich würde ich sagen trotz der vielen fehlenden extra Features die, die App wesentlich besser gemacht hätten, wir (Ich Robin sprech jetzt mal für die anderen) zufrieden mit der App sind.
 
 ---
 
@@ -759,4 +766,7 @@ Danach läuft das Frontend unter `http://localhost:5173` und das Backend unter `
 | POST | `/api/chat/messages` | Nachricht senden (Absender aus JWT, nur im eigenen Kontakt) | geschützt |
 | DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines eigenen Kontakts leeren | geschützt |
 | DELETE | `/api/chat/contacts/:contactId` | Eigenen Kontakt samt Nachrichten löschen | geschützt |
+
+## A.4 Trivia
+- ahonestopinion.ts ist ein dummer witz gelöscht, in neueren Versionen ,einfach Ignorieren
 
