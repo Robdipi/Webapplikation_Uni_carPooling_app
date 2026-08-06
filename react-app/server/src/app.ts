@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
 import { PrismaClient, User } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { Verifier } from "academic-email-verifier";
@@ -28,6 +29,17 @@ app.use(cors({
     origin: allowedOrigins,
 }));
 app.use(express.json());
+
+const rateLimitMax = Number(process.env.RATE_LIMIT_MAX ?? "200");
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: rateLimitMax,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+app.use(limiter);
 
 interface AuthTokenPayload {
     userId: string;

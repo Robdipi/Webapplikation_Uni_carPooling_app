@@ -1,7 +1,7 @@
 # Webapplikation SS2026 CampusRide
 
 **Autoren:** Marlin Wießenberg, Paul Boos, Robin Dietsche
-**Datum:** 24. Juli 2026
+**Datum:** 06. August 2026
 
 ---
 
@@ -23,7 +23,7 @@ Um zu garantieren, dass nur Studenten die Webapp benutzen, wird bei der Registri
 
 ---
 
-# 2 Technologie-Stack
+# 2. Technologie-Stack
 
 Aus der Aufgabe:
 - HTML, CSS
@@ -34,17 +34,17 @@ Aus der Aufgabe:
 
 Gewählt:
 
-### Express.js
+## 2.1 Express.js
 Gründe für die Auswahl:
 - In der Vorlesung behandelt
 
-### Vite
+## 2.2 Vite
 Bundler
 
 Gründe für die Auswahl:
 - In der Vorlesung behandelt
 
-### SQLite
+## 2.3 SQLite
 Datenbank
 
 Gründe für die Auswahl:
@@ -52,39 +52,39 @@ Gründe für die Auswahl:
 - SQL können wir schon
 - braucht keinen eigenen Datenbankserver wie PostgreSQL
 
-### OpenStreetMap
-OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet, nicht für die Fahrtauswahl
+## 2.4 OpenStreetMap
+OpenStreetMap wird zur Darstellung von Fahrtrouten verwendet, nicht für die Fahrtauswahl.
 
 Gründe für die Auswahl:
 
 - kostenlos, anders als die API von Google Maps
-- hilfreiche Tools die wir ursprünglich für eine verbesserte Suche gebraucht hätten
+- hilfreiche Tools, die wir ursprünglich für eine verbesserte Suche gebraucht hätten
 - mir ist nichts anderes eingefallen außer OSM und Google Maps
 
-### express-rate-limit
+## 2.5 Leaflet
 
-`express-rate-limit` ist installiert, wird aber nicht verwendet (hat mich beim Testen von anderen Sachen aufgeregt)
+Leaflet ist die Kartenbibliothek, mit der die OpenStreetMap-Karten in der Anwendung dargestellt werden. Über React-Leaflet wird sie in die React-Komponenten eingebunden; die Kartenkacheln selbst liefert OpenStreetMap.
 
-Es sollte die Anwendung vor Denial-of-Service-Angriffen schützen.
+## 2.6 express-rate-limit
+
+`express-rate-limit` schützt die Anwendung vor Denial-of-Service-Angriffen, indem es die Anzahl der Anfragen pro IP-Adresse begrenzt. Standardmäßig sind 200 Anfragen pro 15 Minuten erlaubt; das Limit lässt sich über die Umgebungsvariable `RATE_LIMIT_MAX` konfigurieren.
 
 
-### jsonwebtoken und bcryptjs
+## 2.7 jsonwebtoken und bcryptjs
 
-JWTs (JSON Web Tokens) werden für die Authentifizierung verwendet. Nach dem Login erhält der Client ein Token mit einer Gültigkeit von zwei Stunden. Für geschützte Anfragen wird dieses Token im `Authorization`-Header als `Bearer`-Token mitgesendet.
+JWTs (JSON Web Tokens) werden für die Authentifizierung verwendet, bcryptjs übernimmt das Hashing der Passwörter, sodass Passwörter niemals im Klartext gespeichert werden. Die genaue Funktionsweise (Token-Gültigkeit, Übertragung im `Authorization`-Header, Salt-Faktor) ist in Kapitel 3 beschrieben.
 
-bcryptjs übernimmt das Hashing der Passwörter mit einem Salt-Faktor von 10 Runden. Passwörter werden niemals im Klartext gespeichert.
-
-### academic-email-verifier
+## 2.8 academic-email-verifier
 Gründe für die Auswahl:
 - Locale Liste oder Datenbank wäre ungenau und müsste manuell auf Änderungen angepasst werden
 - öffentlich und kostenlos
 
 Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z. B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
 
-### Vitest 
+## 2.9 Vitest
 Vitest dient als Testframework für die Backend-Tests.
 
-### Supertest
+## 2.10 Supertest
 Testen von Express-Endpunkten
 
 Gründe für die Auswahl:
@@ -105,29 +105,28 @@ Gründe für die Auswahl:
 |---|---|---|---|
 | User | `id` | – | – |
 | Ride | `id` | `driverId` | User.`id` |
-| ChatContact | `id` | `ownerId` | User.`id` |
-| ChatContact | `id` | `userId` | User.`id` |
+| ChatContact | `id` | `ownerId`, `userId` | User.`id` |
 | ChatMessage | `id` | `contactId` | ChatContact.`id` |
 | ChatMessage | `id` | `senderId` | User.`id` |
 
 ### Besonderheiten
-- 2 Variablen zum Speichern jeder Position, da ein Ortsname nicht immer zu der gleichen Position zeigt. Wir speichern also den Namen und die Koordinaten des Punktes
-- extra = Fahrt Beschreibung optional
-- Type ist ein String für ursprünglich geplante Bildnachrichten
-- alle Zeiten sind String
+- Zwei Variablen zum Speichern jeder Position, da ein Ortsname nicht immer zu der gleichen Position zeigt. Wir speichern also den Namen und die Koordinaten des Punktes
+- `extra` ist ein optionales Freitextfeld für eine zusätzliche Fahrtbeschreibung
+- `type` (bei Chatnachrichten) ist ein String, der ursprünglich Bildnachrichten unterstützen sollte; aktuell wird nur Text gesendet
+- alle Zeitangaben sind als String gespeichert, da sie direkt aus den Eingabefeldern übernommen werden
 
 ---
-### 3.2 Contexts
+## 3.2 Contexts
 
-- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den Darkmode anzustellen. im `localStorage`
+- **GlobalContext** – `darkMode` toggelt die CSS-Klasse `dark` am `<body>`, um den Darkmode einzuschalten. Im `localStorage` gespeichert
 - **UserContext** – Session-Zustand: `currentUser`, `authToken`, `isLoggedIn`, `isAuthLoading`, `profile`. im `localStorage` (`campusRideAuthToken`) und stellt beim App-Start den User über `GET /api/auth/me` wieder her. Bietet `registerUser`, `loginUser`, `logoutUser`, `setProfile`.
 - **RideContext** – lädt alle Fahrten einmal beim Mounten und hält sie im Speicher; bietet `addRide`, `removeRide`, `updateRide`, `clearRides`.
 - **ChatContext** – Kontakte und Nachrichten; lädt beim Login alle Kontakte inkl. Nachrichten
 
 ---
-### 3.3 Routing
+## 3.3 Routing
 
-`src/routes/AppRoutes.tsx` definiert alle Routen. 
+`src/routes/AppRoutes.tsx` definiert alle Routen.
 
 | Route | Seite | Geschützt |
 |---|---|---|
@@ -148,7 +147,7 @@ Gründe für die Auswahl:
 ## 3.4 Komponentenstruktur
 ```text
 AppProviders
-└── AppRoutes   
+└── AppRoutes
     ├── StartPage                               (Login-/Register-Overlays, Formulare)
     ├── ImpressumPage
     ├── ContactPage
@@ -194,7 +193,7 @@ Das Backend liegt unter `react-app/server`. Die zentrale Datei `server/src/app.t
 - `cors` erlaubt dem auf Port 5173 laufenden Frontend die Kommunikation mit dem Backend auf Port 3001.
 - `express.json()` parst eingehende JSON-Bodies und stellt sie über `req.body` bereit.
 
-Die Route-Handler sind bewusst in einer einzigen Datei gehalten wegen des kleinen Größe des Projekts. Bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt die die Datenbank mit 4 Beispiel Accounts und 1 Fahrt füllt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
+Die Route-Handler sind bewusst in einer einzigen Datei gehalten wegen der kleinen Größe des Projekts. Bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt, die die Datenbank mit 4 Testbenutzern und einer Beispielfahrt füllt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
 
 ### Authentifizierung
 
@@ -284,7 +283,7 @@ Ergänzend werden noch fremde APIs benutzt: Nominatim geokodiert Ortsnamen zu Ko
 
 # 4. Umsetzung
 
-## Meilenstein 1 – Projektstart und Fundament
+## 4.1 Meilenstein 1 – Projektstart und Fundament
 
 Der erste Meilenstein hatte das Ziel, die Grundidee von CampusRide als statischen HTML- und CSS-Prototyp umzusetzen. Zu diesem Zeitpunkt gab es noch kein React-Frontend, kein Backend und keine Datenbank. Im Vordergrund standen deshalb die Struktur der Anwendung, die wichtigsten Ansichten, eine konsistente Gestaltung und eine nachvollziehbare Navigation. Der damalige Stand ist im Git-Tag **Meilenstein_1** festgehalten.
 
@@ -326,7 +325,7 @@ Wiederkehrende Bereiche wurden später als eigene React-Komponenten in `componen
 
 ---
 
-## Meilenstein 2 – React-Umbau und Interaktion
+## 4.2 Meilenstein 2 – React-Umbau und Interaktion
 
 Im zweiten Meilenstein wurde der statische HTML- und CSS-Prototyp aus M1 in eine interaktive React-Anwendung überführt. Ziel war es, die vorhandenen Seiten nicht nur optisch nachzubilden, sondern sie in wiederverwendbare Komponenten zu zerlegen, Daten mit TypeScript zu typisieren und sichtbare Nutzerinteraktionen mithilfe von React Hooks umzusetzen. Der damalige Stand ist im Git-Tag **Meilenstein_2** dokumentiert. Benötigte Daten werden noch im Browser verwaltet, da noch keine Datenbank im Backend vorhanden ist.
 
@@ -376,7 +375,7 @@ Die TypeScript-Modelle wurden entsprechend erweitert: Fahrten besitzen nun eine 
 
 ---
 
-## Meilenstein 3 – Daten, Routing, REST, Qualität und Backend
+## 4.3 Meilenstein 3 – Daten, Routing, REST, Qualität und Backend
 
 Im dritten Meilenstein wurde die bis dahin ausschließlich im Browser laufende React-Anwendung zu einer Full-Stack-Anwendung erweitert. Der Schwerpunkt lag auf einer klaren URL-Struktur mit React Router, der Kommunikation mit einem eigenen REST-Backend, einer persistenten Datenhaltung sowie einer echten Registrierung und Anmeldung. Zusätzlich wurden sichtbare Lade- und Fehlerzustände sowie automatisierte Tests ergänzt. Der damalige Stand ist im Git-Tag **Meilenstein_3** dokumentiert.
 
@@ -404,7 +403,7 @@ Im M3-Stand standen folgende zentrale Endpunkte zur Verfügung:
 | `POST` | `/api/auth/login` | Meldet einen Benutzer an |
 | `GET` | `/api/auth/me` | Liefert den Benutzer zum übergebenen JWT |
 
-Damit waren sowohl lesende als auch schreibende REST-Anfragen umgesetzt. Die API antwortet mit passenden HTTP-Statuscodes. Fehlende Eingaben führen beispielsweise zu `400 Bad Request`, doppelte E-Mail-Adressen oder Benutzernamen zu `409 Conflict` und fehlerhafte Anmeldedaten zu `401 Unauthorized`.
+Damit waren sowohl lesende als auch schreibende REST-Anfragen umgesetzt. Die API antwortet mit semantisch passenden HTTP-Statuscodes (siehe Kapitel 3).
 
 ### Datenbankzugriff mit Prisma und SQLite
 
@@ -416,11 +415,7 @@ Persistiert wurden zu diesem Zeitpunkt vor allem die Benutzerkonten. Fahrten und
 
 ### Authentifizierung mit bcrypt und JWT
 
-Passwörter werden nicht im Klartext gespeichert. Bei der Registrierung erzeugt `bcrypt.hash()` mit einem Kostenfaktor von 10 einen Passwort-Hash. Beim Login wird das eingegebene Passwort mit `bcrypt.compare()` gegen diesen Hash geprüft. Die API gibt in ihren Benutzerobjekten nur öffentliche Profildaten zurück; der Passwort-Hash wird nicht an das Frontend übertragen.
-
-Nach einer erfolgreichen Registrierung oder Anmeldung erzeugt das Backend mit `jsonwebtoken` ein JWT mit einer Gültigkeit von zwei Stunden. Das Token enthält die Benutzer-ID und die E-Mail-Adresse. Im Frontend verwaltet der `UserContext` das Token und den aktuell angemeldeten Benutzer. Das Token wird im `localStorage` abgelegt, damit die Anmeldung nach einem Neuladen wiederhergestellt werden kann.
-
-Für geschützte Anfragen wird das JWT im Header als `Authorization: Bearer <Token>` übertragen. Die Middleware `authenticateToken` kontrolliert, ob der Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Erst danach wird der geschützte Endpunkt `/api/auth/me` ausgeführt. Beim Start der Anwendung ruft der `UserContext` diesen Endpunkt auf. Ist das gespeicherte Token ungültig oder abgelaufen, werden Token und Benutzerzustand entfernt.
+Passwörter werden nicht im Klartext gespeichert. Bei der Registrierung erzeugt `bcrypt.hash()` mit einem Kostenfaktor von 10 einen Passwort-Hash; beim Login wird das eingegebene Passwort mit `bcrypt.compare()` geprüft. Nach erfolgreicher Registrierung oder Anmeldung erzeugt das Backend mit `jsonwebtoken` ein JWT, das der `UserContext` im `localStorage` ablegt und bei geschützten Anfragen mitsendet. Beim Start der Anwendung ruft der `UserContext` den geschützten Endpunkt `GET /api/auth/me` auf und stellt so die Anmeldung wieder her; ist das gespeicherte Token ungültig oder abgelaufen, werden Token und Benutzerzustand entfernt. Die Funktionsweise der Authentifizierung ist in Abschnitt 3.5 beschrieben.
 
 ### Geteilter Zustand sowie Lade- und Fehlerbehandlung
 
@@ -430,9 +425,7 @@ Registrierung und Anmeldung liefern ein typisiertes `AuthResult` zurück. Dadurc
 
 ### Automatisierte API-Tests
 
-Die zentralen Backend-Funktionen wurden mit Vitest und Supertest getestet. Supertest kann Requests direkt gegen die exportierte Express-Anwendung ausführen, ohne dass dafür manuell ein Serverprozess gestartet werden muss. Im M3-Stand bestanden vier API-Tests.
-
-Ein Test prüft den Health-Endpunkt. Ein weiterer stellt sicher, dass `/api/auth/me` ohne JWT mit Status 401 abgewiesen wird. Der umfangreichste Test registriert einen neuen Benutzer, meldet ihn anschließend an und ruft mit dem erhaltenen Token den geschützten Benutzerendpunkt auf. Dabei wird auch geprüft, dass keine Passwortdaten in der Antwort enthalten sind. Der vierte Test kontrolliert, dass ein falsches Passwort abgelehnt wird. Eindeutige E-Mail-Adressen und Benutzernamen werden mit einem Zeitstempel erzeugt, damit sich wiederholte Testläufe nicht gegenseitig blockieren.
+Die zentralen Backend-Funktionen wurden mit Vitest und Supertest getestet. Supertest kann Requests direkt gegen die exportierte Express-Anwendung ausführen, ohne dass dafür manuell ein Serverprozess gestartet werden muss. Im M3-Stand bestanden vier API-Tests; die einzelnen Testfälle sind in Kapitel 5 beschrieben.
 
 ### Architekturentscheidung
 
@@ -446,11 +439,11 @@ Die in M3 eingeführte Grundarchitektur wurde im finalen Projekt beibehalten. Re
 
 Das Prisma-Schema enthält im finalen Stand zusätzlich die Modelle `Ride`, `ChatContact` und `ChatMessage` sowie Relationen zu den Benutzern. Fahrten werden über eigene GET-, POST-, PUT- und DELETE-Endpunkte verwaltet. Auch Chatkontakte und Nachrichten werden über geschützte API-Endpunkte geladen, erstellt und gelöscht. Entsprechend greifen `ridecontext.tsx` und `chatcontext.tsx` nicht mehr hauptsächlich auf den `localStorage`, sondern über `rideApi.ts` und `chatApi.ts` auf das Backend zu.
 
-Das Benutzerprofil wurde um Stadt, Kilometerpreis und Profilbild erweitert und kann über `PUT /api/auth/me` persistent geändert werden. Zusätzlich prüft die finale Registrierung mithilfe von `academic-email-verifier`, ob eine akademische E-Mail-Adresse verwendet wird. Die Tests wurden auf Registrierungsvalidierung, Profilbilder, Fahrten, Berechtigungsprüfungen, Chats und Datenbankstatus ausgeweitet. M3 bildete damit das technische Fundament; die finale Version übertrug dieselbe REST- und Datenbankarchitektur auf sämtliche wesentlichen Anwendungsdaten.
+Das Benutzerprofil wurde um Stadt, Kilometerpreis und Profilbild erweitert und kann über `PUT /api/auth/me` persistent geändert werden. Zusätzlich prüft die finale Registrierung mithilfe von `academic-email-verifier`, ob eine akademische E-Mail-Adresse verwendet wird. Die Tests wurden entsprechend ausgeweitet (siehe Kapitel 5). M3 bildete damit das technische Fundament; die finale Version übertrug dieselbe REST- und Datenbankarchitektur auf sämtliche wesentlichen Anwendungsdaten.
 
 ---
 
-## Meilenstein 4 – Betrieb, Fertigstellung und Abschluss
+## 4.4 Meilenstein 4 – Betrieb, Fertigstellung und Abschluss
 
 Der vierte Meilenstein hatte das Ziel, den in M3 aufgebauten Full-Stack-Prototypen zu einer reproduzierbar startbaren und durchgängig nutzbaren Anwendung fertigzustellen. Im Mittelpunkt standen deshalb nicht mehr einzelne neue Vorlesungskonzepte, sondern der zuverlässige Betrieb der Gesamtanwendung, die Vervollständigung der persistenten Kernfunktionen und eine konkrete Performance-Maßnahme.
 
@@ -466,36 +459,7 @@ Auch die Registrierung wurde weiter abgesichert. Mithilfe von `academic-email-ve
 
 ### Reproduzierbarer Betrieb mit Docker Compose
 
-Die wichtigste betriebliche Erweiterung von M4 ist die Containerisierung der Anwendung. Im Projekt-Root befindet sich die Datei `docker-compose.yml`, die Frontend und Backend gemeinsam startet. Dadurch ist keine getrennte manuelle Installation und Konfiguration beider Anwendungsteile erforderlich.
-
-Docker Compose definiert zwei Services:
-
-| Service | Aufgabe | Port |
-|---|---|---|
-| `client` | React-Frontend mit Vite | `5173` |
-| `server` | Express-Backend, Prisma und SQLite | `3001` |
-
-SQLite benötigt keinen eigenen Datenbankserver und daher auch keinen separaten Datenbank-Container. Die Datenbankdatei befindet sich im Backend-Container unter `/app/data/dev.db`. Das benannte Docker-Volume `db-data` wird an dieses Verzeichnis gebunden. Dadurch bleiben Benutzer, Fahrten und Chats auch dann erhalten, wenn die Container beendet oder neu erstellt werden. Erst ein bewusstes Entfernen des Volumes würde die persistierten Daten löschen.
-
-Für beide Services existiert ein eigenes Dockerfile. Das Frontend-Dockerfile verwendet ein Node-20-Image, installiert die npm-Abhängigkeiten und startet Vite mit dem Parameter `--host`, damit der Entwicklungsserver außerhalb des Containers über Port 5173 erreichbar ist. Das Backend-Dockerfile installiert zusätzlich die für den SQLite-Adapter benötigten Build-Werkzeuge, erzeugt den Prisma Client und kompiliert den TypeScript-Code.
-
-Beim Start des Backend-Containers wird zunächst
-
-```bash
-npx prisma migrate deploy
-```
-
-ausgeführt. Dadurch werden alle vorhandenen Migrationen automatisch auf die Datenbank im Docker-Volume angewendet. Anschließend startet der kompilierte Express-Server. Der Startvorgang ruft außerdem die Funktion `seed()` aus `server/src/seed.ts` auf. Diese legt mehrere Testbenutzer und eine Beispielfahrt an, sofern die entsprechenden Datensätze noch nicht existieren. Die Seed-Funktion ist damit wiederholbar, ohne bei jedem Start Duplikate zu erzeugen.
-
-Die gesamte Anwendung kann aus dem Projekt-Root mit folgendem Befehl gebaut und gestartet werden:
-
-```bash
-docker compose up --build
-```
-
-Vor dem ersten Start muss im Projekt-Root eine `.env`-Datei angelegt werden, die den `JWT_SECRET` enthält (Vorlage: `.env.example`). Docker Compose liest diese Datei automatisch ein und reicht den Wert per Variablen-Interpolation an den Backend-Container weiter (`JWT_SECRET: ${JWT_SECRET}`). Der `JWT_SECRET` steht damit nicht im Repository, sondern nur lokal auf dem Rechner der Entwickler. Er wird über `.gitignore` vom Versionsverwaltungssystem ausgeschlossen. Ein zufälliger Wert kann unter anderem mit `openssl rand -base64 32` erzeugt werden.
-
-Danach ist das Frontend unter `http://localhost:5173` und das Backend unter `http://localhost:3001` erreichbar. Um den Build-Kontext klein zu halten, schließen `.dockerignore`-Dateien unter anderem `node_modules`, lokale Umgebungsdateien, Build-Ausgaben und die lokale Entwicklungsdatenbank aus.
+Die wichtigste betriebliche Erweiterung von M4 ist die Containerisierung der Anwendung. Im Projekt-Root befindet sich die Datei `docker-compose.yml`, die Frontend und Backend gemeinsam startet, sodass keine getrennte manuelle Installation und Konfiguration beider Anwendungsteile erforderlich ist. Beim Start des Backend-Containers werden die Prisma-Migrationen angewendet und die wiederholbare Seed-Funktion `seed()` aus `server/src/seed.ts` legt Testbenutzer und eine Beispielfahrt an, sofern diese noch nicht existieren. Die konkreten Startschritte, Konfiguration und Test-Zugangsdaten sind in Kapitel 6 beschrieben.
 
 ### Performance- und HTTP-Aspekt
 
@@ -507,14 +471,12 @@ Ergänzend werden in mehreren Komponenten abgeleitete Daten mit `useMemo` berech
 
 ### Testdaten und Qualitätssicherung
 
-Für die finale Version wurden auch die automatisierten Backend-Tests deutlich erweitert, um uns Zeit beim Debuggen zu sparen, da wir bei den vielen Änderungen an der Datenbank, um den Chat funktionsfähig zu machen, viele seltsame Bugs hatten. Die Testdatei `server/src/app.test.ts` enthält 21 Tests. Neben der Registrierung werden nun insbesondere die CRUD-Operationen für Fahrten, die Berechtigungsprüfung beim Bearbeiten fremder Fahrten, die Chat-Endpunkte samt Ownership-Checks, fehlende Authentifizierung und der Datenbankstatus geprüft.
-
-Ein umfangreicher Integrationstest bildet beispielsweise den Ablauf ab, bei dem ein Mitfahrer auf das Fahrerprofil einer Fahrt klickt, ein Chatkontakt entsteht und anschließend Nachrichten ausgetauscht werden können. Die Tests prüfen damit nicht nur isolierte Endpunkte, sondern auch zentrale Abläufe der fertigen Anwendung. Viele davon waren frühere Problemfälle.
+Für die finale Version wurden die automatisierten Backend-Tests deutlich erweitert. Die finale Testsuite umfasst 21 Testfälle; Umfang, Ablauf und zentrale Testfälle sind in Kapitel 5 ausführlich beschrieben.
 
 ---
 # 5. Testing und Qualitätssicherung
 
-### 5.1 Ziel und Teststrategie
+## 5.1 Ziel und Teststrategie
 
 Für die finale Version von CampusRide wurden die automatisierten Backend-Tests deutlich erweitert. Ein wesentlicher Grund dafür waren wiederholt auftretende Fehler während der Entwicklung der Datenbankanbindung und insbesondere des Chats. Durch die zahlreichen Änderungen an Relationen, Nachrichten und Chatkontakten entstanden mehrere schwer nachvollziehbare Problemfälle. Viele der später ergänzten Tests bilden deshalb konkrete Fehler nach, die während der Entwicklung bereits aufgetreten waren.
 
@@ -522,7 +484,7 @@ Die Tests dienen damit nicht nur dazu, die Funktionsfähigkeit einzelner Endpunk
 
 Die automatisierten Tests befinden sich in `react-app/server/src/app.test.ts`. Die finale Testsuite umfasst 21 Testfälle und geht damit deutlich über die in Meilenstein 3 geforderten drei bis fünf aussagekräftigen Tests hinaus. Geprüft werden insbesondere Registrierung und Authentifizierung, die CRUD-Operationen der Fahrtenverwaltung, Berechtigungsprüfungen, Chatfunktionen samt Ownership-Checks, fehlende oder ungültige Eingaben sowie der Datenbankstatus.
 
-### 5.2 Werkzeuge, Konfiguration und Ausführung
+## 5.2 Werkzeuge, Konfiguration und Ausführung
 
 Als Testframework wird **Vitest** eingesetzt. Vitest stellt unter anderem die Funktionen `describe`, `it`, `expect` und `afterAll` bereit und fügt sich gut in das bestehende TypeScript- und Vite-Umfeld ein. Für die Simulation von HTTP-Anfragen wird zusätzlich **Supertest** verwendet.
 
@@ -558,7 +520,7 @@ Während der Entwicklung kann alternativ `npm run test:watch` verwendet werden. 
 
 Die einzelnen Testfälle orientieren sich am Schema **Arrange – Act – Assert**. Zunächst werden die benötigten Ausgangsdaten vorbereitet, beispielsweise ein Benutzer registriert und ein JWT erzeugt. Anschließend wird die zu prüfende Aktion über einen HTTP-Request ausgeführt. Abschließend kontrollieren Assertions den Statuscode, die Antwortdaten und bei Bedarf den Zustand der Datenbank. Hilfsfunktionen wie `registerAndLogin()` und `rideData()` reduzieren Wiederholungen und sorgen für einheitliche Testdaten.
 
-### 5.3 Umfang und zentrale Testfälle
+## 5.3 Umfang und zentrale Testfälle
 
 Die Testsuite ist mit `describe` in die Bereiche Authentifizierung, Fahrten, Chat, Zusammenspiel von Fahrt und Chat sowie Datenbankstatus gegliedert. Dabei werden nicht nur isolierte Endpunkte, sondern auch vollständige Abläufe der Anwendung geprüft.
 
@@ -574,7 +536,7 @@ Ein besonders anwendungsnaher Integrationstest bildet einen früheren Problemfal
 
 Der abschließende Datenbanktest ruft `/api/db-status` auf und erwartet einen erfolgreichen Verbindungsstatus sowie eine numerische Benutzeranzahl. Nach Abschluss der Tests entfernt `afterAll` die während des Testlaufs erzeugten Kontakte, Nachrichten, Fahrten und Benutzer und trennt die Prisma-Verbindung.
 
-### 5.4 Weitere Maßnahmen zur Qualitätssicherung
+## 5.4 Weitere Maßnahmen zur Qualitätssicherung
 
 Neben den automatisierten Laufzeittests wird die Codequalität durch **TypeScript** abgesichert. Im Backend ist in `server/tsconfig.json` der Modus `"strict": true` aktiviert. Dadurch prüft der Compiler unter anderem implizite `any`-Typen, mögliche `null`- oder `undefined`-Werte und unpassende Funktionsaufrufe. Der Befehl `npm run build` führt im Backend `tsc` aus und erzeugt nur bei erfolgreicher Typprüfung den kompilierten Code.
 
@@ -582,9 +544,9 @@ Auch der Frontend-Build enthält mit `"build": "tsc -b && vite build"` eine vorg
 
 Für die statische Analyse des Frontends wird außerdem **ESLint** eingesetzt. Die Konfiguration in `react-app/eslint.config.js` kombiniert empfohlene Regeln für JavaScript und TypeScript mit den Plugins `react-hooks` und `react-refresh`. Dadurch können beispielsweise fehlerhafte Hook-Verwendungen, nicht verwendeter Code oder riskante Muster erkannt werden. Die Prüfung wird mit `npm run lint` gestartet und läuft im aktuellen Stand fehlerfrei (0 Errors, 0 Warnings).
 
-Ein weiterer Teil der Qualitätssicherung ist die konsequente **Validierung und Fehlerbehandlung**. Das Backend prüft Pflichtfelder bei Registrierung, Login, Fahrten und Chatnachrichten und antwortet mit semantisch passenden HTTP-Statuscodes. Unauthentifizierte Zugriffe werden mit `401`, fehlende Berechtigungen mit `403`, nicht vorhandene Ressourcen mit `404` und Konflikte wie doppelte E-Mail-Adressen mit `409` behandelt. Die Fehlerantworten enthalten strukturierte JSON-Nachrichten, die vom Frontend ausgewertet und sichtbar dargestellt werden.
+Ein weiterer Teil der Qualitätssicherung ist die konsequente **Validierung und Fehlerbehandlung**. Das Backend prüft Pflichtfelder bei Registrierung, Login, Fahrten und Chatnachrichten und antwortet mit den semantisch passenden HTTP-Statuscodes `400`, `401`, `403`, `404` und `409` (siehe Abschnitt 3.5). Die Fehlerantworten enthalten strukturierte JSON-Nachrichten, die vom Frontend ausgewertet und sichtbar dargestellt werden.
 
-Zur Sicherheit und Datenqualität werden Passwörter mit bcrypt gehasht. Geschützte Endpunkte verlangen ein JWT im `Authorization`-Header und überprüfen dieses in der Middleware `authenticateToken`. Besitzprüfungen verhindern, dass Benutzer fremde Fahrten bearbeiten oder löschen. Auch beim Anlegen einer Fahrt wird der Fahrer aus dem verifizierten JWT abgeleitet (nicht aus dem Request-Body), sodass niemand eine Fahrt im Namen eines anderen Users erstellen kann. Ebenso prüfen die Chat-Endpunkte die Ownership: Der Absender einer Nachricht wird aus dem JWT abgeleitet (nicht aus dem Request-Body), und Nachrichten können nur an eigene Kontakte gesendet, eigene Chats geleert und eigene Kontakte gelöscht werden. Das Prisma-Schema ergänzt diese Maßnahmen durch eindeutige Constraints für E-Mail-Adresse und Benutzername sowie durch definierte Relationen und Löschregeln zwischen Benutzern, Fahrten, Chatkontakten und Nachrichten. Umgebungsvariablen und Secrets werden über `.gitignore` vom Repository ausgeschlossen.
+Zur Sicherheit und Datenqualität werden Passwörter mit bcrypt gehasht und geschützte Endpunkte über die Middleware `authenticateToken` mit einem JWT abgesichert. Besitzprüfungen stellen sicher, dass Fahrer und Chat-Absender aus dem verifizierten JWT abgeleitet werden und Benutzer weder fremde Fahrten noch fremde Chats bearbeiten oder löschen können (Details in Kapitel 3 und 4). Das Prisma-Schema ergänzt diese Maßnahmen durch eindeutige Constraints für E-Mail-Adresse und Benutzername sowie durch definierte Relationen und Löschregeln zwischen Benutzern, Fahrten, Chatkontakten und Nachrichten. Umgebungsvariablen und Secrets werden über `.gitignore` vom Repository ausgeschlossen.
 
 Insgesamt kombiniert CampusRide automatisierte API- und Integrationstests mit statischer Typprüfung, Linting, Eingabevalidierung, strukturierter Fehlerbehandlung, Authentifizierungsprüfungen und Datenbank-Constraints. Dadurch wird die Qualität über mehrere Ebenen der Full-Stack-Anwendung hinweg abgesichert.
 
@@ -593,7 +555,7 @@ Insgesamt kombiniert CampusRide automatisierte API- und Integrationstests mit st
 
 # 6. Betrieb
 
-## Starten der Anwendung
+## 6.1 Starten der Anwendung
 
 ### Variante 1: Docker Compose
 
@@ -667,40 +629,39 @@ Diskussion über:
 
 
 
-## Was lief gut
+## 7.1 Was lief gut
 
-- Die Ausarbeitung im Repository als Markdown zu schreiben hat sehr gut funktioniert. 
-- Die Teamarbeit war teilweise sehr gut, in M3 zum Beispiel hatte ich der Autor dieses Textes (Robin) keine Zeit an Web zu arbeiten da ich bei einem anderen Projekt sehr hinterher war das dringlicher war deswegen hab ichs mit Paul abgesprochen das er für mich übernimmt. Im Gegenzug hab ich dann für ihn den Programmierteil von M4 übernommen da sein Praktikum sehr früh anfing und er deswegen wenig Zeit hatte.
-- Wir haben gegen Ende des Projekts sehr viele AI-Agent Reviews machen lassen die uns sehr viele Probleme gezeigt haben die uns sonst nicht aufgefallen wären. z. B.: Man hätte Chats löschen können ohne Autorisierung zu einem Zeitpunkt und auch viele meiner Rechtschreibfehler
+- Die Ausarbeitung im Repository als Markdown zu schreiben, hat sehr gut funktioniert.
+- Die Teamarbeit war teilweise sehr gut. In M3 zum Beispiel hatte ich, der Autor dieses Textes (Robin), keine Zeit an der Web-App zu arbeiten, da ich bei einem anderen Projekt sehr hinterher war, das dringlicher war. Deswegen habe ich es mit Paul abgesprochen, dass er für mich übernimmt. Im Gegenzug habe ich dann für ihn den Programmierteil von M4 übernommen, da sein Praktikum sehr früh anfing und er deswegen wenig Zeit hatte.
+- Wir haben gegen Ende des Projekts sehr viele AI-Agent-Reviews machen lassen, die uns sehr viele Probleme gezeigt haben, die uns sonst nicht aufgefallen wären, z. B. dass man Chats zu einem Zeitpunkt ohne Autorisierung löschen konnte, und auch viele meiner Rechtschreibfehler.
 
 
-## Was würde beim nächsten Mal anders gemacht werden?
+## 7.2 Was würde beim nächsten Mal anders gemacht werden?
 
 ### Funktionen
-Viele der in der bekannte Einschränkungen Sektion im README
-beschriebenen Funktion würden wir beim nächsten Mal implementieren um das ganze Projekt funktionaler zu machen:
+Viele der in der Sektion „Bekannte Einschränkungen" im README
+beschriebenen Funktionen würden wir beim nächsten Mal implementieren, um das ganze Projekt funktionaler zu machen:
 - Echtzeit-Chat
 - OpenStreetMap als Routenauswahl
 - Gruppenchat für die einzelnen Fahrten
-- Wert/Passwort Validierung 
-- Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden. Ansonsten würden zu viele Fahrten in der Datenbank die Webseite sehr sehr langsam machen da sie alle geladen werden müssten.
-- anderes Preis-Modell unser aktuelles mit `pricePerKm` ist irgendwie doof
+- Wert/Passwort Validierung
+- Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden. Ansonsten würden zu viele Fahrten in der Datenbank die Webseite sehr, sehr langsam machen, da sie alle geladen werden müssten.
+- ein anderes Preis-Modell – unser aktuelles mit `pricePerKm` ist irgendwie doof
 - Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können und nicht alles über den Chat abgeklärt werden muss.
 - Eine Übersicht der eigenen Fahrten, in der man sie bearbeiten und löschen kann
 
 ### Generell
-- Unregelmäßigen Commits wie in M4 vermeiden. Die meisten stammten daher das ich mir basierend auf wie bis zu diesem Zeitpunkt unser Projekt lief (siehe Commit-Historie) und das Paul mit seinem Praktikum beschäftigt war, wusste das ich(Robin) wahrscheinlich nur alleine dran arbeiten werde.
-- Unprofessionelle und nichtssagende Commit-Namen z. B. "Docker finaly fucking works" oder "missing_files2" vermeiden
-- Nicht mehr Zeugs so übel aufschieben. Wie an unserer "Commits over time" Tabelle gut abzulesen ist haben wir als Gruppe viel sehr aufgeschoben bis kurz vor die Abgabe
+- Unregelmäßige Commits wie in M4 vermeiden. Die meisten stammten daher, dass ich anhand des bisherigen Projektverlaufs (siehe Commit-Historie) und der Tatsache, dass Paul mit seinem Praktikum beschäftigt war, wusste, dass ich (Robin) wahrscheinlich nur allein daran arbeiten werde.
+- Unprofessionelle und nichtssagende Commit-Namen wie z. B. "Docker finaly fucking works" oder "missing_files2" vermeiden
+- Nicht mehr so viel aufschieben. Wie an unserer Tabelle „Commits over time" gut abzulesen ist, haben wir als Gruppe vieles bis kurz vor die Abgabe aufgeschoben.
 
-### Was wurde gelernt?
-- Eine Kartenanzeige zu machen mit einer API ist viel einfacher als ein Chat-Fenster zu machen anders als ursprünglich gedacht.
-- Kurzzeitige Designentscheidungen beißen einen schnell z. B. 
-in M2 haben wir im chatcontext bei einer Nachricht gespeichert ob sie von diesem oder dem anderen User kam nicht deren UserIDs als wir dann später das exakt so in der Datenbanktabelle hatten gab es das Problem das der Chat aus beiden Perspektiven gleich aussah weil jeder User dachte `me` meint ihn selber. Dies auszubessern hat etwas gedauert, wesentlich länger als wenn man es gleich richtig gemacht hätte
-- AI-Agent Code Reviews sind sehr sehr hilfreich vor allem wenn kombiniert mit Vorlesungsunterlagen und den beiden PDFs über das Projekt. Wir haben uns sogar mit Hilfe des Agents eine Bewertung anhand der Bewertungskriterien geben lassen um zu sehen wo wir am besten unser Projekt verbessern. Während ich das schreibe gibt uns der Agent: 14/18 (Beim ersten warens 11 also ne gute Steigerung bisher)
+## 7.3 Was wurde gelernt?
+- Eine Kartenanzeige mit einer API zu machen ist viel einfacher als ein Chat-Fenster zu machen, anders als ursprünglich gedacht.
+- Kurzzeitige Designentscheidungen beißen einen schnell. Z. B. haben wir in M2 im chatcontext bei einer Nachricht gespeichert, ob sie von diesem oder dem anderen User kam, nicht deren User-IDs. Als wir das später exakt so in der Datenbanktabelle hatten, gab es das Problem, dass der Chat aus beiden Perspektiven gleich aussah, weil jeder User dachte, `me` meint ihn selber. Dies auszubessern hat etwas gedauert, wesentlich länger, als wenn man es gleich richtig gemacht hätte.
+- AI-Agent-Code-Reviews sind sehr, sehr hilfreich, vor allem, wenn sie mit Vorlesungsunterlagen und den beiden PDFs über das Projekt kombiniert werden. Wir haben uns sogar mit Hilfe des Agents eine Bewertung anhand der Bewertungskriterien geben lassen, um zu sehen, wo wir unser Projekt am besten verbessern. Die letzte Bewertung ergab 15/18 Punkte (nach anfänglichen 11/18).
 
-### Fazit
-Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzige Meilenstein in dem wir nichts aufgeschoben hatten, die extra Zeit die wir damals hatten konnten wir damals nutzen um unsere App mit mehr CSS schöner zu machen als sie sein hätte müssen z. B.: ein/aus-fahrbares Login-Fenster, animierte Knöpfe, Darkmode vorbereitet, … . In M4 habe ich wenig aufgeschoben, aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehler zu hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir — ich (Robin) spreche jetzt mal für die anderen — zufrieden mit der App.
+## 7.4 Fazit
+Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzige Meilenstein, in dem wir nichts aufgeschoben hatten; die extra Zeit, die wir damals hatten, konnten wir nutzen, um unsere App mit mehr CSS schöner zu machen, als sie hätte sein müssen, z. B.: ein- und ausfahrbares Login-Fenster, animierte Knöpfe, vorbereiteter Darkmode, … . In M4 habe ich wenig aufgeschoben, habe aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehlern hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir als Gruppe zufrieden mit der App.
 
 ---
 
@@ -742,36 +703,5 @@ Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe
 
 ## A.2 Installationsanleitung (Kurzfassung)
 
-Die ausführliche Anleitung steht in der `README.md`. Der einfachste Weg, CampusRide zu starten, ist Docker Compose. Im Projekt-Root muss dafür eine `.env`-Datei existieren (Vorlage `.env.example`), die ein zufälliges `JWT_SECRET` enthält:
-
-```bash
-cp .env.example .env
-openssl rand -base64 32   # Wert in JWT_SECRET einfügen
-docker compose up --build
-```
-
-Danach läuft das Frontend unter `http://localhost:5173` und das Backend unter `http://localhost:3001`. Alternativ können Frontend (`react-app`) und Backend (`react-app/server`) mit `npm install` und `npm run dev` manuell gestartet werden; im Server-Ordner sind zuvor `npx prisma migrate dev` und `npx prisma generate` auszuführen. Die Tests laufen mit `npm test` im Ordner `react-app/server`.
-
-## A.3 API-Dokumentation
-
-| Methode | Pfad | Zweck | Schutz |
-|---|---|---|---|
-| GET | `/api/health` | Prüft, ob das Backend läuft | öffentlich |
-| GET | `/api/db-status` | Prüft die Verbindung zur SQLite-Datenbank | öffentlich |
-| POST | `/api/auth/register` | Registriert einen neuen User (nur akademische E-Mail) | öffentlich |
-| POST | `/api/auth/login` | Prüft Login-Daten und gibt ein JWT zurück | öffentlich |
-| GET | `/api/auth/me` | Gibt den aktuell eingeloggten User zurück | geschützt |
-| PUT | `/api/auth/me` | Aktualisiert das Profil des eingeloggten Users | geschützt |
-| GET | `/api/rides` | Liste aller Fahrten | öffentlich |
-| POST | `/api/rides` | Neue Fahrt anlegen (Fahrer aus dem JWT abgeleitet) | geschützt |
-| PUT | `/api/rides/:id` | Fahrt aktualisieren (nur Fahrer) | geschützt |
-| DELETE | `/api/rides/:id` | Fahrt löschen (nur Fahrer) | geschützt |
-| GET | `/api/chat/contacts` | Chat-Kontakte des eingeloggten Users (inkl. Nachrichten) | geschützt |
-| POST | `/api/chat/contacts` | Chat-Kontakt anlegen (`userId` im Body) | geschützt |
-| POST | `/api/chat/messages` | Nachricht senden (Absender aus JWT, nur im eigenen Kontakt) | geschützt |
-| DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines eigenen Kontakts leeren | geschützt |
-| DELETE | `/api/chat/contacts/:contactId` | Eigenen Kontakt samt Nachrichten löschen | geschützt |
-
-## A.4 Trivia
-- ahonestopinion.ts ist ein dummer Witz, gelöscht in neueren Versionen, einfach ignorieren.
+Die Start- und Installationsanleitung für Docker Compose und die manuelle Entwicklung findet sich in Kapitel 6, die ausführliche Dokumentation in der `README.md`.
 
