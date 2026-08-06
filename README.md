@@ -5,7 +5,7 @@
 | Name | MatrikelNr | Githubname |
 | --- | --- | --- |
 | Robin Dietsche | 315081 | Robdipi |
-| Marlin Wießenberg | 315344 | marlinw-media |
+| Marlin Wiesenberg | 315344 | marlinw-media |
 | Paul Boos | 315053 | Palimus1 |
 
 **Repository:** https://github.com/Robdipi/Webapplikation_Uni_carPooling_app
