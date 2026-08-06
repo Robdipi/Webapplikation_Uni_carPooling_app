@@ -8,7 +8,7 @@ import Footer from "../../components/Footer";
 import RouteMapFromCoords from "./RouteMapFromCoords";
 import RideCard from "../find_ride/rideCard";
 import "../style.css";
-import "./rout_recomendation.css";
+import "./route_recommendation.css";
 import "./popup.css";
 
 const HomePage: React.FC = () => {

@@ -310,7 +310,7 @@ Eine echte Verarbeitung der Eingaben war in diesem Meilenstein noch nicht vorges
 
 Die grundlegende Gestaltung wurde in `html/style.css` zentralisiert. Farben, Schatten und Farbverläufe wurden als CSS-Variablen im `:root`-Bereich definiert. Auf diese Weise konnten dieselben Markenfarben in unterschiedlichen Ansichten wiederverwendet werden. Der `body` wurde als vertikaler Flex-Container mit einer Mindesthöhe von `100vh` umgesetzt. Der Hauptbereich füllte dadurch den Platz zwischen Header und Footer aus. Auch der Header nutzte Flexbox, um Logo und Navigation horizontal anzuordnen.
 
-Zusätzlich existierten seitenspezifische Stylesheets. `html/home/rout_recomendation.css` definierte das Karten- und Fahrtenlayout, `html/find_ride/searchbar.css` die Suchleiste und `html/create_ride/create_ride.css` das Formular samt Informationsbox. Der Chat wurde in `html/chat/chatstyle.css` mit CSS Grid aufgebaut. Dabei wurden feste Bereiche für Header, Kontaktliste, Nachrichtenbereich und Eingabezeile definiert. Somit kamen sowohl Flexbox als auch Grid in sinnvollen Anwendungsfällen zum Einsatz.
+Zusätzlich existierten seitenspezifische Stylesheets. `html/home/route_recommendation.css` definierte das Karten- und Fahrtenlayout, `html/find_ride/searchbar.css` die Suchleiste und `html/create_ride/create_ride.css` das Formular samt Informationsbox. Der Chat wurde in `html/chat/chatstyle.css` mit CSS Grid aufgebaut. Dabei wurden feste Bereiche für Header, Kontaktliste, Nachrichtenbereich und Eingabezeile definiert. Somit kamen sowohl Flexbox als auch Grid in sinnvollen Anwendungsfällen zum Einsatz.
 
 Für kleinere Bildschirme enthielt `html/style.css` eine Media Query bei maximal 600 Pixel Breite. Der Header wechselte dort von einer horizontalen zu einer vertikalen Anordnung. Weitere Layouts nutzten `flex-wrap` oder flexible Breiten, damit Inhalte bei geringerem Platz umbrechen konnten. Damit erfüllte der Prototyp bereits die grundlegenden Anforderungen an ein responsives Layout.
 
@@ -684,7 +684,7 @@ beschriebenen Funktion würden wir beim nächsten Mal implementieren um das ganz
 - Gruppenchat für die einzelnen Fahrten
 - Wert/Passwort Validierung 
 - Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden. Ansonsten würden zu viele Fahrten in der Datenbank die Webseite sehr sehr langsam machen da sie alle geladen werden müssten.
-- anderes Preis-Modell unser aktuelles mit `pricePerKm` ist irgendwie doff
+- anderes Preis-Modell unser aktuelles mit `pricePerKm` ist irgendwie doof
 - Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können und nicht alles über den Chat abgeklärt werden muss.
 - Eine Übersicht der eigenen Fahrten, in der man sie bearbeiten und löschen kann
 
@@ -700,7 +700,7 @@ in M2 haben wir im chatcontext bei einer Nachricht gespeichert ob sie von diesem
 - AI-Agent Code Reviews sind sehr sehr hilfreich vor allem wenn kombiniert mit Vorlesungsunterlagen und den beiden PDFs über das Projekt. Wir haben uns sogar mit Hilfe des Agents eine Bewertung anhand der Bewertungskriterien geben lassen um zu sehen wo wir am besten unser Projekt verbessern. Während ich das schreibe gibt uns der Agent: 14/18 (Beim ersten warens 11 also ne gute Steigerung bisher)
 
 ### Fazit
-Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzige Meilenstein in dem wir nichts aufgeschoben hatten, die extra Zeit die wir damals hatten konnten wir damals nutzen um unsere App mit mehr CSS schöner zu machen als sie sein hätten müssen z. B.: ein/aus-fahrbares Login-Fenster, animierte Knöpfe, Darkmode vorbereitet, … . In M4 habe ich wenig aufgeschoben, aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehler zu hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir — ich (Robin) spreche jetzt mal für die anderen — zufrieden mit der App.
+Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzige Meilenstein in dem wir nichts aufgeschoben hatten, die extra Zeit die wir damals hatten konnten wir damals nutzen um unsere App mit mehr CSS schöner zu machen als sie sein hätte müssen z. B.: ein/aus-fahrbares Login-Fenster, animierte Knöpfe, Darkmode vorbereitet, … . In M4 habe ich wenig aufgeschoben, aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehler zu hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir — ich (Robin) spreche jetzt mal für die anderen — zufrieden mit der App.
 
 ---
 

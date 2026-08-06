@@ -24,7 +24,7 @@ Ein In-App-Chat erleichtert die Kontaktaufnahme zwischen Fahrern und Mitfahrern.
 - **Eingeschränkte Suchfunktion**: Die Suche filtert nur nach Start, Ziel, Datum und Uhrzeit. Erweiterte Filter (z. B. maximale Entfernung, Preisbereich, Zwischenstopps) sind nicht vorhanden.
 - **express-rate-limit nicht aktiviert**: Die Bibliothek `express-rate-limit` ist installiert, wird aber nicht verwendet. Dadurch fehlt ein Schutz vor DoS-Angriffen auf die API.
 - **Kein integriertes Zahlungssystem**: wir überlassen dem User, wie er sich um die Zahlung kümmert
-- **Schlechtes Preis System**: Preis ist in den Profileinstellungen als Kilometerpreis anstatt bei jeder Fahrt mit dabei.
+- **Schlechtes Preissystem**: Preis ist in den Profileinstellungen als Kilometerpreis anstatt bei jeder Fahrt mit dabei.
 - **Keine Pagination**: Alle existierenden Fahrten werden auf einmal geladen. Bei vielen Fahrten wird die Liste unübersichtlich und die Antwort langsam.
 - **Fehlende Wert-Validierung**: Negative Sitzplätze oder Preise sind möglich, es gibt keine Passwort-Mindestlänge und unbegrenzte Stringlängen.
 - **Keine Buchungs-/Reservierungslogik**: Sitze existieren als Feld, werden aber nie reserviert.

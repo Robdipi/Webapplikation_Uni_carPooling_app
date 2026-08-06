@@ -7,7 +7,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import RideCard from "./rideCard";
 import "../style.css";
-import "../home/rout_recomendation.css";
+import "../home/route_recommendation.css";
 import "./searchbar.css";
 import RouteMapFromCoords from "../home/RouteMapFromCoords";
 
