@@ -67,7 +67,7 @@ Leaflet ist die Kartenbibliothek, mit der die OpenStreetMap-Karten in der Anwend
 
 ## 2.6 express-rate-limit
 
-`express-rate-limit` schützt die Anwendung vor Denial-of-Service-Angriffen, indem es die Anzahl der Anfragen pro IP-Adresse begrenzt. Standardmäßig sind 200 Anfragen pro 15 Minuten erlaubt; das Limit lässt sich über die Umgebungsvariable `RATE_LIMIT_MAX` konfigurieren.
+`express-rate-limit` ist als Bibliothek installiert, wird in der Anwendung aber bewusst nicht verwendet. Würde vor Denial of Service attacks schützen hat mich aber beim testen gestört.
 
 
 ## 2.7 jsonwebtoken und bcryptjs
@@ -83,6 +83,9 @@ Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich 
 
 ## 2.9 Vitest
 Vitest dient als Testframework für die Backend-Tests.
+Gründe für die Auswahl:
+- braucht keinen Server
+- braucht keine extra config benutzt vite.config mit
 
 ## 2.10 Supertest
 Testen von Express-Endpunkten
@@ -701,7 +704,7 @@ Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe
 
 ![Screenshot der Anwendung im Darkmode](screenshots/Darkmode.png)
 
-## A.2 Installationsanleitung (Kurzfassung)
+## A.2 Installationsanleitung
 
 Die Start- und Installationsanleitung für Docker Compose und die manuelle Entwicklung findet sich in Kapitel 6, die ausführliche Dokumentation in der `README.md`.
 
