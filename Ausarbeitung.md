@@ -133,6 +133,8 @@ Gründe für die Auswahl:
 |---|---|---|
 | `/` | `StartPage` (Login/Registrierung) | nein |
 | `/impressum` | `ImpressumPage` | nein |
+| `/contact` | `ContactPage` | nein |
+| `/copyright` | `CopyrightPage` | nein |
 | `/home` | `HomePage` (Übersicht + Karte) | ja |
 | `/chat` | `ChatPage` | ja |
 | `/create-ride` | `CreateRidePage` | ja |
@@ -148,6 +150,9 @@ Gründe für die Auswahl:
 AppProviders
 └── AppRoutes   
     ├── StartPage                               (Login-/Register-Overlays, Formulare)
+    ├── ImpressumPage
+    ├── ContactPage
+    ├── CopyrightPage
     ├── HomePage
     │   ├── Header/ Footer                      (Navigation, Logout, Nutzername)
     │   ├── RouteMapFromCoords                  (Leaflet-Karte + OSRM-Route)

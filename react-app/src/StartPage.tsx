@@ -249,8 +249,8 @@ const StartPage: React.FC = () => {
                 <Link to="/impressum" className="extra-info-btn">
                     Impressum
                 </Link>{" "}
-                | <a href="#" className="extra-info-btn">Copyright</a> |{" "}
-                <a href="#" className="extra-info-btn">Kontakt</a>
+                | <Link to="/copyright" className="extra-info-btn">Copyright</Link> |{" "}
+                <Link to="/contact" className="extra-info-btn">Kontakt</Link>
             </footer>
         </div>
     );

@@ -192,8 +192,8 @@ Die App läuft unter `http://localhost:5173`.
 
 | Kriterium | Datei | Zeile / Hinweis |
 |---|---|---|
-| React Router mit mehreren Routen | `react-app/src/main.tsx`; `react-app/src/routes/AppRoutes.tsx` | `BrowserRouter` in Z. 3 und Z. 15-17; Routen `/`, `/home`, `/chat`, `/create-ride`, `/find-ride`, `/profile`, `/impressum` und 404 in Z. 14-66 |
-| Navigation über React Router | `react-app/src/StartPage.tsx`; `react-app/src/routes/AppRoutes.tsx` | `useNavigate` nach Login/Register in Z. 6, Z. 26, Z. 49; Redirects mit `Navigate` in Z. 26, Z. 45, Z. 55 |
+| React Router mit mehreren Routen | `react-app/src/main.tsx`; `react-app/src/routes/AppRoutes.tsx` | `BrowserRouter` in Z. 3 und Z. 15-17; Routen `/`, `/home`, `/chat`, `/create-ride`, `/find-ride`, `/profile`, `/impressum`, `/contact`, `/copyright` und 404 in Z. 14-70 |
+| Navigation über React Router | `react-app/src/StartPage.tsx`; `react-app/src/routes/AppRoutes.tsx` | `useNavigate` nach Login/Register in Z. 6, Z. 26, Z. 49; Redirects mit `Navigate` in Z. 30, Z. 49, Z. 59 |
 | Eigener API-Zugriff aus dem Frontend | `react-app/src/api/authApi.ts` | Fetch gegen `http://localhost:3001/api` in Z. 35 |
 | REST: GET und POST | `react-app/src/api/authApi.ts`; `react-app/server/src/app.ts` | POST `/auth/register`, POST `/auth/login`, GET `/auth/me` |
 | Fehlerzustände sichtbar | `react-app/src/api/authApi.ts`; `react-app/src/StartPage.tsx` | API-Fehler werden gelesen und geworfen in Z. 37-44, Z. 55-87; Fehleranzeige in Z. 104-108, Z. 218-222 |
@@ -228,7 +228,7 @@ Beim Login sendet das Frontend Benutzername/E-Mail und Passwort an `POST /api/au
 | Containerisierung mit Docker | `react-app/Dockerfile`; `react-app/server/Dockerfile` | Frontend-Container (Node 20, Vite `--host`) Z. 1-12; Backend-Container (Build-Tools, `prisma generate`, Build) Z. 1-21 |
 | Reproduzierbarer Start mit Docker Compose | `docker-compose.yml` | Services `server` Z. 2-14 und `client` Z. 16-25; benanntes Volume `db-data` Z. 27-28 |
 | Migrationen und Seed beim Start | `react-app/server/Dockerfile`; `react-app/server/src/index.ts`; `react-app/server/src/seed.ts` | `npx prisma migrate deploy` in Dockerfile Z. 21; `seed()` in `index.ts` Z. 7; idempotente Seed-Logik in `seed.ts` Z. 45-98 |
-| Secrets nicht im Repository | `.env.example`; `docker-compose.yml`; `.gitignore` | `JWT_SECRET: ${JWT_SECRET}` in `docker-compose.yml` Z. 10; `.env` in `.gitignore` Z. 15 |
+| Secrets nicht im Repository | `.env.example`; `docker-compose.yml`; `.gitignore` | `JWT_SECRET: ${JWT_SECRET}` in `docker-compose.yml` Z. 10; `.env` in `.gitignore` Z. 7 |
 | Performance: HTTP-Anfragen begrenzen (Debounce) | `react-app/src/pages/create_ride/useDebounce.ts`; `react-app/src/pages/create_ride/RouteMap.tsx` | Hook in `useDebounce.ts` Z. 3-12; Verwendung mit 800 ms in `RouteMap.tsx` Z. 24-25 |
 | Performance: `useMemo` | `react-app/src/pages/find_ride/find_ride.tsx`; `react-app/src/contexts/chatcontext.tsx` | Gefilterte Fahrtenliste in `find_ride.tsx` Z. 133; ausgewählter Kontakt und Nachrichten in `chatcontext.tsx` Z. 144-151 |
 | Erweiterte automatisierte Tests | `react-app/server/src/app.test.ts` | 21 Tests für Auth, Rides, Chat, Berechtigungen, Integration (Avatar-Klick → Chat) und Datenbankstatus |

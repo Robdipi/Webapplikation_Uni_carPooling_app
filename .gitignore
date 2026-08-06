@@ -3,6 +3,9 @@ test.html
 .idea/
 *.tsbuildinfo
 
+# Umgebungsvariablen
+.env
+
 node_modules/
 react-app/node_modules/
 react-app/.vite/
