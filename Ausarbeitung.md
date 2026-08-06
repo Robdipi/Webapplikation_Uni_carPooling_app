@@ -19,11 +19,7 @@ Bei der Suche und beim Anbieten von Fahrten wird OpenStreetMap integriert, um di
 
 Um zu garantieren, dass nur Studenten die Webapp benutzen, wird bei der Registrierung der E-Mail-Provider mit einer öffentlich verfügbaren Datenbank verglichen.
 
-Die Idee zu CampusRide entstand aus einer alltäglichen Erfahrung: Viele Studierende pendeln täglich zwischen Wohnort und Campus, fahren dabei aber oft alleine und mit freien Sitzplätzen. Gleichzeitig ist die Anbindung vieler Wohnorte an die Hochschulen und die Universität eingeschränkt. CampusRide bringt diese Personen zusammen: Fahrer stellen freie Plätze ein, Mitfahrer finden passende Fahrten und klären die Details direkt im integrierten Chat. Die Konzentration auf Studierende unterscheidet CampusRide bewusst von allgemeinen Mitfahrplattformen – durch die akademische E-Mail-Verifizierung entsteht eine geschlossene, vertrauenswürdige Nutzergruppe.
 
-Das Projekt wird von drei Studierenden im Rahmen des Moduls „Webapplikationen" entwickelt. Ziel ist eine vollständige Full-Stack-Anwendung, die alle im Kurs behandelten Konzepte – von semantischem HTML über React und Context bis hin zu einem eigenen Express-Backend mit SQLite – in einem zusammenhängenden Produkt vereint. Die Anwendung soll nicht nur technisch sauber umgesetzt sein, sondern auch realistisch betreibbar: reproduzierbarer Start per Docker Compose, automatisierte Tests und eine dokumentierte API gehören deshalb von Anfang an dazu.
-
-Die vorliegende Ausarbeitung dokumentiert den Entwicklungsprozess. Kapitel 2 begründet den Technologie-Stack, Kapitel 3 beschreibt die Architektur und die API, Kapitel 4 schildert die Umsetzung entlang der vier Meilensteine. Kapitel 5 erläutert das Vorgehen bei Tests und Qualitätssicherung, Kapitel 6 den Betrieb der Anwendung. Kapitel 7 schließt mit einer ehrlichen Reflexion ab – was gut gelaufen ist, was wir im Nachhinein anders machen würden und was wir aus dem Projekt gelernt haben. Der Anhang enthält Screenshots der fertigen Anwendung sowie eine Übersicht der API-Endpunkte.
 
 ---
 
@@ -83,7 +79,7 @@ Gründe für die Auswahl:
 - Locale Liste oder Datenbank wäre ungenau und müsste manuell auf Änderungen angepasst werden
 - öffentlich und kostenlos
 
-Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z.B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
+Bei der Registrierung wird die E-Mail-Adresse des Nutzers mit einer öffentlich verfügbaren Datenbank akademischer Domains abgeglichen. Nur Nutzer mit einer gültigen Universitäts-E-Mail-Adresse (z. B. `@uni-konstanz.de`, `@htwg-konstanz.de`) können sich registrieren. Dies stellt sicher, dass CampusRide ausschließlich von Studenten genutzt wird.
 
 ### Vitest 
 Vitest dient als Testframework für die Backend-Tests.
@@ -123,7 +119,7 @@ Gründe für die Auswahl:
 ---
 ### 3.2 Contexts
 
-- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den darkmode anzustellen. im `localStorage`
+- **GlobalContext** – `darkMode` toggelt CSS-Klasse `dark` am `<body>` um den Darkmode anzustellen. im `localStorage`
 - **UserContext** – Session-Zustand: `currentUser`, `authToken`, `isLoggedIn`, `isAuthLoading`, `profile`. im `localStorage` (`campusRideAuthToken`) und stellt beim App-Start den User über `GET /api/auth/me` wieder her. Bietet `registerUser`, `loginUser`, `logoutUser`, `setProfile`.
 - **RideContext** – lädt alle Fahrten einmal beim Mounten und hält sie im Speicher; bietet `addRide`, `removeRide`, `updateRide`, `clearRides`.
 - **ChatContext** – Kontakte und Nachrichten; lädt beim Login alle Kontakte inkl. Nachrichten
@@ -183,7 +179,8 @@ AppProviders
 ---
 ## 3.5 API-Architektur
 
-Die API von CampusRide ist eine REST-Schnittstelle, über die ausschließlich JSON-Daten ausgetauscht werden. Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank: Das Frontend greift niemals direkt auf die Datenbank zu, sondern sendet HTTP-Anfragen an das Express-Backend. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten unter dem Pfadprefix `/api`.
+Die API von CampusRide ist eine REST-Schnittstelle, über die ausschließlich JSON-Daten ausgetauscht werden.
+Sie ist die einzige Verbindung zwischen dem React-Frontend und der SQLite-Datenbank. Dort werden die Anfragen validiert, Berechtigungen geprüft und die Datenbankoperationen über Prisma ausgeführt. Das Backend liefert dabei keine HTML-Seiten, sondern ausschließlich JSON-Antworten.
 
 ### Aufbau des Backends
 
@@ -192,11 +189,11 @@ Das Backend liegt unter `react-app/server`. Die zentrale Datei `server/src/app.t
 - `cors` erlaubt dem auf Port 5173 laufenden Frontend die Kommunikation mit dem Backend auf Port 3001.
 - `express.json()` parst eingehende JSON-Bodies und stellt sie über `req.body` bereit.
 
-Die Route-Handler sind bewusst in einer einzigen Datei gehalten. Für den Umfang des Projekts ist dieser monolithische Aufbau übersichtlich und ausreichend; bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
+Die Route-Handler sind bewusst in einer einzigen Datei gehalten wegen des kleinen Größe des Projekts. Bei weiterem Wachstum wären separate Router-Module sinnvoll. Gestartet wird der Server in `server/src/index.ts`, das vor dem Start die Seed-Funktion ausführt die die Datenbank mit 4 Beispiel Accounts und 1 Fahrt füllt und anschließend auf dem in `PORT` konfigurierten Port lauscht.
 
 ### Authentifizierung
 
-Die API unterscheidet öffentliche und geschützte Endpunkte. Öffentliche Endpunkte benötigen keine Anmeldung, geschützte Endpunkte verlangen ein gültiges JWT.
+Die API unterscheidet öffentliche und geschützte Endpunkte. Öffentliche Endpunkte benötigen keine Anmeldung, geschützte Endpunkte brauchen ein gültiges JWT.
 
 Das JWT wird bei der Registrierung oder Anmeldung im Backend erzeugt, enthält die Benutzer-ID und die E-Mail-Adresse und ist zwei Stunden gültig. Das Frontend sendet es bei jeder geschützten Anfrage im HTTP-Header mit:
 
@@ -204,7 +201,7 @@ Das JWT wird bei der Registrierung oder Anmeldung im Backend erzeugt, enthält d
 Authorization: Bearer <token>
 ```
 
-Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Ist dies nicht der Fall, antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
+Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten Endpunkts, ob der `Authorization`-Header vorhanden und korrekt formatiert ist und ob das Token gültig ist. Falls nicht antwortet das Backend mit `401 Unauthorized`. Bei einem gültigen Token wird die darin enthaltene Benutzer-ID an den Request-Handler übergeben, sodass datenbankseitig zwischen den Benutzern unterschieden werden kann. Auf dieser Grundlage lassen sich Besitzprüfungen umsetzen: Beispielsweise darf nur der Fahrer einer Fahrt diese über `PUT` ändern oder über `DELETE` löschen; für fremde Fahrten antwortet das Backend mit `403 Forbidden`.
 
 ### Endpunkte im Überblick
 
@@ -228,7 +225,7 @@ Die Middleware `authenticateToken` prüft vor der Ausführung eines geschützten
 
 ### Fehlerbehandlung
 
-Jeder Endpunkt validiert seine Eingaben und antwortet mit semantisch passenden HTTP-Statuscodes. Fehlende oder leere Pflichtfelder führen zu `400 Bad Request`, doppelte E-Mail-Adressen oder Benutzernamen zu `409 Conflict`, falsche Anmeldedaten zu `401 Unauthorized` und nicht vorhandene Ressourcen zu `404 Not Found`. Fehlerantworten folgen dabei einheitlich dem Schema `{ "error": "..." }`, das das Frontend über `readErrorMessage` auswertet und dem Nutzer sichtbar anzeigt.
+Jeder Endpunkt validiert seine Eingaben und antwortet mit semantisch passenden HTTP-Statuscodes. Fehlende oder leere Pflichtfelder führen zu `400 Bad Request`, doppelte E-Mail-Adressen oder Benutzernamen zu `409 Conflict`, falsche Anmeldedaten zu `401 Unauthorized` und nicht vorhandene Ressourcen zu `404 Not Found`. Fehler folgen dabei dem Schema `{ "error": "..." }`, das das Frontend über `readErrorMessage` auswertet und dem Nutzer anzeigt.
 
 Die öffentlichen Repräsentationen `publicUser` und `publicRide` mappen die internen Datenbankobjekte auf eigene Antwortformate. Dadurch werden sensible Felder wie der `passwordHash` niemals an das Frontend übertragen und komplexe Strukturen wie die Fahrtenkoordinaten übersichtlich als `departureCoords` bzw. `destinationCoords` mit `lat` und `lng` geliefert.
 
@@ -243,7 +240,7 @@ Das Frontend kapselt sämtliche `fetch`-Aufrufe in der API-Schicht `src/api/`. K
 | `rideApi.ts` | Fahrten laden, erstellen, aktualisieren und löschen |
 | `chatApi.ts` | Chatkontakte und Nachrichten verwalten |
 
-Jede Funktion baut die URL aus `API_BASE_URL` und dem Pfad zusammen, setzt die Header `Content-Type: application/json` und bei geschützten Aufrufen `Authorization: Bearer <token>`, prüft `response.ok` und wirft bei Fehlern eine `Error` mit der Servermeldung. Der Datenfluss bei einer geschützten Anfrage folgt damit immer demselben Muster:
+Jede Funktion baut die URL aus `API_BASE_URL` und dem Pfad zusammen, setzt die Header `Content-Type: application/json` und bei geschützten Aufrufen `Authorization: Bearer <token>`, prüft `response.ok` und wirft bei Fehlern eine `Error` mit der Servermeldung. Der Datenfluss bei einer geschützten Anfrage folgt damit:
 
 ```
 Komponente → Context → api/ → fetch → Express → Prisma → SQLite → Antwort zurück
@@ -251,7 +248,7 @@ Komponente → Context → api/ → fetch → Express → Prisma → SQLite → 
 
 ### Sequenzdiagramm für einen geschützten Request
 
-Das folgende Sequenzdiagramm zeigt den Ablauf einer geschützten Anfrage am Beispiel des Erstellens einer Fahrt über `POST /api/rides`:
+Das folgende Sequenzdiagramm zeigt den Ablauf einer geschützten Anfrage am Beispiel des erfolgreichen Erstellens einer Fahrt über `POST /api/rides`:
 
 ```mermaid
 sequenceDiagram
@@ -276,7 +273,8 @@ sequenceDiagram
 
 ### Externe APIs
 
-Ergänzend greift das Frontend direkt vom Browser aus auf externe Dienste zu: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über das eigene Backend.
+
+Ergänzend werden noch fremde APIs benutzt: Nominatim geokodiert Ortsnamen zu Koordinaten, OSRM berechnet daraus die Fahrtrouten und die OpenStreetMap-Tiles liefern die Kartenbilder für Leaflet. Diese Anfragen laufen nicht über unser Backend.
 
 
 # 4. Umsetzung
@@ -662,35 +660,42 @@ npm test
 
 Diskussion über:
 
-- Was lief gut?
-- Paul hat gut für mich m3 ich hab dann auch m4 für ihn übernommen
-- Was würde beim nächsten Mal anders gemacht werden?
-  - Echtzeit-Chat:
-  - keine regelmäßigen comits in M4 weil ich quasy wusste das ich(robin) nur alleine dran arbeiten werde
-  - 
-  - OpenStreetMap wird aktuell nicht zur Auswahl von Start- und Endpunkt verwendet, wäre eine mögliche Verbesserung
-  - Chat könnte Gruppenchat für die Fahrt sein, wäre aber komplexer
-  - bessere Suche
-  - Fehlende Wert-Validierung: negative Sitzplätze oder Preise verhindern, Passwort-Mindestlänge einführen, Stringlängen begrenzen
-  - Commit-Historie professionalisieren: sprechende Messages statt „Docker finaly fucking works" oder „bug fixes round 2", AI-Agenten-Commits kennzeichnen
-  - Gesplittete Git-Identität (`robin` vs. `Robin`) über eine `.mailmap`-Datei bereinigen
-  - Flache Stack-Begründungen wie „In der Vorlesung behandelt" oder „mir ist nichts anderes eingefallen außer OSM und Google Maps" durch echte Abwägungen ersetzen
-  - Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden
-  - Preis-Modell: Preis pro Fahrt statt `pricePerKm` im Profil
-  - Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können
-- man kann Fahrten nicht mehr löschen
-nicht mehr Zeugs so übel aufschieben
-- keine fahrten übersicht
-- schlechte Team arbeit
-- ahonestopinion.ts is a stupid joke if you stumble over it
-- 
 
-- Was wurde gelernt?
-- Ai reviews are extremly helpful did a boatload of them
 
-Geplanter Umfang:
+## Was lief gut
 
-**2 Seiten**
+- Die Ausarbeitung im Repository als Markdown zu schreiben hat sehr gut funktioniert. 
+- Die Teamarbeit war teilweise sehr gut, in M3 zum Beispiel hatte ich der Autor dieses Textes (Robin) keine Zeit an Web zu arbeiten da ich bei einem anderen Projekt sehr hinterher war das dringlicher war deswegen hab ichs mit Paul abgesprochen das er für mich übernimmt. Im Gegenzug hab ich dann für ihn den Programmierteil von M4 übernommen da sein Praktikum sehr früh anfing und er deswegen wenig Zeit hatte.
+- Wir haben gegen Ende des Projekts sehr viele AI-Agent Reviews machen lassen die uns sehr viele Probleme gezeigt haben die uns sonst nicht aufgefallen wären. z. B.: Man hätte Chats löschen können ohne Autorisierung zu einem Zeitpunkt und auch viele meiner Rechtschreibfehler
+
+
+## Was würde beim nächsten Mal anders gemacht werden?
+
+### Funktionen
+Viele der in der bekannte Einschränkungen Sektion im README
+beschriebenen Funktion würden wir beim nächsten Mal implementieren um das ganze Projekt funktionaler zu machen:
+- Echtzeit-Chat
+- OpenStreetMap als Routenauswahl
+- Gruppenchat für die einzelnen Fahrten
+- Wert/Passwort Validierung 
+- Pagination für die Fahrtenliste, damit nicht alle Fahrten auf einmal geladen werden. Ansonsten würden zu viele Fahrten in der Datenbank die Webseite sehr sehr langsam machen da sie alle geladen werden müssten.
+- anderes Preis-Modell unser aktuelles mit `pricePerKm` ist irgendwie doff
+- Buchungs-/Reservierungslogik, damit Sitzplätze tatsächlich reserviert werden können und nicht alles über den Chat abgeklärt werden muss.
+- Eine Übersicht der eigenen Fahrten, in der man sie bearbeiten und löschen kann
+
+### Generell
+- Unregelmäßigen Commits wie in M4 vermeiden. Die meisten stammten daher das ich mir basierend auf wie bis zu diesem Zeitpunkt unser Projekt lief (siehe Commit-Historie) und das Paul mit seinem Praktikum beschäftigt war, wusste das ich(Robin) wahrscheinlich nur alleine dran arbeiten werde.
+- Unprofessionelle und nichtssagende Commit-Namen z. B. "Docker finaly fucking works" oder "missing_files2" vermeiden
+- Nicht mehr Zeugs so übel aufschieben. Wie an unserer "Commits over time" Tabelle gut abzulesen ist haben wir als Gruppe viel sehr aufgeschoben bis kurz vor die Abgabe
+
+### Was wurde gelernt?
+- Eine Kartenanzeige zu machen mit einer API ist viel einfacher als ein Chat-Fenster zu machen anders als ursprünglich gedacht.
+- Kurzzeitige Designentscheidungen beißen einen schnell z. B. 
+in M2 haben wir im chatcontext bei einer Nachricht gespeichert ob sie von diesem oder dem anderen User kam nicht deren UserIDs als wir dann später das exakt so in der Datenbanktabelle hatten gab es das Problem das der Chat aus beiden Perspektiven gleich aussah weil jeder User dachte `me` meint ihn selber. Dies auszubessern hat etwas gedauert, wesentlich länger als wenn man es gleich richtig gemacht hätte
+- AI-Agent Code Reviews sind sehr sehr hilfreich vor allem wenn kombiniert mit Vorlesungsunterlagen und den beiden PDFs über das Projekt. Wir haben uns sogar mit Hilfe des Agents eine Bewertung anhand der Bewertungskriterien geben lassen um zu sehen wo wir am besten unser Projekt verbessern. Während ich das schreibe gibt uns der Agent: 14/18 (Beim ersten warens 11 also ne gute Steigerung bisher)
+
+### Fazit
+Hauptgrund für die fehlenden Extra-Features sehe ich darin, dass wir als Gruppe sehr viel aufgeschoben haben. M1 war der einzige Meilenstein in dem wir nichts aufgeschoben hatten, die extra Zeit die wir damals hatten konnten wir damals nutzen um unsere App mit mehr CSS schöner zu machen als sie sein hätten müssen z. B.: ein/aus-fahrbares Login-Fenster, animierte Knöpfe, Darkmode vorbereitet, … . In M4 habe ich wenig aufgeschoben, aber nach dem Video keine neuen Features mehr angefasst, um während der Ausarbeitung nicht an Fehler zu hängenzubleiben. Letztendlich würde ich sagen: Trotz der vielen fehlenden Extra-Features, die die App wesentlich besser gemacht hätten, sind wir — ich (Robin) spreche jetzt mal für die anderen — zufrieden mit der App.
 
 ---
 
@@ -761,4 +766,7 @@ Danach läuft das Frontend unter `http://localhost:5173` und das Backend unter `
 | POST | `/api/chat/messages` | Nachricht senden (Absender aus JWT, nur im eigenen Kontakt) | geschützt |
 | DELETE | `/api/chat/messages/:contactId` | Chat-Verlauf eines eigenen Kontakts leeren | geschützt |
 | DELETE | `/api/chat/contacts/:contactId` | Eigenen Kontakt samt Nachrichten löschen | geschützt |
+
+## A.4 Trivia
+- ahonestopinion.ts ist ein dummer Witz, gelöscht in neueren Versionen, einfach ignorieren.
 
