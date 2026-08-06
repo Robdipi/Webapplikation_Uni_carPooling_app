@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import StartPage from "../StartPage";
 import ChatPage from "../pages/chat/chat";
+import ContactPage from "../pages/contact/contact";
+import CopyrightPage from "../pages/copyright/copyright";
 import CreateRidePage from "../pages/create_ride/create_ride";
 import FindRidePage from "../pages/find_ride/find_ride";
 import HomePage from "../pages/home/home";
@@ -14,6 +16,8 @@ export default function AppRoutes() {
         <Routes>
             <Route path="/" element={<StartPage />} />
             <Route path="/impressum" element={<ImpressumPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/copyright" element={<CopyrightPage />} />
 
             <Route
                 path="/home"
